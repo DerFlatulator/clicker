@@ -37,7 +37,8 @@
         "bower_components/materialize/dist/font/material-design-icons/**"
       ],
       "react" : [
-        "bower_components/react/react.min.js"
+        "bower_components/react/react.min.js",
+        "bower_components/react/react.js"
       ]
     }
   }

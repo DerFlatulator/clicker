@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#
-# TODO: Check if already installed before going ahead
-#
-
 python_module_installed() {
     python -c "__import__('$1')"
 }

@@ -4,9 +4,11 @@ var babel = require("gulp-babel");
 var concat = require("gulp-concat");
 var plumber = require("gulp-plumber");
 var uglify = require("gulp-uglify");
+var livereload = require("gulp-livereload");
 
 var globs = {
-    client_jsx: "client/templates/*.jsx"
+    client_jsx: "client/templates/*.jsx",
+    client_html: "client/templates/*.html"
 };
 var output = {
     js: "static/js/"
@@ -30,9 +32,13 @@ gulp.task("default", function () {
             sourceMappingURLPrefix: "/static/js/"
         }))
         // Output to `dist/js`
-        .pipe(gulp.dest(output.js));
+        .pipe(gulp.dest(output.js))
+        // Connect livereload
+        .pipe(livereload({ start: true }));
 });
 
 gulp.task("watch", function () {
+    livereload.listen();
     gulp.watch(globs.client_jsx, ['default']);
+    gulp.watch(globs.client_html, []);
 });

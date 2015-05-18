@@ -1,16 +1,30 @@
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer, BubbleSortSerializer
+from rest_framework import viewsets, serializers
+from .serializers import UserSerializer, GroupSerializer
 
-from .models import BubbleSort as MBubbleSort
-
-# def index(request):
-#     return HttpResponse("Hello, world. You're at the clicker index.")
+from .models import BubbleSort, BubbleSortSwap
 
 
-class BubbleSortViewSet(viewsets.ModelViewSet):
-    queryset = MBubbleSort.objects.all()
-    serializer_class = BubbleSortSerializer
+def generic_serializer_view_set_factory(_model, _serializer=serializers.HyperlinkedModelSerializer):
+    class GenericSerializerViewSet(viewsets.ModelViewSet):
+        queryset = _model.objects.all()
+
+        def get_serializer_class(self):
+            class GenericSerializer(_serializer):
+                class Meta:
+                    model = _model
+
+            self.serializer_class = GenericSerializer
+            return self.serializer_class
+    try:
+        GenericSerializerViewSet.__name__ = _model.__name__ + ":"
+    finally:
+        return GenericSerializerViewSet
+
+
+# noinspection PyTypeChecker
+BubbleSortViewSet = generic_serializer_view_set_factory(BubbleSort)
+BubbleSortSwapViewSet = generic_serializer_view_set_factory(BubbleSortSwap)
 
 
 class UserViewSet(viewsets.ModelViewSet):
