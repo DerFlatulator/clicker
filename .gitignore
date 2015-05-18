@@ -1,0 +1,7 @@
+node_modules/
+static/js/
+static/css/
+bower_components/
+**/*.pyc
+.idea
+*.sqlite3

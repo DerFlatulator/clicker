@@ -1,0 +1,44 @@
+{
+  "name": "clicker",
+  "version": "0.0.0",
+  "authors": [
+    "Lucas Azzola <laazz1@student.monash.edu>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "react": "~0.13.3",
+    "materialize": "~0.96.1"
+  },
+  "install" : {
+    "path" : {
+      "css": "static/css/lib",
+      "js": "static/js/lib",
+      "map": "static/js/lib",
+      "/roboto/": "static/css/lib/{name}/../font/roboto",
+      "/material-design-icons/": "static/css/lib/{name}/../font/material-design-icons"
+    },
+    "sources" : {
+      "jquery" : [
+        "bower_components/jquery/dist/jquery.min.js",
+        "bower_components/jquery/dist/jquery.min.map"
+      ],
+      "materialize" : [
+        "bower_components/materialize/dist/js/materialize.min.js",
+        "bower_components/materialize/dist/css/materialize.min.css",
+        "bower_components/materialize/dist/font/roboto/**",
+        "bower_components/materialize/dist/font/material-design-icons/**"
+      ],
+      "react" : [
+        "bower_components/react/react.min.js"
+      ]
+    }
+  }
+}
