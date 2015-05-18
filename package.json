@@ -2,6 +2,10 @@
   "name": "clicker",
   "version": "0.0.0",
   "description": "clicker",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DerFlatulator/clicker.git"
+  },
   "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

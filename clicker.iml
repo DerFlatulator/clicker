@@ -20,6 +20,7 @@
     <orderEntry type="library" name="jQuery-2.0.0" level="application" />
     <orderEntry type="library" name="gulp-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="react-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="clicker node_modules" level="project" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
