@@ -1,6 +1,6 @@
 node_modules/
-static/js/
-static/css/
+static/*
+dist/*
 bower_components/
 **/*.pyc
 .idea

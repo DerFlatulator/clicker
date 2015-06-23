@@ -16,7 +16,8 @@
     "jquery": "~2.1.4",
     "react": "~0.13.3",
     "materialize": "~0.96.1",
-    "url-parser": "~2.3.1"
+    "url-parser": "~2.3.1",
+    "jquery-cookie": "~1.4.1"
   },
   "install": {
     "path": {
@@ -43,6 +44,9 @@
       ],
       "url-parser": [
         "bower_components/url-parser/purl.js"
+      ],
+      "cookie": [
+        "bower_components/jquery-cookie/jquery.cookie.js"
       ]
     }
   }

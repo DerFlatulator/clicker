@@ -43,6 +43,12 @@ class BubbleSort extends React.Component {
 }
 
 let run = function () {
+    $.ajaxSetup({
+        beforeSend: req => {
+            req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+        }
+    });
+
     var lower_index = parseInt($.url().param('lower_index')) || 0;
     React.render(
         <BubbleSort url="/api/bubblesort/swap/" lower_index={lower_index} date={new Date()}/>,
