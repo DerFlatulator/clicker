@@ -2,7 +2,7 @@
 
 var gulp = require('gulp');
 // var browserify = require('browserify');
-var transform = require('vinyl-transform');
+// var transform = require('vinyl-transform');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
