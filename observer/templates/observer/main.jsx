@@ -91,8 +91,11 @@ class BubbleSortItem extends React.Component {
 }
 
 let run = function () {
+    var instance = parseInt($.url().param('instance')) || 1,
+        url = "/api/bubblesort/view/#/".replace('#', String(instance));
+
     React.render(
-        <BubbleSort url="/api/bubblesort/view/1/" id="1" date={new Date()}/>,
+        <BubbleSort url={url} id={instance} date={new Date()}/>,
         document.getElementById('react-main')
     );
 };
