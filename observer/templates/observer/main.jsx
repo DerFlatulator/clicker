@@ -121,12 +121,18 @@ class BubbleSortCaption extends React.Component {
 }
 
 let run = function () {
-    var instance = parseInt($.url().param('instance')) || 1,
+
+    var socketURL = "//" + window.location.hostname + ":4000/socket.io/socket.io.js",
+        instance = parseInt($.url().param('instance')) || 1,
         url = "/api/bubblesort/view/#/".replace('#', String(instance));
 
-    React.render(
-        <BubbleSort url={url} id={instance} date={new Date()}/>,
-        document.getElementById('react-main')
-    );
+    // Wait for socket code to load before activating React
+    $.getScript(socketURL, function () {
+        React.render(
+            <BubbleSort url={url} id={instance} date={new Date()}/>,
+            document.getElementById('react-main')
+        );
+    });
+
 };
 run();

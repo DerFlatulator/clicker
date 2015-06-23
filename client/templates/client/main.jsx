@@ -15,7 +15,7 @@ class BubbleSort extends React.Component {
         ] });
     }
 
-    swap(e) {
+    swap(_) {
         $.post(this.props.swapURL, {
             lower_index: this.state.indices[0],
             bubble_sort: 'http://' + window.location.host + this.props.url
@@ -42,9 +42,7 @@ class BubbleSort extends React.Component {
 
 let run = function () {
     $.ajaxSetup({
-        beforeSend: req => {
-            req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-        }
+        beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
     });
 
     var instance = parseInt($.url().param('instance')) || 1,
