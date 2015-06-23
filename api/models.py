@@ -37,7 +37,7 @@ class BubbleSort(models.Model):
         return current
 
     def __unicode__(self):
-        return ','.join(self._current) if self._current else self.shuffled
+        return ','.join(self._current) if hasattr(self, '_current') else self.shuffled
 
 
 class BubbleSortSwap(models.Model):
