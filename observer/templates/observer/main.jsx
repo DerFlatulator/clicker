@@ -26,7 +26,7 @@ class BubbleSort extends React.Component {
         });
 
         $(function () {
-            var socket = io('http://localhost:4000');
+            var socket = io('http://' + window.location.hostname + ':4000');
 
             socket.on('connect', function () {
                 console.log('socket connected');
