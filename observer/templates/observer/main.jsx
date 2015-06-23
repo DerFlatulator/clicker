@@ -60,6 +60,15 @@ class BubbleSort extends React.Component {
                             <BubbleSortItem key={item} index={index} item={item}></BubbleSortItem>
                         );
                     })}
+                    {this.state.list.map((_, index) => {
+                        if (index === 0)
+                            return;
+
+                        return (
+                            <BubbleSortCaption key={index} index={index}></BubbleSortCaption>
+                        );
+                    })}
+
                 </div>
             </div>
         );
@@ -81,10 +90,31 @@ class BubbleSortItem extends React.Component {
             <div className="sortItem"
                  style={{
                     height: (this.state.height_multiplier * this.props.item) + 'px',
-                    left: (this.state.width_multiplier * this.props.index) + 'px',
-                    display: "inline-block"
+                    left: (this.state.width_multiplier * this.props.index) + 'px'
                  }}>
                 {this.props.item}
+            </div>
+        );
+    }
+}
+
+class BubbleSortCaption extends React.Component {
+
+    constructor(props) {
+        super (props);
+        this.state = {
+            width_multiplier: 44
+        };
+    }
+
+    render() {
+        return (
+            <div className="sortCaption"
+                 style={{
+                    height: (this.state.height_multiplier) + 'px',
+                    left: (this.state.width_multiplier * (this.props.index - 0.5)) + 'px'
+                 }}>
+                {this.props.index}
             </div>
         );
     }

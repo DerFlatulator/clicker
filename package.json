@@ -6,8 +6,9 @@
     "type": "git",
     "url": "git://github.com/DerFlatulator/clicker.git"
   },
-  "main": "",
+  "main": "observer/nodejs/push.js",
   "scripts": {
+    "start": "node observer/nodejs/push.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Lucas Azzola <laazz1@student.monash.edu>",

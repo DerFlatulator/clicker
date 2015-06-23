@@ -8,6 +8,14 @@
     bottom: 0;
 }
 
+.sortCaption {
+    width: 40px;
+    text-align: center;
+    margin: 2px;
+    position: absolute;
+    bottom: -20px;
+}
+
 .sortList {
     height: 150px;
     position: relative;
