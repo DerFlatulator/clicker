@@ -20,9 +20,9 @@ var globs = {
     observer_css: 'observer/templates/observer/*.css'
 };
 var output = {
-    client_js: 'static/js/',
-    observer_js: 'static/js/',
-    observer_css: 'static/css/'
+    client_js: 'dist/js/',
+    observer_js: 'dist/js/',
+    observer_css: 'dist/css/'
 };
 
 gulp.task('client', function () {

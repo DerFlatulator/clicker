@@ -20,11 +20,11 @@
   },
   "install": {
     "path": {
-      "css": "static/css/lib",
-      "js": "static/js/lib",
-      "map": "static/js/lib",
-      "/roboto/": "static/css/lib/{name}/../font/roboto",
-      "/material-design-icons/": "static/css/lib/{name}/../font/material-design-icons"
+      "css": "dist/css/lib",
+      "js": "dist/js/lib",
+      "map": "dist/js/lib",
+      "/roboto/": "dist/css/lib/{name}/../font/roboto",
+      "/material-design-icons/": "dist/css/lib/{name}/../font/material-design-icons"
     },
     "sources": {
       "jquery": [
