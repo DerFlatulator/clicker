@@ -23,8 +23,8 @@
       "css": "static/css/lib",
       "js": "static/js/lib",
       "map": "static/js/lib",
-      "/roboto": "static/css/lib/{name}/../font/roboto",
-      "/material-design-icons": "static/css/lib/{name}/../font/material-design-icons"
+      "/roboto/": "static/css/lib/{name}/../font/roboto",
+      "/material-design-icons/": "static/css/lib/{name}/../font/material-design-icons"
     },
     "sources": {
       "jquery": [
