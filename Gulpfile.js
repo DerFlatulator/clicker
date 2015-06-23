@@ -1,7 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
-var browserify = require('browserify');
+// var browserify = require('browserify');
 var transform = require('vinyl-transform');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
@@ -87,6 +87,8 @@ gulp.task('observer-css', function () {
         .pipe(gulp.dest(output.observer_css))
         .pipe(livereload({ start: true }));
 });
+
+gulp.task('default', ['observer', 'observer-css', 'client']);
 
 gulp.task('watch', function () {
     livereload.listen();
