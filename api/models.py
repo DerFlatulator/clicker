@@ -3,20 +3,41 @@ from django.core.exceptions import ValidationError
 
 
 class BubbleSort(models.Model):
-    values = models.CommaSeparatedIntegerField(null=False, max_length=1000, default="1,3,2")  # CSV
-    size = models.IntegerField(blank=True, default=-1)
+    shuffled = models.CommaSeparatedIntegerField(null=False, max_length=1000, default="1,3,2")  # CSV
+
+    def __init__(self, *args, **kwargs):
+        super(self.__class__, self).__init__(*args, **kwargs)
 
     def save(self, **kwargs):
-        super(BubbleSort, self).save(**kwargs)
-        values = self.values.split(',')
-        self.size = len(values)
+            super(BubbleSort, self).save(**kwargs)
 
-    def clean(self):
-        values = self.values.split(',')
-        self.size = len(values)
+    @property
+    def get_list_size(self):
+        return len(self.shuffled.split(','))
+
+    @property
+    def get_list_sorted(self):
+        return ','.join(sorted(self.shuffled.split(',')))
+
+    @property
+    def get_list_current(self):
+        """
+        Get the current representation of the list by querying `BubbleSortSwap`
+        :todo: Cache the result and timestamp before re-querying
+        :return: A str representation of the current list
+        """
+        current = self.shuffled.split(',')
+        swaps = BubbleSortSwap.objects.filter(bubble_sort=self.id)
+        for swap in swaps:
+            tmp = current[swap.lower_index]
+            current[swap.lower_index] = current[swap.lower_index + 1]
+            current[swap.lower_index + 1] = tmp
+
+        self._current = current
+        return current
 
     def __unicode__(self):
-        return self.values
+        return ','.join(self._current) if self._current else self.shuffled
 
 
 class BubbleSortSwap(models.Model):
@@ -27,5 +48,12 @@ class BubbleSortSwap(models.Model):
         if self.lower_index < 0 or self.lower_index >= self.bubble_sort.size:
             raise ValidationError({'lower_index': 'Must be a valid index'})
 
+    # def save(self, *args, **kwargs):
+    #     """
+    #     Save the swap
+    #     :param kwargs: passed to super
+    #     """
+    #     super(BubbleSortSwap, self).save(*args, **kwargs)
+
     def __unicode__(self):
-        return "Swap {} and {}.".format(self.lower_index, self.lowest_index + 1)
+        return "[{}] Swap {} and {}.".format(self.bubble_sort_id, self.lower_index, self.lower_index + 1)

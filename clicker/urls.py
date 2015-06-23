@@ -17,9 +17,11 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from client.views import app as client_app
+from observer.views import app as observer_app
 
 urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^client/', client_app, name='client_app'),
+    url(r'^observer/', observer_app, name='observer_app')
 ]

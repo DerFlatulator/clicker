@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from django.apps import AppConfig
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -28,6 +30,15 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+class ObserverConfig(AppConfig):
+    name = 'observer'
+
+    def ready(self):
+        super(ObserverConfig, self).ready()
+        print "Observer App ready()"
+        from observer import signals
+
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -40,6 +51,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'api',
     'client',
+    'observer'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -58,7 +70,10 @@ ROOT_URLCONF = 'clicker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'client/templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'client/templates'),
+            os.path.join(BASE_DIR, 'observer/templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,7 +89,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'clicker.wsgi.application'
 
 REST_FRAMEWORK = {
-    #'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
     'PAGE_SIZE': 20,
     'DEFAULT_MODEL_SERIALIZER_CLASS': 'rest_framework.serializers.HyperlinkedModelSerializer',
 }
@@ -115,4 +130,5 @@ STATICFILES_DIRS = (
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'client/templates'),
+    os.path.join(BASE_DIR,  'observer/templates')
 )

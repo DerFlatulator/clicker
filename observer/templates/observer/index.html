@@ -1,18 +1,22 @@
-{% extends "default.html" %}
+{% extends "observer/default.html" %}
 {% load staticfiles %}
-{% block title %}Clicker | Client{% endblock %}
+{% block title %}Clicker | Observer{% endblock %}
 {% block styles %}
     <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/observer.css" %}" />
+{% endblock %}
+{% block scripts_head %}
+    <script src="http://localhost:4000/socket.io/socket.io.js"></script>
 {% endblock %}
 {% block content %}
     <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Collaborinteractatronmajig</a>
             <ul class="right hide-on-med-and-down">
-                <li><a href="/client/">Bubble Sort</a></li>
+                <li><a href="/observer/">Bubble Sort</a></li>
             </ul>
 
             <ul id="nav-mobile" class="side-nav">
-                <li><a href="/client/">Bubble Sort</a></li>
+                <li><a href="/observer/">Bubble Sort</a></li>
             </ul>
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
         </div>
@@ -51,5 +55,5 @@
     <script type="text/javascript" src="{% static "js/lib/react/react.js" %}"></script>
     <script type="text/javascript" src="{% static "js/lib/materialize/materialize.min.js" %}"></script>
 
-    <script type="text/javascript" src="{% static "js/client.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/observer.min.js" %}"></script>
 {% endblock %}

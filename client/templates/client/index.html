@@ -1,0 +1,57 @@
+{% extends "client/default.html" %}
+{% load staticfiles %}
+{% block title %}Clicker | Client{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
+{% endblock %}
+{% block content %}
+    <nav class="light-blue lighten-1" role="navigation">
+        <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Collaborinteractatronmajig</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/client">Bubble Sort</a></li>
+            </ul>
+
+            <ul id="nav-mobile" class="side-nav">
+                <li><a href="/client">Bubble Sort</a></li>
+            </ul>
+            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12" id="react-main">
+
+                </div>
+            </div>
+
+        </div>
+        <br><br>
+
+        <div class="section">
+
+        </div>
+    </div>
+
+    <footer class="page-footer orange">
+        <div class="container">
+            <div class="row">
+
+            </div>
+        </div>
+        <div class="footer-copyright">
+
+        </div>
+    </footer>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" src="{% static "js/lib/jquery/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/lib/url-parser/purl.js" %}"></script>
+
+    <script type="text/javascript" src="{% static "js/lib/react/react.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/lib/materialize/materialize.min.js" %}"></script>
+
+    <script type="text/javascript" src="{% static "js/client.min.js" %}"></script>
+{% endblock %}

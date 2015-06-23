@@ -1,0 +1,14 @@
+.sortItem {
+    background: #000;
+    width: 40px;
+    color: white;
+    text-align: center;
+    margin: 2px;
+    position: absolute;
+    bottom: 0;
+}
+
+.sortList {
+    height: 100px;
+    position: relative;
+}

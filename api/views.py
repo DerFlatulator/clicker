@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, serializers
-from .serializers import UserSerializer, GroupSerializer
+from .serializers import UserSerializer, GroupSerializer, BubbleSortSerializer
 
 from .models import BubbleSort, BubbleSortSwap
 
@@ -17,14 +17,16 @@ def generic_serializer_view_set_factory(_model, _serializer=serializers.Hyperlin
             self.serializer_class = GenericSerializer
             return self.serializer_class
     try:
-        GenericSerializerViewSet.__name__ = _model.__name__ + ":"
+        GenericSerializerViewSet.__name__ = _model.__name__
     finally:
         return GenericSerializerViewSet
 
-
-# noinspection PyTypeChecker
-BubbleSortViewSet = generic_serializer_view_set_factory(BubbleSort)
 BubbleSortSwapViewSet = generic_serializer_view_set_factory(BubbleSortSwap)
+
+
+class BubbleSortViewSet(viewsets.ModelViewSet):
+    queryset = BubbleSort.objects.all()
+    serializer_class = BubbleSortSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
