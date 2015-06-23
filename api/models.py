@@ -48,12 +48,5 @@ class BubbleSortSwap(models.Model):
         if self.lower_index < 0 or self.lower_index >= self.bubble_sort.size:
             raise ValidationError({'lower_index': 'Must be a valid index'})
 
-    # def save(self, *args, **kwargs):
-    #     """
-    #     Save the swap
-    #     :param kwargs: passed to super
-    #     """
-    #     super(BubbleSortSwap, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return "[{}] Swap {} and {}.".format(self.bubble_sort_id, self.lower_index, self.lower_index + 1)

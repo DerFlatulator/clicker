@@ -50,9 +50,9 @@ gulp.task('client', function () {
             sourceMappingURLPrefix: '/' + output.client_js
         }))
         // Output to `dist/js`
-        .pipe(gulp.dest(output.client_js))
+        .pipe(gulp.dest(output.client_js));
         // Connect livereload
-        .pipe(livereload({ start: true }));
+        //.pipe(livereload({ start: true }));
 });
 
 gulp.task('observer', function () {
@@ -74,9 +74,9 @@ gulp.task('observer', function () {
             sourceMappingURLPrefix: '/' + output.observer_js
         }))
         // Output to `dist/js`
-        .pipe(gulp.dest(output.observer_js))
+        .pipe(gulp.dest(output.observer_js));
         // Connect livereload
-        .pipe(livereload({ start: true }));
+        //.pipe(livereload({ start: true }));
 });
 
 gulp.task('observer-css', function () {
@@ -84,11 +84,11 @@ gulp.task('observer-css', function () {
     return gulp.src(globs.observer_css)
         .pipe(plumber())
         .pipe(concat('observer.css'))
-        .pipe(gulp.dest(output.observer_css))
-        .pipe(livereload({ start: true }));
+        .pipe(gulp.dest(output.observer_css));
+        //.pipe(livereload({ start: true }));
 });
 
-gulp.task('default', ['observer', 'observer-css', 'client']);
+gulp.task('deploy', ['observer', 'observer-css', 'client']);
 
 gulp.task('watch', function () {
     livereload.listen();
