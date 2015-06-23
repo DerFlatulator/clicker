@@ -53,7 +53,7 @@ class BubbleSort extends React.Component {
     render() {
         return (
             <div>
-                <p>Current list:</p>
+                <h2>Bubble Sort</h2>
                 <div className="sortList">
                     {this.state.list.map((item, index) => {
                         return (
