@@ -47,7 +47,11 @@
     </footer>
 {% endblock %}
 {% block scripts %}
-    <script type="text/javascript" src="{% static "components/jquery/dist/jquery.min.js" %}"></script>
+    <!--[if lt IE 9]><script src="{% static "components/jquery-legacy/jquery.min.js" %}"></script><![endif]-->
+    <!--[if gte IE 9]><!-->
+        <script src="{% static "components/jquery/dist/jquery.min.js" %}"></script>
+    <!--<![endif]-->
+
     <script type="text/javascript" src="{% static "components/url-parser/purl.js" %}"></script>
     <script type="text/javascript" src="{% static "components/jquery-cookie/jquery.cookie.js" %}"></script>
     <script type="text/javascript" src="{% static "components/classnames/index.js" %}"></script>
