@@ -1,15 +1,16 @@
 .sortItem {
     background: #000;
-    width: 40px;
+    width: 55px;
     color: white;
     text-align: center;
     margin: 2px;
     position: absolute;
     bottom: 0;
+    padding-top: 5px;
 }
 
 .sortCaption {
-    width: 40px;
+    width: 55px;
     text-align: center;
     margin: 2px;
     position: absolute;
@@ -17,7 +18,7 @@
 }
 
 .sortList {
-    height: 150px;
+    height: 200px;
     position: relative;
 }
 
@@ -25,4 +26,16 @@
     position: absolute;
     bottom: -40px;
     text-align: center;
+}
+
+/* http://stackoverflow.com/a/8490961/1280997 */
+.page-footer {
+    bottom: 0;
+    position: fixed;
+    z-index: 150;
+    _position: absolute;
+    _top: expression(eval(document.documentElement.scrollTop+
+        (document.documentElement.clientHeight-this.offsetHeight)));
+    /* height: 35px; */
+    width: 100%;
 }

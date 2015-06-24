@@ -50,9 +50,14 @@ class BubbleSort extends React.Component {
         this.setState({ list });
     }
 
+    colourFromIndex(index, max) {
+        var hue = index * 256 / max;
+        return "hsl(" + String(Math.floor(hue)) + ", 40%, 50%)";
+    }
+
     render() {
         var bottomStyles = {
-            width: 44 * this.state.list.length
+            width: 66 * this.state.list.length
         };
 
         return (
@@ -60,8 +65,9 @@ class BubbleSort extends React.Component {
                 <h2>Bubble Sort</h2>
                 <div className="sortList">
                     {this.state.list.map((item, index) => {
+                        var colour = this.colourFromIndex(index, this.state.list.length);
                         return (
-                            <BubbleSortItem key={item} index={index} item={item}></BubbleSortItem>
+                            <BubbleSortItem colour={colour} key={item} index={index} item={item}></BubbleSortItem>
                         );
                     })}
                     {this.state.list.map((_, index) => {
@@ -84,8 +90,8 @@ class BubbleSortItem extends React.Component {
     constructor(props) {
         super (props);
         this.state = {
-            height_multiplier: 20,
-            width_multiplier: 44
+            height_multiplier: 30,
+            width_multiplier: 66
         };
     }
 
@@ -93,6 +99,7 @@ class BubbleSortItem extends React.Component {
         return (
             <div className="sortItem"
                  style={{
+                    background: this.props.colour,
                     height: (this.state.height_multiplier * this.props.item) + 'px',
                     left: (this.state.width_multiplier * this.props.index) + 'px'
                  }}>
@@ -107,7 +114,7 @@ class BubbleSortCaption extends React.Component {
     constructor(props) {
         super (props);
         this.state = {
-            width_multiplier: 44
+            width_multiplier: 66
         };
     }
 
