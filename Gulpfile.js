@@ -15,6 +15,7 @@ var globs = {
     client: 'client/templates/client',
     client_jsx: 'client/templates/client/*.jsx',
     client_html: 'client/templates/client/*.html',
+    client_css: 'client/templates/client/*.css',
     observer: 'observer/templates/observer',
     observer_jsx: 'observer/templates/observer/*.jsx',
     observer_html: 'observer/templates/observer/*.html',
@@ -22,6 +23,7 @@ var globs = {
 };
 var output = {
     client_js: 'dist/js/',
+    client_css: 'dist/css/',
     observer_js: 'dist/js/',
     observer_css: 'dist/css/'
 };
@@ -86,18 +88,29 @@ gulp.task('observer-css', function () {
         .pipe(plumber())
         .pipe(concat('observer.css'))
         .pipe(gulp.dest(output.observer_css));
-        //.pipe(livereload({ start: true }));
+    //.pipe(livereload({ start: true }));
 });
+
+gulp.task('client-css', function () {
+
+    return gulp.src(globs.client_css)
+        .pipe(plumber())
+        .pipe(concat('client.css'))
+        .pipe(gulp.dest(output.client_css));
+    //.pipe(livereload({ start: true }));
+});
+
 
 gulp.task('bower', function () {
     return bower();
 });
 
-gulp.task('deploy', ['bower', 'observer', 'observer-css', 'client']);
+gulp.task('deploy', ['bower', 'observer', 'observer-css', 'client', 'client-css']);
 
 gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(globs.client_jsx, ['client']);
+    gulp.watch(globs.client_css, ['client-css']);
     gulp.watch(globs.client_html, []);
     gulp.watch(globs.observer_jsx, ['observer']);
     gulp.watch(globs.observer_css, ['observer-css']);

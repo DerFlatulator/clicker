@@ -2,7 +2,8 @@
 {% load staticfiles %}
 {% block title %}Clicker | Client{% endblock %}
 {% block styles %}
-    <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
+    <link rel="stylesheet" media="all" href="{% static "css/lib/materialize/materialize.min.css" %}" />
+    <link rel="stylesheet" media="all" href="{% static "css/client.css" %}" />
 {% endblock %}
 {% block content %}
     <nav class="light-blue lighten-1" role="navigation">
@@ -28,11 +29,6 @@
 
                 </div>
             </div>
-
-        </div>
-        <br><br>
-
-        <div class="section">
 
         </div>
     </div>

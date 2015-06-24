@@ -1,0 +1,26 @@
+
+.sortPanel {
+    width: 100%;
+    text-align: center;
+    padding-top: 10%;
+    height: 100%;
+}
+
+.sortPanel h5 {
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+
+/* http://stackoverflow.com/a/8490961/1280997 */
+.page-footer {
+    bottom: 0;
+    position: fixed;
+    z-index: 150;
+    _position: absolute;
+    _top: expression(eval(document.documentElement.scrollTop+
+        (document.documentElement.clientHeight-this.offsetHeight)));
+    /* height: 35px; */
+    width: 100%;
+}
+

@@ -36,14 +36,13 @@ class BubbleSort extends React.Component {
         ]);
 
         return (
-            <div>
-                <p>
-                Press the swap button to swap at interval <strong>{this.state.indices[0] + 1}</strong>:
-                </p>
+            <div className="sortPanel">
+                <h5>You are responsible for <strong>interval {this.state.indices[0] + 1}</strong>.</h5>
                 <a onClick={this.swap.bind(this)} className={classes}>
                     <i className="mdi-action-swap-horiz left"></i>
                     Swap!
                 </a>
+                <h5>Click SWAP when the number on the <em>left</em> is <strong>greater</strong> than the number on the <em>right</em>.</h5>
             </div>
         );
     }
