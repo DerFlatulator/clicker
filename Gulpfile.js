@@ -57,7 +57,7 @@ gulp.task('client', function () {
 
 gulp.task('observer', function () {
 
-    return gulp.src(globs.observer_jsx)
+    gulp.src(globs.observer_jsx)
         // Prevent errors from killing watch task
         .pipe(plumber())
         // Initialise source mappings

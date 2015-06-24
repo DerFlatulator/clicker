@@ -127,6 +127,7 @@ STATIC_ROOT = 'static/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "dist"),
+    os.path.join(BASE_DIR, "bower")
 )
 
 TEMPLATE_DIRS = (

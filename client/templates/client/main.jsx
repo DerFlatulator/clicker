@@ -5,7 +5,8 @@ class BubbleSort extends React.Component {
     constructor(props) {
         super (props);
         this.state = {
-          indices: [0, 1]
+            indices: [0, 1],
+            buttonEnabled: true
         };
     }
 
@@ -16,22 +17,31 @@ class BubbleSort extends React.Component {
     }
 
     swap(_) {
+        this.setState({ buttonEnabled: false });
         $.post(this.props.swapURL, {
             lower_index: this.state.indices[0],
             bubble_sort: 'http://' + window.location.host + this.props.url
         })
-        .then(res => console.log)
-        .fail(res => console.error);
+        .done(res => console.log)
+        .fail(res => console.error)
+        .always(_ => {
+            this.setState({ buttonEnabled: true });
+        });
     }
 
     render() {
+        var classes = classNames({
+            'disabled': !this.state.buttonEnabled
+        }, [
+            'swapButton', 'waves-effect', 'waves-light', 'btn-large'
+        ]);
+
         return (
             <div>
                 <p>
-                Press the swap button to swap at interval <strong>{this.state.indices[0]}</strong>:
+                Press the swap button to swap at interval <strong>{this.state.indices[0] + 1}</strong>:
                 </p>
-                <a onClick={this.swap.bind(this)}
-                   className="waves-effect waves-light btn-large">
+                <a onClick={this.swap.bind(this)} className={classes}>
                     <i className="mdi-action-swap-horiz left"></i>
                     Swap!
                 </a>

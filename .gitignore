@@ -1,7 +1,7 @@
 node_modules/
 static/*
 dist/*
-bower_components/
+bower/*
 **/*.pyc
 .idea
 *.sqlite3
