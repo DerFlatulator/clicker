@@ -16,7 +16,7 @@ class BubbleSort extends React.Component {
         ] });
     }
 
-    swap(_) {
+    swap() {
         this.setState({ buttonEnabled: false });
         $.post(this.props.swapURL, {
             lower_index: this.state.indices[0],

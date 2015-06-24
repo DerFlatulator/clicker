@@ -51,6 +51,10 @@ class BubbleSort extends React.Component {
     }
 
     render() {
+        var bottomStyles = {
+            width: 44 * this.state.list.length
+        };
+
         return (
             <div>
                 <h2>Bubble Sort</h2>
@@ -68,7 +72,7 @@ class BubbleSort extends React.Component {
                             <BubbleSortCaption key={index} index={index}></BubbleSortCaption>
                         );
                     })}
-
+                    <div className="sortFooter" style={bottomStyles}>Invervals</div>
                 </div>
             </div>
         );
