@@ -50,8 +50,14 @@ class BubbleSort extends React.Component {
         this.setState({ list });
     }
 
-    colourFromIndex(index, max) {
-        var hue = index * 256 / max;
+    colourFromValue(value) {
+        var max = Math.max.apply(null, this.state.list.map(v =>  parseInt(v))),
+            hue = value * 256 / max;
+
+        if (isNaN(max)) {
+            return "blue";
+        }
+
         return "hsl(" + String(Math.floor(hue)) + ", 40%, 50%)";
     }
 
@@ -65,7 +71,7 @@ class BubbleSort extends React.Component {
                 <h2>Bubble Sort</h2>
                 <div className="sortList">
                     {this.state.list.map((item, index) => {
-                        var colour = this.colourFromIndex(index, this.state.list.length);
+                        var colour = this.colourFromValue(item);
                         return (
                             <BubbleSortItem colour={colour} key={item} index={index} item={item}></BubbleSortItem>
                         );
