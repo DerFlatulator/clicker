@@ -9,6 +9,7 @@ var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var uglify = require('gulp-uglify');
 var livereload = require('gulp-livereload');
+var bower = require('gulp-bower');
 
 var globs = {
     client: 'client/templates/client',
@@ -88,7 +89,11 @@ gulp.task('observer-css', function () {
         //.pipe(livereload({ start: true }));
 });
 
-gulp.task('deploy', ['observer', 'observer-css', 'client']);
+gulp.task('bower', function () {
+    return bower();
+});
+
+gulp.task('deploy', ['bower', 'observer', 'observer-css', 'client']);
 
 gulp.task('watch', function () {
     livereload.listen();
