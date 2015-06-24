@@ -21,7 +21,7 @@ class BubbleSort extends React.Component {
         $.post(this.props.swapURL, {
             lower_index: this.state.indices[0],
             bubble_sort: 'http://' + window.location.host + this.props.url
-        }, this.swapDone).fail(this.swapDone).always(this.swapDone);
+        }, this.swapDone.bind(this)).fail(this.swapDone.bind(this)).always(this.swapDone.bind(this));
     }
 
     swapDone() {
