@@ -6,3 +6,4 @@ bower/*
 .idea
 *.sqlite3
 **/*.rdb
+**/*.log
