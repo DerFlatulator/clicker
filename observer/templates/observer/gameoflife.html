@@ -1,6 +1,6 @@
 {% extends "observer/default.html" %}
 {% load staticfiles %}
-{% block title %}Clicker | Observer{% endblock %}
+{% block title %}Game of Life | Observer{% endblock %}
 {% block styles %}
     <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
     <link rel="stylesheet" media="screen,projection" href="{% static "css/observer.css" %}" />
@@ -14,12 +14,12 @@
 
             <ul class="right hide-on-med-and-down">
                 <li><a href="/observer/bubblesort">Bubble Sort</a></li>
-                <li><a href="/observer/gameoflife">Game of Life</a></li>
+                <li class="active"><a href="/observer/gameoflife">Game of Life</a></li>
             </ul>
 
             <ul id="nav-mobile" class="side-nav">
                 <li><a href="/observer/bubblesort">Bubble Sort</a></li>
-                <li><a href="/observer/gameoflife">Game of Life</a></li>
+                <li class="active"><a href="/observer/gameoflife">Game of Life</a></li>
             </ul>
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
         </div>
@@ -29,7 +29,10 @@
         <div class="section">
 
             <div class="row">
-                <div class="col s12" id="react-main">
+                <div class="card">
+                    <div class="col s12" id="react-main">
+
+                    </div>
 
                 </div>
             </div>
@@ -59,9 +62,15 @@
         <script src="{% static "components/jquery/dist/jquery.min.js" %}"></script>
     <!--<![endif]-->
     <script type="text/javascript" src="{% static "components/url-parser/purl.js" %}"></script>
+    <script type="text/javascript" src="{% static "components/classnames/index.js" %}"></script>
 
     <script type="text/javascript" src="{% static "components/react/react.js" %}"></script>
     <script type="text/javascript" src="{% static "components/materialize/dist/js/materialize.min.js" %}"></script>
+    <script type="text/javascript">
+        $('.button-collapse').sideNav({
+            closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
+        });
+    </script>
 
     <script type="text/javascript" src="{% static "js/observer-gameoflife.min.js" %}"></script>
 {% endblock %}

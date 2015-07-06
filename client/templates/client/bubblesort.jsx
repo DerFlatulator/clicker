@@ -42,7 +42,7 @@ class BubbleSort extends React.Component {
                     <i className="mdi-action-swap-horiz left"></i>
                     Swap!
                 </a>
-                <h5>Click SWAP when the number on the <em>left</em> is <strong>greater</strong>
+                <h5>Click SWAP when the number on the <em>left</em> is <strong>greater </strong>
                     than the number on the <em>right</em>.</h5>
             </div>
         );

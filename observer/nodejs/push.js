@@ -1,5 +1,17 @@
 'use strict';
 
+/*
+ * TODO refactor:
+ *  1. io.on 'connection'
+ *  2. wait for receive message
+ *  3. check recv msg for subscription. eg: {subscribe: "gameoflife::observer"}
+ *  4. attach hooks from redis --> socket
+ *
+ * TODO add more redis channels
+ *  <namespace>::<device>
+ */
+
+
 var http = require('http');
 var server = http.createServer();
 var io = require('socket.io').listen(server);

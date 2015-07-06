@@ -13,19 +13,60 @@
     width: 55px;
     text-align: center;
     margin: 2px;
+    font-size: 1.5em;
     position: absolute;
-    bottom: -25px;
+    bottom: -30px;
 }
 
 .sortList {
     height: 250px;
     position: relative;
+    margin-bottom: 55px;
 }
 
 .sortFooter {
     position: absolute;
-    bottom: -40px;
+    bottom: -50px;
+    font-size: 1.5em;
     text-align: center;
+}
+
+.gol {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: #222;
+}
+
+.golDead {
+    background: #ddd;
+}
+
+.golRow {
+    height: 50px;
+}
+
+.golCornerSpacer {
+    width: 30px;
+    display: inline-block;
+}
+
+.golRowCaption {
+    width: 30px;
+    display: inline-block;
+    font-size: 2em;
+    height: 40px;
+    text-align: center;
+    vertical-align: super;
+}
+
+.golColumnCaption {
+    width: 50px;
+    display: inline-block;
+    font-size: 2em;
+    height: 40px;
+    text-align: center;
+/*    vertical-align: super; */
 }
 
 /* http://stackoverflow.com/a/8490961/1280997 */

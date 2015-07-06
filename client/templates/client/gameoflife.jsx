@@ -24,7 +24,7 @@ class GameOfLife extends React.Component {
             row = parseInt(this.props.cellName.substring(1)) - 1,
             column = columnLetter.toUpperCase().charCodeAt(0) - "A".charCodeAt(0);
 
-        return this.props.cells[row][column];
+        return this.state.cells[row][column];
     }
 
     swap() {
@@ -47,9 +47,16 @@ class GameOfLife extends React.Component {
                 <h5>You are responsible for <strong>cell {this.props.cellName}</strong>.</h5>
 
                 <a onClick={this.swap.bind(this)} className={classes}>
-                    <i className="mdi-action-swap-horiz left"></i>
-                    Die
+                    <i className="mdi-action-invert-colors left"></i>
+                    { this.isEnabled() ? 'Die' : 'Live' }
                 </a>
+
+                {this.isEnabled() ? (
+                    <h5>Click DIE when the number of <em>alive</em> neighbours is <strong>more than 3 </strong>
+                    or <strong>less than 2</strong>.</h5>
+                ) : (
+                    <h5>Click LIVE when the number of <em>alive</em> neighbours is <strong>exactly 3</strong>.</h5>
+                )}
             </div>
         );
     }
