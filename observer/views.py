@@ -6,9 +6,12 @@ from django.contrib.auth.models import User
 import redis
 
 
-def app(request):
-    return render(request, 'observer/index.html', {})
+def bubble_sort(request):
+    return render(request, 'observer/bubblesort.html', {})
 
+
+def game_of_life(request):
+    return render(request, 'observer/gameoflife.html', {})
 
 """
 def socket(request):

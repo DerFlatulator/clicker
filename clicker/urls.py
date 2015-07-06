@@ -16,12 +16,12 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from client.views import app as client_app
-from observer.views import app as observer_app
+from client import urls as client_urls
+from observer import urls as observer_urls
 
 urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^client/', client_app, name='client_app'),
-    url(r'^observer/', observer_app, name='observer_app')
+    url(r'^client/', include(client_urls), name='client_app'),
+    url(r'^observer/', include(observer_urls), name='observer_app'),
 ]

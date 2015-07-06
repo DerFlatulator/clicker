@@ -1,5 +1,9 @@
 from django.shortcuts import render
 
 
-def app(request):
-    return render(request, 'client/index.html', {})
+def bubble_sort(request):
+    return render(request, 'client/bubblesort.html', {})
+
+
+def game_of_life(request):
+    return render(request, 'client/gameoflife.html', {})

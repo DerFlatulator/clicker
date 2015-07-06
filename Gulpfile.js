@@ -13,11 +13,13 @@ var bower = require('gulp-bower');
 
 var globs = {
     client: 'client/templates/client',
-    client_jsx: 'client/templates/client/*.jsx',
+    client_jsx_bubblesort: 'client/templates/client/bubblesort.jsx',
+    client_jsx_gameoflife: 'client/templates/client/gameoflife.jsx',
     client_html: 'client/templates/client/*.html',
     client_css: 'client/templates/client/*.css',
     observer: 'observer/templates/observer',
-    observer_jsx: 'observer/templates/observer/*.jsx',
+    observer_jsx_bubblesort: 'observer/templates/observer/bubblesort.jsx',
+    observer_jsx_gameoflife: 'observer/templates/observer/gameoflife.jsx',
     observer_html: 'observer/templates/observer/*.html',
     observer_css: 'observer/templates/observer/*.css'
 };
@@ -28,23 +30,17 @@ var output = {
     observer_css: 'dist/css/'
 };
 
-gulp.task('client', function () {
+gulp.task('client-bubblesort', function () {
 
-    return gulp.src(globs.client_jsx)
+    return gulp.src(globs.client_jsx_bubblesort)
         // Prevent errors from killing watch task
         .pipe(plumber())
         // Initialise source mappings
         .pipe(sourcemaps.init())
         // Concatenate all source files
-        .pipe(concat('client.min.js'))
+        .pipe(concat('client-bubblesort.min.js'))
         // Transpile JSX and ES6 to ES5
         .pipe(babel())
-        // Browserify (require())
-        //.pipe(transform(
-        //    function(filename) {
-        //        return browserify(filename).bundle();
-        //    }
-        //))
         // Minify
         .pipe(uglify())
         // Save Source mappings
@@ -58,15 +54,40 @@ gulp.task('client', function () {
         //.pipe(livereload({ start: true }));
 });
 
-gulp.task('observer', function () {
+gulp.task('client-gameoflife', function () {
 
-    return gulp.src(globs.observer_jsx)
+    return gulp.src(globs.client_jsx_gameoflife)
         // Prevent errors from killing watch task
         .pipe(plumber())
         // Initialise source mappings
         .pipe(sourcemaps.init())
         // Concatenate all source files
-        .pipe(concat('observer.min.js'))
+        .pipe(concat('client-gameoflife.min.js'))
+        // Transpile JSX and ES6 to ES5
+        .pipe(babel())
+        // Minify
+        .pipe(uglify())
+        // Save Source mappings
+        .pipe(sourcemaps.write('.', {
+            sourceRoot: '../../' + globs.client + '/',
+            sourceMappingURLPrefix: '/' + output.client_js
+        }))
+        // Output to `dist/js`
+        .pipe(gulp.dest(output.client_js));
+    // Connect livereload
+    //.pipe(livereload({ start: true }));
+});
+
+
+gulp.task('observer-bubblesort', function () {
+
+    return gulp.src(globs.observer_jsx_bubblesort)
+        // Prevent errors from killing watch task
+        .pipe(plumber())
+        // Initialise source mappings
+        .pipe(sourcemaps.init())
+        // Concatenate all source files
+        .pipe(concat('observer-bubblesort.min.js'))
         // Transpile JSX and ES6 to ES5
         .pipe(babel())
         // Minify
@@ -81,6 +102,31 @@ gulp.task('observer', function () {
         // Connect livereload
         //.pipe(livereload({ start: true }));
 });
+
+gulp.task('observer-gameoflife', function () {
+
+    return gulp.src(globs.observer_jsx_gameoflife)
+        // Prevent errors from killing watch task
+        .pipe(plumber())
+        // Initialise source mappings
+        .pipe(sourcemaps.init())
+        // Concatenate all source files
+        .pipe(concat('observer-gameoflife.min.js'))
+        // Transpile JSX and ES6 to ES5
+        .pipe(babel())
+        // Minify
+        .pipe(uglify())
+        // Save Source mappings
+        .pipe(sourcemaps.write('.', {
+            sourceRoot: '../../' + globs.observer + '/',
+            sourceMappingURLPrefix: '/' + output.observer_js
+        }))
+        // Output to `dist/js`
+        .pipe(gulp.dest(output.observer_js));
+    // Connect livereload
+    //.pipe(livereload({ start: true }));
+});
+
 
 gulp.task('observer-css', function () {
 
@@ -105,14 +151,24 @@ gulp.task('bower', function () {
     return bower();
 });
 
-gulp.task('deploy', ['bower', 'observer', 'observer-css', 'client', 'client-css']);
+gulp.task('deploy', [
+    'bower',
+    'observer-bubblesort',
+    'observer-gameoflife',
+    'observer-css',
+    'client-bubblesort',
+    'client-gameoflife',
+    'client-css'
+]);
 
 gulp.task('watch', function () {
     livereload.listen();
-    gulp.watch(globs.client_jsx, ['client']);
+    gulp.watch(globs.client_jsx_bubblesort, ['client-bubblesort']);
+    gulp.watch(globs.client_jsx_gameoflife, ['client-gameoflife']);
     gulp.watch(globs.client_css, ['client-css']);
     gulp.watch(globs.client_html, []);
-    gulp.watch(globs.observer_jsx, ['observer']);
+    gulp.watch(globs.observer_jsx_bubblesort, ['observer-bubblesort']);
+    gulp.watch(globs.observer_jsx_gameoflife, ['observer-gameoflife']);
     gulp.watch(globs.observer_css, ['observer-css']);
     gulp.watch(globs.observer_html, []);
 });
