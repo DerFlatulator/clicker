@@ -26,7 +26,9 @@ class BubbleSort extends React.Component {
         });
 
         $(function () {
-            var socket = io('http://' + window.location.hostname + ':4000');
+            var path = 'http://#1:4000/#2',
+                socket = io(path.replace('#1', window.location.hostname)
+                                .replace('#2', String(this.props.channel)));
 
             socket.on('connect', function () {
                 console.log('socket connected');
@@ -139,14 +141,19 @@ class BubbleSortCaption extends React.Component {
 
 let run = function () {
 
-    var socketURL = "//" + window.location.hostname + ":4000/socket.io/socket.io.js",
+    var socketURL = "//#:4000/socket.io/socket.io.js".replace('#', window.location.hostname),
         instance = parseInt($.url().param('instance')) || 1,
-        url = "/api/bubblesort/view/#/".replace('#', String(instance));
+        url = "/api/bubblesort/view/#/".replace('#', String(instance)),
+        channel = "bubblesort.observer";
 
-    // Wait for socket code to load before activating React
+    /*
+     * Wait for socket code to load before activating React.
+     * React will briefly render the default state, then
+     * update when the first GET request completes.
+     */
     $.getScript(socketURL, function () {
         React.render(
-            <BubbleSort url={url} id={instance} date={new Date()}/>,
+            <BubbleSort url={url} channel={channel} id={instance} date={new Date()}/>,
             document.getElementById('react-main')
         );
     });

@@ -119,14 +119,15 @@ class GameOfLife extends React.Component {
 
 let run = function () {
 
-    var socketURL = "//" + window.location.hostname + ":4000/socket.io/socket.io.js",
+    var socketURL = "//#:4000/socket.io/socket.io.js".replace('#', window.location.hostname),
         instance = parseInt($.url().param('instance')) || 1,
-        url = "/api/gameoflife/view/#/".replace('#', String(instance));
+        url = "/api/gameoflife/view/#/".replace('#', String(instance)),
+        channel = "gameoflife.observer";
 
     // Wait for socket code to load before activating React
     $.getScript(socketURL, function () {
         React.render(
-            <GameOfLife url={url} id={instance} date={new Date()}/>,
+            <GameOfLife url={url} channel={channel} id={instance} date={new Date()}/>,
             document.getElementById('react-main')
         );
     });

@@ -11,7 +11,7 @@ def new_bubble_sort_swap(sender, **kwargs):
     instance = kwargs['instance']
     r = redis.StrictRedis(host='localhost', port=6379, db=0)
     print "Publishing to redis:observer"
-    r.publish('observer', json.dumps({
+    r.publish('bubblesort.observer', json.dumps({
         'lower_index': instance.lower_index,
         'bubble_sort': instance.bubble_sort_id
     }))
