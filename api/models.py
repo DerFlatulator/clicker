@@ -60,6 +60,11 @@ class GameOfLife(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = not self.pk  # new if instance hasn't been assigned a p.k.
+        if not is_new:
+            old_self = GameOfLife.objects.get(pk=self.pk)
+            (old_rows, old_cols) = (old_self.num_rows, old_self.num_cols)
+        else:
+            (old_rows, old_cols) = (None, None)
 
         super(GameOfLife, self).save(*args, **kwargs)
 
@@ -67,6 +72,20 @@ class GameOfLife(models.Model):
             for y in range(self.num_rows):
                 for x in range(self.num_cols):
                     GameOfLifeCell(alive=False, col=x, row=y, game_of_life=self).save()
+        else:
+            # Insertions
+            if self.num_rows > old_rows or self.num_cols > old_cols:
+                for x in range(0, self.num_cols):
+                    for y in range(0, self.num_rows):
+                        if x >= old_cols or y >= old_rows:
+                            GameOfLifeCell(alive=False, col=x, row=y, game_of_life=self).save()
+
+            # Deletions
+            if self.num_rows < old_rows or self.num_cols < old_cols:
+                for x in range(0, old_cols):
+                    for y in range(0, old_rows):
+                        if x >= self.num_cols or y >= self.num_rows:
+                            GameOfLifeCell.objects.get(col=x, row=y, game_of_life=self).delete()
 
     @property
     def get_current_state(self):

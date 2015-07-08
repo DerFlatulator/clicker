@@ -7,32 +7,75 @@ class GameOfLife extends React.Component {
         this.state = {
             cells: [[true,  false],
                     [false, true ]],
+            clientCell: false,
             buttonEnabled: true
         };
     }
 
     componentDidMount() {
-        this.setState({ indices: [
-            this.props.lower_index, this.props.lower_index + 1
-        ] });
+        $.ajax({
+            url: this.props.cellURL,
+            dataType: 'json',
+            cache: false,
+            success: data => {
+                console.log(data);
+                this.setState({
+                    clientCell: data.alive
+                });
+            },
+            error: (xhr, status, err) => {
+                console.error(this.props.cellURL, status, err.toString());
+            }
+        });
     }
 
-    isEnabled() {
+    /**
+     * Deserialize a cell representation
+     * @param {string} serial
+     * @returns {Array} 2D array of {Boolean} cells
+     */
+    static deserialize(serial) {
+        var rows = serial.split('\n');
+
+        return rows.map(row => {
+            return row.split('').map(s => s !== "0");
+        });
+    }
+
+    isAlive() {
+        return this.state.clientCell;
+
         // TODO validation
-
-        var columnLetter = this.props.cellName.charAt(0),
-            row = parseInt(this.props.cellName.substring(1)) - 1,
-            column = columnLetter.toUpperCase().charCodeAt(0) - "A".charCodeAt(0);
-
-        return this.state.cells[row][column];
+        //var columnLetter = this.props.cellName.charAt(0),
+        //    row = parseInt(this.props.cellName.substring(1)) - 1,
+        //    column = columnLetter.toUpperCase().charCodeAt(0) - "A".charCodeAt(0);
+        //
+        //console.log(this.state.cells[row][column]);
+        //
+        //return this.state.cells[row][column];
     }
 
     swap() {
         this.setState({ buttonEnabled: false });
+        $.ajax({
+            url: this.props.cellURL,
+            method: 'PATCH',
+            data: {
+                alive: !this.isAlive()
+            },
+            dataType: 'json',
+            success: this.swapDone.bind(this),
+            error: (xhr, status, err) => {
+                console.error(this.props.cellURL, status, err.toString());
+            }
+        });
     }
 
-    swapDone() {
-        this.setState({ buttonEnabled: true });
+    swapDone(data) {
+        this.setState({
+            buttonEnabled: true,
+            clientCell: data.alive
+        });
     }
 
     render() {
@@ -48,10 +91,10 @@ class GameOfLife extends React.Component {
 
                 <a onClick={this.swap.bind(this)} className={classes}>
                     <i className="mdi-action-invert-colors left"></i>
-                    { this.isEnabled() ? 'Die' : 'Live' }
+                    { this.isAlive() ? 'Die' : 'Live' }
                 </a>
 
-                {this.isEnabled() ? (
+                {this.isAlive() ? (
                     <h5>Click DIE when the number of <em>alive</em> neighbours is <strong>more than 3 </strong>
                     or <strong>less than 2</strong>.</h5>
                 ) : (
@@ -69,10 +112,11 @@ let run = function () {
 
     var instance = parseInt($.url().param('instance')) || 1,
         cellName = parseInt($.url().param('cell_name')) || "A1",
-        url = "/api/gameoflife/#/".replace('#', String(instance));
+        url = "/api/gameoflife/#/".replace('#', String(instance)),
+        cellURL = url + "cell/#/".replace('#', String(cellName));
 
     React.render(
-        <GameOfLife url={url} cellName={cellName} date={new Date()}/>,
+        <GameOfLife url={url} cellURL={cellURL} cellName={cellName} date={new Date()}/>,
         document.getElementById('react-main')
     );
 };

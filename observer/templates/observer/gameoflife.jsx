@@ -39,7 +39,7 @@ class GameOfLife extends React.Component {
                 console.log(message);
                 let data = JSON.parse(message);
                 if (this.props.id == data.game_of_life) {
-                    this.setState({ cells: GameOfLife.deserialize(data.serialized) });
+                    this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
                 }
             });
         }.bind(this));
@@ -64,6 +64,23 @@ class GameOfLife extends React.Component {
         return rows.map(row => {
             return row.split('').map(s => s !== "0");
         });
+    }
+
+    static updateCells(cells, data) {
+        // {"game_of_life": 3, "col": 0, "alive": false, "row": 3}
+        var newCells = $.extend(true, [], cells);
+        if (data.col < cells[0].length && data.row < cells.length) {
+            newCells[data.row][data.col] = data.alive;
+        } else {
+            //var oneRow = new Array(Math.max(cells[0].length, data.col));
+            //var numRows = Math.max(cells.length, data.row);
+            //for (let i = 0; i < numRows; i++) {
+            //    newCells.push($.extend(true, [], oneRow));
+            //}
+            //// TODO update, etc
+            //// ...
+        }
+        return newCells;
     }
 
     render() {
@@ -117,6 +134,7 @@ class GameOfLife extends React.Component {
             </div>
         );
     }
+
 }
 
 let run = function () {
