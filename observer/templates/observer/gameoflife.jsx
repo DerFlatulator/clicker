@@ -108,7 +108,10 @@ class GameOfLife extends React.Component {
 
                                 {row.map((value) => {
                                     return (
-                                        <span className={classNames("gol", {"golDead": !value})}></span>
+                                        <span className={classNames("gol", {
+                                            "red lighten-2": !value,
+                                            "green darken-2": value
+                                        })}></span>
                                     );
                                 })}
 

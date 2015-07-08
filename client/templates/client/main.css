@@ -11,6 +11,10 @@
     padding-bottom: 5%;
 }
 
+a.modal-trigger {
+    text-decoration: underline;
+}
+
 
 /* http://stackoverflow.com/a/8490961/1280997 */
 .page-footer {

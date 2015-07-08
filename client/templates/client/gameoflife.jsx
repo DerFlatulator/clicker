@@ -27,6 +27,11 @@ class GameOfLife extends React.Component {
                 console.error(this.props.cellURL, status, err.toString());
             }
         });
+
+        $(function () {
+            $('.modal-trigger').leanModal();
+            $('.tooltip').tooltip({delay: 50});
+        }.bind(this));
     }
 
     /**
@@ -46,13 +51,12 @@ class GameOfLife extends React.Component {
         return this.state.clientCell;
 
         // TODO validation
-        //var columnLetter = this.props.cellName.charAt(0),
-        //    row = parseInt(this.props.cellName.substring(1)) - 1,
+        // var index = this.props.cellName.match(/[0-9]/).index,
+        //    columnLetter = this.props.cellName.substring(0, index),
+        //    row = parseInt(this.props.cellName.substring(index)) - 1,
         //    column = columnLetter.toUpperCase().charCodeAt(0) - "A".charCodeAt(0);
         //
-        //console.log(this.state.cells[row][column]);
-        //
-        //return this.state.cells[row][column];
+        // return this.state.cells[row][column];
     }
 
     swap() {
@@ -80,7 +84,9 @@ class GameOfLife extends React.Component {
 
     render() {
         var classes = classNames({
-            'disabled': !this.state.buttonEnabled
+            'disabled': !this.state.buttonEnabled,
+            'green darken-2': !this.isAlive(),
+            'red darken-2': this.isAlive()
         }, [
             'swapButton', 'waves-effect', 'waves-light', 'btn-large'
         ]);
@@ -95,11 +101,34 @@ class GameOfLife extends React.Component {
                 </a>
 
                 {this.isAlive() ? (
-                    <h5>Click DIE when the number of <em>alive</em> neighbours is <strong>more than 3 </strong>
-                    or <strong>less than 2</strong>.</h5>
+                    <h5>Click <span className="red-text">DIE</span> when the number of
+                        <span className="green-text"> alive </span>
+                        <a href="#neighbours" className="modal-trigger tooltip"
+                           data-tooltip="Click for info"> neighbours</a>
+                        &nbsp;is <strong> more than 3 </strong>
+                        or <strong> less than 2</strong>.</h5>
                 ) : (
-                    <h5>Click LIVE when the number of <em>alive</em> neighbours is <strong>exactly 3</strong>.</h5>
+                    <h5>Click <span className="green-text">LIVE</span> when the number of
+                        <span className="green-text"> alive </span>
+                        <a href="#neighbours" className="modal-trigger tooltip"
+                           data-tooltip="Click for info"> neighbours</a>
+                           &nbsp;is <strong> exactly 3</strong>.</h5>
                 )}
+
+                <div id="neighbours" className="modal modal-fixed-footer">
+                    <div className="modal-content">
+                        <h4>Neighbours</h4>
+                        <p>A neighbour is any cell that is next to your cell. This includes diagonals.</p>
+                        <ul className="collection">
+                            <li className="collection-item">Cells in corners have three neighbours.</li>
+                            <li className="collection-item">Cells on an edge have five neighbours.</li>
+                            <li className="collection-item">All other cells have a total of eight neighbours.</li>
+                        </ul>
+                    </div>
+                    <div className="modal-footer">
+                        <a href="#!" className="modal-action modal-close waves-effect waves-green btn-flat">Got it!</a>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -111,7 +140,7 @@ let run = function () {
     });
 
     var instance = parseInt($.url().param('instance')) || 1,
-        cellName = parseInt($.url().param('cell_name')) || "A1",
+        cellName = $.url().param('cell_name') || "A1",
         url = "/api/gameoflife/#/".replace('#', String(instance)),
         cellURL = url + "cell/#/".replace('#', String(cellName));
 
