@@ -1,4 +1,4 @@
 Django
 djangorestframework
 redis
-
+drf-nested-routers

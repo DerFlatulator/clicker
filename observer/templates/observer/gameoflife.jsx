@@ -27,7 +27,9 @@ class GameOfLife extends React.Component {
         });
 
         $(function () {
-            var socket = io('http://' + window.location.hostname + ':4000');
+            var path = 'http://#1:4000/#2',
+                socket = io(path.replace('#1', window.location.hostname)
+                                .replace('#2', String(this.props.channel)));
 
             socket.on('connect', function () {
                 console.log('socket connected');
@@ -44,7 +46,7 @@ class GameOfLife extends React.Component {
     }
 
     /**
-     * @param index the index (0-based) to convert from
+     * @param {number} index the index (0-based) to convert from
      * @returns {string} the column letter
      */
     static indexToColumnLetter(index) {
