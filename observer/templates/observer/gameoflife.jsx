@@ -16,9 +16,9 @@ class GameOfLife extends React.Component {
             dataType: 'json',
             cache: false,
             success: data => {
-                console.log(data.serial_cells);
+                console.log(data.serialized);
                 this.setState({
-                    cells: GameOfLife.deserialize(data.serial_cells)
+                    cells: GameOfLife.deserialize(data.serialized)
                 });
             },
             error: (xhr, status, err) => {
@@ -39,7 +39,7 @@ class GameOfLife extends React.Component {
                 console.log(message);
                 let data = JSON.parse(message);
                 if (this.props.id == data.game_of_life) {
-                    this.setState({ cells: GameOfLife.deserialize(data.serial_cells) });
+                    this.setState({ cells: GameOfLife.deserialize(data.serialized) });
                 }
             });
         }.bind(this));
@@ -123,7 +123,7 @@ let run = function () {
 
     var socketURL = "//#:4000/socket.io/socket.io.js".replace('#', window.location.hostname),
         instance = parseInt($.url().param('instance')) || 1,
-        url = "/api/gameoflife/view/#/".replace('#', String(instance)),
+        url = "/api/gameoflife/#/".replace('#', String(instance)),
         channel = "gameoflife.observer";
 
     // Wait for socket code to load before activating React

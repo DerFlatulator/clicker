@@ -69,7 +69,7 @@ let run = function () {
 
     var instance = parseInt($.url().param('instance')) || 1,
         cellName = parseInt($.url().param('cell_name')) || "A1",
-        url = "/api/gameoflife/view/#/".replace('#', String(instance));
+        url = "/api/gameoflife/#/".replace('#', String(instance));
 
     React.render(
         <GameOfLife url={url} cellName={cellName} date={new Date()}/>,

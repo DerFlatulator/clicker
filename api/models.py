@@ -70,8 +70,8 @@ class GameOfLife(models.Model):
 
     @property
     def get_current_state(self):
-        cells = GameOfLifeCell.objects.filter(game_of_life=self.id, alive=True)
-        gol = [[False] * self.num_cols] * self.num_rows
+        cells = GameOfLifeCell.objects.filter(game_of_life=self.id)
+        gol = [[False] * self.num_cols for _ in range(self.num_rows)]
         for cell in cells:
             if cell.alive:
                 gol[cell.row][cell.col] = True
@@ -116,4 +116,8 @@ class GameOfLifeCell(models.Model):
                 self.changed = True
 
         super(GameOfLifeCell, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return "Game of life cell: instance={}, @({}, {}), alive={}".format(
+            self.game_of_life_id, self.col, self.row, self.alive)
 
