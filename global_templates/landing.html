@@ -6,10 +6,18 @@
 {% block content %}
     <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
-            <a id="logo-container" href="/" class="brand-logo">Clicker++</a>
+            <a id="logo-container" href="#" class="brand-logo">Clicker++</a>
 
-            {% block nav_items %}
-            {% endblock %}
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/client/">Client</a></li>
+                <li><a href="/creator/">Creator</a></li>
+                <li><a href="/observer/">Observer</a></li>
+            </ul>
+            <ul id="nav-mobile" class="side-nav">
+                <li><a href="/client/">Client</a></li>
+                <li><a href="/creator/">Creator</a></li>
+                <li><a href="/observer/">Observer</a></li>
+            </ul>
 
             <a href="#" data-activates="nav-mobile" class="button-collapse">
                 <i class="mdi-navigation-menu"></i>
@@ -22,11 +30,9 @@
 
             <div class="row">
                 <div class="card">
-                    {% block react_outlet %}
                     <div class="col s12" id="react-main">
-
+                        <h1>Landing Page</h1>
                     </div>
-                    {% endblock %}
                 </div>
 
             </div>
@@ -39,7 +45,7 @@
         </div>
     </div>
 
-    <footer class="page-footer {% block footer_class %}yellow lighten-2{% endblock %}">
+    <footer class="page-footer {% block footer_class %}green lighten-2{% endblock %}">
         <div class="container">
             <div class="row">
                 {% block footer_content %}
@@ -58,9 +64,6 @@
     <!--<![endif]-->
     <script type="text/javascript" src="{% static "components/url-parser/purl.js" %}"></script>
     <script type="text/javascript" src="{% static "components/jquery-cookie/jquery.cookie.js" %}"></script>
-    <script type="text/javascript" src="{% static "components/classnames/index.js" %}"></script>
-
-    <script type="text/javascript" src="{% static "components/react/react.js" %}"></script>
     <script type="text/javascript" src="{% static "components/materialize/dist/js/materialize.min.js" %}"></script>
     <script type="text/javascript">
         $('.button-collapse').sideNav({

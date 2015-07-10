@@ -1,33 +1,55 @@
 from django.conf.urls import url, include
 
-from rest_framework_nested import routers
+from rest_framework.routers import DefaultRouter
+from rest_framework_nested.routers import NestedSimpleRouter
 
 import api.views as views
 
-router = routers.SimpleRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
-router.register(r'class', views.ClickerClassViewSet)
-router.register(r'bubblesort/view', views.BubbleSortViewSet)
-router.register(r'bubblesort/swap', views.BubbleSortSwapViewSet)
-# router.register(r'gameoflife/cell', views.GameOfLifeCellViewSet)
-
-router.register(r'gameoflife', views.GameOfLifeViewSet)
-gameoflife_router = routers.NestedSimpleRouter(router, r'gameoflife', lookup='gameoflife')
-gameoflife_router.register(r'cell', views.GameOfLifeCellViewSet, base_name='gameoflifecell')
+router = DefaultRouter()
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
-    url(r'^', include(gameoflife_router.urls)),
-    # url(
-    #     r'gameoflife/(?P<game_of_life_id>[0-9]+)/cell/(?P<cell_name>\w+)/$',
-    #     views.GameOfLifeCellViewSet.as_view({'get': 'retrieve'}),
-    #     name='gameoflifecell-detail'
-    # ),
-    # url(
-    #     r'gameoflife/(?P<game_of_life_id>[0-9]+)/cell/$',
-    #     views.GameOfLifeCellViewSet.as_view({'get': 'list'}),
-    #     name='gameoflifecell-list'
-    # ),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
+
+view_sets = [
+    views.UserViewSet,
+    views.GroupViewSet,
+    (views.ClickerClassViewSet, "clicker"),
+    views.BubbleSortViewSet,
+    views.GameOfLifeViewSet,
+]
+
+
+for view_set in view_sets:
+    if isinstance(view_set, tuple):
+        view_name = view_set[1]
+        view_set = view_set[0]
+    else:
+        view_name = view_set.__name__.replace("ViewSet", "").lower()
+
+    router.register(view_name, view_set)
+
+urlpatterns.append(url(r'^', include(router.urls)))
+
+#
+# Begin nested routes
+#
+
+
+def nested(view, uri=None, parent=None):
+    nested_simple_router = NestedSimpleRouter(router, parent, lookup=parent)
+    nested_simple_router.register(uri, view, base_name=(parent + uri))
+    return nested_simple_router
+
+nested_routers = [
+    nested(views.GameOfLifeCellViewSet, uri="cell", parent="gameoflife"),
+    nested(views.BubbleSortSwapViewSet, uri="swap", parent="bubblesort")
+]
+
+for nested_router in nested_routers:
+    urlpatterns.append(url(r'^', include(nested_router.urls)))
+
+
+# gameoflife_router = NestedSimpleRouter(router, r'gameoflife', lookup='gameoflife')
+# gameoflife_router.register(r'cell', views.GameOfLifeCellViewSet, base_name='gameoflifecell')
+

@@ -16,7 +16,6 @@ class GameOfLife extends React.Component {
             dataType: 'json',
             cache: false,
             success: data => {
-                console.log(data.serialized);
                 this.setState({
                     cells: GameOfLife.deserialize(data.serialized)
                 });

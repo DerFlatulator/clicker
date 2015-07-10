@@ -28,15 +28,18 @@ class BubbleSortSerializer(serializers.HyperlinkedModelSerializer):
         model = models.BubbleSort
 
 
-class BubbleSortSwapSerializer(serializers.HyperlinkedModelSerializer):
+class BubbleSortSwapSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
-        if data['lower_index'] < 0 or self['lower_index'] >= data['bubble_sort.size']:
+        if data['lower_index'] < 0 or data['lower_index'] >= data['bubble_sort'].get_list_size:
             raise serializers.ValidationError({'lower_index': 'Must be a valid index'})
         return data
 
     class Meta:
         model = models.BubbleSortSwap
+        extra_kwargs = {
+            'url': {'view_name': 'bubblesortswap-detail', 'lookup_field': 'id'}
+        }
 
 
 class GameOfLifeSerializer(serializers.HyperlinkedModelSerializer):
@@ -57,6 +60,7 @@ class GameOfLifeCellSerializer(serializers.ModelSerializer):
         }
 
 
+# noinspection PyMethodMayBeStatic
 class ClickerClassSerializer(serializers.HyperlinkedModelSerializer):
 
     def validate_class_name(self, class_name):

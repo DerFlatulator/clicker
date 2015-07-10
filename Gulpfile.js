@@ -36,7 +36,7 @@ var output = {
     observer_css: 'dist/css/',
     creator_js: 'dist/js/',
     creator_css: 'dist/css/',
-    default_css: 'dist/css/'
+    default_css: 'dist/css/',
 };
 
 gulp.task('client-bubblesort', function () {
@@ -55,7 +55,7 @@ gulp.task('client-bubblesort', function () {
         // Save Source mappings
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.client + '/',
-            sourceMappingURLPrefix: '/' + output.client_js
+            sourceMappingURLPrefix: '/static/js/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.client_js));
@@ -77,7 +77,7 @@ gulp.task('client-gameoflife', function () {
         // Save Source mappings
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.client + '/',
-            sourceMappingURLPrefix: '/' + output.client_js
+            sourceMappingURLPrefix: '/static/js/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.client_js));
@@ -100,7 +100,7 @@ gulp.task('observer-bubblesort', function () {
         // Save Source mappings
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.observer + '/',
-            sourceMappingURLPrefix: '/' + output.observer_js
+            sourceMappingURLPrefix: '/static/js/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.observer_js));
@@ -122,7 +122,7 @@ gulp.task('observer-gameoflife', function () {
         // Save Source mappings
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.observer + '/',
-            sourceMappingURLPrefix: '/' + output.observer_js
+            sourceMappingURLPrefix: '/static/js/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.observer_js));
@@ -147,7 +147,7 @@ gulp.task('creator-jsx', function () {
         }))
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.creator + '/',
-            sourceMappingURLPrefix: '/' + output.creator_js
+            sourceMappingURLPrefix: '/static/js/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.creator_js));

@@ -20,7 +20,10 @@ from client import urls as client_urls
 from observer import urls as observer_urls
 from creator import urls as creator_urls
 
+from views import landing
+
 urlpatterns = [
+    url(r'^$', landing),
     url(r'^api/', include('api.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^client/', include(client_urls), name='client_app'),

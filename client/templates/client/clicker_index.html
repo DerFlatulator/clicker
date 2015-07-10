@@ -1,0 +1,49 @@
+{% extends "react_app.html" %}
+{% load staticfiles %}
+
+{% block title %}Index | Client{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/client.css" %}" />
+{% endblock %}
+
+{% block scripts_head %}
+{% endblock %}
+
+{% block nav_items %}
+    {% include "nav.html" with app="client" class_name="" %}
+{% endblock %}
+
+{% block react_outlet %}
+<div class="card-content">
+    <span class="card-title activator grey-text text-darken-4">Clicker++ Client</span>
+    <p>Available classes:</p>
+    <div class="row">
+        <div class="col s12 m12 l8">
+            <ul class="collection">
+                {% for class in class_list %}
+                <li class="collection-item avatar">
+                    <i class="material-icons circle green mdi-action-assessment"></i>
+                    <span class="title">{{ class.long_name }}</span>
+                    <p>Class is open.</p>
+                    <a href="/client/{{ class.class_name }}/" class="secondary-content waves-effect waves-light btn">
+                        <i class="mdi-action-game left"></i>
+                        Participate
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_class %}
+    orange
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {# <script type="text/javascript" src="{% static "js/client-index.min.js"></script> #}
+{% endblock %}

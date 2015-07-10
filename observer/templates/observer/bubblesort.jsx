@@ -33,7 +33,6 @@ class BubbleSort extends React.Component {
             });
 
             socket.on('message', message => {
-                console.log(message);
                 let data = JSON.parse(message);
                 if (this.props.id == data.bubble_sort) {
                     this.swapListIndex(data.lower_index);
@@ -58,7 +57,7 @@ class BubbleSort extends React.Component {
             return "blue";
         }
 
-        return "hsl(" + String(Math.floor(hue)) + ", 40%, 50%)";
+        return `hsl(${String(Math.floor(hue))}, 40%, 50%)`;
     }
 
     render() {
@@ -142,8 +141,8 @@ let run = function () {
     var socketBase = `//${window.location.hostname}:4000/`,
         socketURL = socketBase + "socket.io/socket.io.js",
         instance = parseInt($.url().param('instance')) || 1,
-        url = `/api/bubblesort/view/${instance}/`,
-        channel = socketBase +  "bubblesort.observer";
+        url = `/api/bubblesort/${instance}/`,
+        channel = socketBase + "bubblesort.observer";
 
     /*
      * Wait for socket code to load before activating React.

@@ -30,6 +30,10 @@ class BubbleSortSwapViewSet(viewsets.ModelViewSet):
     queryset = models.BubbleSortSwap.objects.all()
     serializer_class = serializers.BubbleSortSwapSerializer
 
+    def filter_queryset(self, _):
+        bubblesort_pk = self.kwargs['bubblesort_pk']
+        return self.queryset.filter(bubble_sort_id=bubblesort_pk)
+
 
 class ClickerClassViewSet(viewsets.ModelViewSet):
     queryset = models.ClickerClass.objects.all()
