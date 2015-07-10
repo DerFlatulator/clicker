@@ -1,0 +1,14 @@
+<ul class="right hide-on-med-and-down">
+    {% for c in class_list %}
+        <li {% if class_name == c.class_name %} class="active" {% endif %}>
+            <a href="/{{ app }}/{{ c.class_name }}/">{{ c.long_name }}</a>
+        </li>
+    {% endfor %}
+</ul>
+<ul id="nav-mobile" class="side-nav">
+    {% for c in class_list %}
+        <li {% if class_name == c.class_name %}class="active"{% endif %}>
+            <a href="/{{ app }}/{{ c.class_name }}/">{{ c.long_name }}</a>
+        </li>
+    {% endfor %}
+</ul>

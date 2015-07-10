@@ -1,0 +1,25 @@
+{% extends "react_app.html" %}
+{% load staticfiles %}
+
+{% block title %}{{ class_name }} | Observer{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/observer.css" %}" />
+{% endblock %}
+
+{% block scripts_head %}
+{% endblock %}
+
+{% block nav_items %}
+    {% include "nav.html" with app="observer" %}
+{% endblock %}
+
+{% block footer_class %}
+    yellow lighten-2
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "js/observer-" %}{{ class_name }}.min.js"></script>
+{% endblock %}

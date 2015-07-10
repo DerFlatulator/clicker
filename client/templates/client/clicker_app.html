@@ -1,0 +1,25 @@
+{% extends "react_app.html" %}
+{% load staticfiles %}
+
+{% block title %}{{ class_name }} | Client{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/client.css" %}" />
+{% endblock %}
+
+{% block scripts_head %}
+{% endblock %}
+
+{% block nav_items %}
+    {% include "nav.html" with app="client" %}
+{% endblock %}
+
+{% block footer_class %}
+    orange
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "js/client-" %}{{ class_name }}.min.js"></script>
+{% endblock %}

@@ -69,15 +69,3 @@
     text-align: center;
 /*    vertical-align: super; */
 }
-
-/* http://stackoverflow.com/a/8490961/1280997 */
-.page-footer {
-    bottom: 0;
-    position: fixed;
-    z-index: 150;
-    _position: absolute;
-    _top: expression(eval(document.documentElement.scrollTop+
-        (document.documentElement.clientHeight-this.offsetHeight)));
-    /* height: 35px; */
-    width: 100%;
-}

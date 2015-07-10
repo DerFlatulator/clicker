@@ -51,7 +51,8 @@ INSTALLED_APPS = (
     'rest_framework',
     'api',
     'client',
-    'observer'
+    'observer',
+    'creator',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -72,7 +73,9 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'client/templates'),
-            os.path.join(BASE_DIR, 'observer/templates')
+            os.path.join(BASE_DIR, 'observer/templates'),
+            os.path.join(BASE_DIR, 'creator/templates'),
+            os.path.join(BASE_DIR, 'global_templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -132,5 +135,7 @@ STATICFILES_DIRS = (
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'client/templates'),
-    os.path.join(BASE_DIR,  'observer/templates')
+    os.path.join(BASE_DIR,  'observer/templates'),
+    os.path.join(BASE_DIR,  'creator/templates'),
+    os.path.join(BASE_DIR,  'global_templates')
 )

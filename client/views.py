@@ -1,9 +1,23 @@
 from django.shortcuts import render
+from django.http import Http404
 
 
-def bubble_sort(request):
-    return render(request, 'client/bubblesort.html', {})
+def clicker_app(request, class_name):
+    class_list = [
+        {
+            'class_name': 'bubblesort',
+            'long_name': 'Bubble Sort'
+        },
+        {
+            'class_name': 'gameoflife',
+            'long_name': 'Game of Life'
+        }
+    ]
 
+    if not filter(lambda d: d['class_name'] == class_name, class_list):
+        raise Http404("Class does not exist.")
 
-def game_of_life(request):
-    return render(request, 'client/gameoflife.html', {})
+    return render(request, 'client/clicker_app.html', {
+        'class_name': class_name,
+        'class_list': class_list
+    })

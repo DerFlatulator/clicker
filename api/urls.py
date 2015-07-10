@@ -7,6 +7,7 @@ import api.views as views
 router = routers.SimpleRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
+router.register(r'class', views.ClickerClassViewSet)
 router.register(r'bubblesort/view', views.BubbleSortViewSet)
 router.register(r'bubblesort/swap', views.BubbleSortSwapViewSet)
 # router.register(r'gameoflife/cell', views.GameOfLifeCellViewSet)

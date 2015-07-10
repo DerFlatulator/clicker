@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 import string
+import re
 
 
 class BubbleSort(models.Model):
@@ -45,10 +46,6 @@ class BubbleSort(models.Model):
 class BubbleSortSwap(models.Model):
     lower_index = models.IntegerField(null=False)
     bubble_sort = models.ForeignKey(BubbleSort)
-
-    def clean(self):
-        if self.lower_index < 0 or self.lower_index >= self.bubble_sort.size:
-            raise ValidationError({'lower_index': 'Must be a valid index'})
 
     def __unicode__(self):
         return "[{}] Swap {} and {}.".format(self.bubble_sort_id, self.lower_index, self.lower_index + 1)
@@ -140,3 +137,12 @@ class GameOfLifeCell(models.Model):
         return "Game of life cell: instance={}, @({}, {}), alive={}".format(
             self.game_of_life_id, self.col, self.row, self.alive)
 
+# Classes
+
+
+class ClickerClass(models.Model):
+    class_name = models.CharField(max_length=50, null=False)
+    long_name = models.CharField(max_length=255, null=False)
+
+    def __unicode__(self):
+        return "Class: {} ({})".format(self.class_name, self.long_name)

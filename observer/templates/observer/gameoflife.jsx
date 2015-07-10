@@ -27,9 +27,7 @@ class GameOfLife extends React.Component {
         });
 
         $(function () {
-            var path = 'http://#1:4000/#2',
-                socket = io(path.replace('#1', window.location.hostname)
-                                .replace('#2', String(this.props.channel)));
+            var socket = io(this.props.channel);
 
             socket.on('connect', function () {
                 console.log('socket connected');
@@ -141,11 +139,11 @@ class GameOfLife extends React.Component {
 }
 
 let run = function () {
-
-    var socketURL = "//#:4000/socket.io/socket.io.js".replace('#', window.location.hostname),
+    var socketBase = `//${window.location.hostname}:4000/`,
+        socketURL = socketBase + 'socket.io/socket.io.js',
         instance = parseInt($.url().param('instance')) || 1,
-        url = "/api/gameoflife/#/".replace('#', String(instance)),
-        channel = "gameoflife.observer";
+        url = `/api/gameoflife/${instance}/`,
+        channel = socketBase + "gameoflife.observer";
 
     // Wait for socket code to load before activating React
     $.getScript(socketURL, function () {

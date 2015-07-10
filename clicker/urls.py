@@ -18,10 +18,12 @@ from django.contrib import admin
 
 from client import urls as client_urls
 from observer import urls as observer_urls
+from creator import urls as creator_urls
 
 urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^client/', include(client_urls), name='client_app'),
     url(r'^observer/', include(observer_urls), name='observer_app'),
+    url(r'^creator/', include(creator_urls), name='creator_app')
 ]

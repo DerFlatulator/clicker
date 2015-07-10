@@ -1,26 +1,15 @@
 from django.contrib.admin.utils import lookup_field
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
+from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from .serializers import (
-    UserSerializer,
-    GroupSerializer,
-    BubbleSortSerializer,
-    GameOfLifeSerializer,
-    GameOfLifeCellSerializer
-)
-
-from .models import (
-    BubbleSort,
-    BubbleSortSwap,
-    GameOfLife,
-    GameOfLifeCell,
-)
+from . import serializers
+from . import models
 
 
-def generic_serializer_view_set_factory(_model, _serializer=serializers.HyperlinkedModelSerializer):
+def generic_serializer_view_set_factory(_model, _serializer=HyperlinkedModelSerializer):
     class GenericSerializerViewSet(viewsets.ModelViewSet):
         queryset = _model.objects.all()
 
@@ -36,22 +25,30 @@ def generic_serializer_view_set_factory(_model, _serializer=serializers.Hyperlin
     finally:
         return GenericSerializerViewSet
 
-BubbleSortSwapViewSet = generic_serializer_view_set_factory(BubbleSortSwap)
+
+class BubbleSortSwapViewSet(viewsets.ModelViewSet):
+    queryset = models.BubbleSortSwap.objects.all()
+    serializer_class = serializers.BubbleSortSwapSerializer
+
+
+class ClickerClassViewSet(viewsets.ModelViewSet):
+    queryset = models.ClickerClass.objects.all()
+    serializer_class = serializers.ClickerClassSerializer
 
 
 class BubbleSortViewSet(viewsets.ModelViewSet):
-    queryset = BubbleSort.objects.all()
-    serializer_class = BubbleSortSerializer
+    queryset = models.BubbleSort.objects.all()
+    serializer_class = serializers.BubbleSortSerializer
 
 
 class GameOfLifeViewSet(viewsets.ModelViewSet):
-    queryset = GameOfLife.objects.all()
-    serializer_class = GameOfLifeSerializer
+    queryset = models.GameOfLife.objects.all()
+    serializer_class = serializers.GameOfLifeSerializer
 
 
 class GameOfLifeCellViewSet(viewsets.ModelViewSet):
-    serializer_class = GameOfLifeCellSerializer
-    queryset = GameOfLifeCell.objects.all()
+    serializer_class = serializers.GameOfLifeCellSerializer
+    queryset = models.GameOfLifeCell.objects.all()
     lookup_field = 'cell_name'
 
     def list(self, request, gameoflife_pk=None, **kwargs):
@@ -70,9 +67,9 @@ class GameOfLifeCellViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+    serializer_class = serializers.GroupSerializer

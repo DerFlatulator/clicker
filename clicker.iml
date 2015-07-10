@@ -31,6 +31,7 @@
       <list>
         <option value="$MODULE_DIR$/client/templates" />
         <option value="$MODULE_DIR$/observer/templates" />
+        <option value="$MODULE_DIR$/creator/templates" />
       </list>
     </option>
   </component>

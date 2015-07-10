@@ -1,25 +1,19 @@
-{% extends "client/default.html" %}
+{% extends "default.html" %}
 {% load staticfiles %}
-{% block title %}Clicker | Client{% endblock %}
 {% block styles %}
-    <link rel="stylesheet" media="all" href="{% static "css/lib/materialize/materialize.min.css" %}" />
-    <link rel="stylesheet" media="all" href="{% static "css/client.css" %}" />
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
 {% endblock %}
 {% block content %}
     <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
             <a id="logo-container" href="#" class="brand-logo">Clicker++</a>
 
-            <ul class="right hide-on-med-and-down">
-                <li class="active"><a href="/client/bubblesort">Bubble Sort</a></li>
-                <li><a href="/client/gameoflife">Game of Life</a></li>
-            </ul>
+            {% block nav_items %}
+            {% endblock %}
 
-            <ul id="nav-mobile" class="side-nav">
-                <li class="active"><a href="/client/bubblesort">Bubble Sort</a></li>
-                <li><a href="/client/gameoflife">Game of Life</a></li>
-            </ul>
-            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+            <a href="#" data-activates="nav-mobile" class="button-collapse">
+                <i class="mdi-navigation-menu"></i>
+            </a>
         </div>
     </nav>
 
@@ -28,19 +22,28 @@
 
             <div class="row">
                 <div class="card">
+                    {% block react_outlet %}
                     <div class="col s12" id="react-main">
 
                     </div>
+                    {% endblock %}
                 </div>
+
             </div>
+
+        </div>
+        <br><br>
+
+        <div class="section">
 
         </div>
     </div>
 
-    <footer class="page-footer orange">
+    <footer class="page-footer {% block footer_class %}yellow lighten-2{% endblock %}">
         <div class="container">
             <div class="row">
-
+                {% block footer_content %}
+                {% endblock %}
             </div>
         </div>
         <div class="footer-copyright">
@@ -51,20 +54,17 @@
 {% block scripts %}
     <!--[if lt IE 9]><script src="{% static "components/jquery-legacy/jquery.min.js" %}"></script><![endif]-->
     <!--[if gte IE 9]><!-->
-        <script src="{% static "components/jquery/dist/jquery.min.js" %}"></script>
+    <script src="{% static "components/jquery/dist/jquery.min.js" %}"></script>
     <!--<![endif]-->
-
     <script type="text/javascript" src="{% static "components/url-parser/purl.js" %}"></script>
     <script type="text/javascript" src="{% static "components/jquery-cookie/jquery.cookie.js" %}"></script>
     <script type="text/javascript" src="{% static "components/classnames/index.js" %}"></script>
 
-    <script type="text/javascript" src="{% static "components/react/react-with-addons.js" %}"></script>
+    <script type="text/javascript" src="{% static "components/react/react.js" %}"></script>
     <script type="text/javascript" src="{% static "components/materialize/dist/js/materialize.min.js" %}"></script>
     <script type="text/javascript">
         $('.button-collapse').sideNav({
             closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
         });
     </script>
-
-    <script type="text/javascript" src="{% static "js/client-bubblesort.min.js" %}"></script>
 {% endblock %}

@@ -14,10 +14,10 @@ class BubbleSort extends React.Component {
             url: this.props.url,
             dataType: 'json',
             cache: false,
-            success: data => {
-                console.log(data.current_list);
+            success: ({ current_list }) => {
+                console.log(current_list);
                 this.setState({
-                    list: data.current_list
+                    list: current_list
                 });
             },
             error: (xhr, status, err) => {
@@ -25,10 +25,8 @@ class BubbleSort extends React.Component {
             }
         });
 
-        $(function () {
-            var path = 'http://#1:4000/#2',
-                socket = io(path.replace('#1', window.location.hostname)
-                                .replace('#2', String(this.props.channel)));
+        $(() => {
+            var socket = io(this.props.channel);
 
             socket.on('connect', function () {
                 console.log('socket connected');
@@ -41,7 +39,7 @@ class BubbleSort extends React.Component {
                     this.swapListIndex(data.lower_index);
                 }
             });
-        }.bind(this));
+        });
     }
 
     swapListIndex(index) {
@@ -141,10 +139,11 @@ class BubbleSortCaption extends React.Component {
 
 let run = function () {
 
-    var socketURL = "//#:4000/socket.io/socket.io.js".replace('#', window.location.hostname),
+    var socketBase = `//${window.location.hostname}:4000/`,
+        socketURL = socketBase + "socket.io/socket.io.js",
         instance = parseInt($.url().param('instance')) || 1,
-        url = "/api/bubblesort/view/#/".replace('#', String(instance)),
-        channel = "bubblesort.observer";
+        url = `/api/bubblesort/view/${instance}/`,
+        channel = socketBase +  "bubblesort.observer";
 
     /*
      * Wait for socket code to load before activating React.
@@ -160,3 +159,4 @@ let run = function () {
 
 };
 run();
+

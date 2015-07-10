@@ -75,10 +75,10 @@ class GameOfLife extends React.Component {
         });
     }
 
-    swapDone(data) {
+    swapDone({ alive }) {
         this.setState({
             buttonEnabled: true,
-            clientCell: data.alive
+            clientCell: alive
         });
     }
 
@@ -141,8 +141,8 @@ let run = function () {
 
     var instance = parseInt($.url().param('instance')) || 1,
         cellName = $.url().param('cell_name') || "A1",
-        url = "/api/gameoflife/#/".replace('#', String(instance)),
-        cellURL = url + "cell/#/".replace('#', String(cellName));
+        url = `/api/gameoflife/${instance}/`,
+        cellURL = url + `cell/${cellName}/`;
 
     React.render(
         <GameOfLife url={url} cellURL={cellURL} cellName={cellName} date={new Date()}/>,

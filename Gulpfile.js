@@ -9,6 +9,7 @@ var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var uglify = require('gulp-uglify');
 var livereload = require('gulp-livereload');
+var rename = require('gulp-rename');
 var bower = require('gulp-bower');
 
 var globs = {
@@ -21,13 +22,21 @@ var globs = {
     observer_jsx_bubblesort: 'observer/templates/observer/bubblesort.jsx',
     observer_jsx_gameoflife: 'observer/templates/observer/gameoflife.jsx',
     observer_html: 'observer/templates/observer/*.html',
-    observer_css: 'observer/templates/observer/*.css'
+    observer_css: 'observer/templates/observer/*.css',
+    creator: 'creator/templates/creator',
+    creator_html: 'creator/templates/creator/*.html',
+    creator_jsx: 'creator/templates/creator/*.jsx',
+    creator_css: 'creator/templates/creator/*.css',
+    default_css: 'global_templates/default.css'
 };
 var output = {
     client_js: 'dist/js/',
     client_css: 'dist/css/',
     observer_js: 'dist/js/',
-    observer_css: 'dist/css/'
+    observer_css: 'dist/css/',
+    creator_js: 'dist/js/',
+    creator_css: 'dist/css/',
+    default_css: 'dist/css/'
 };
 
 gulp.task('client-bubblesort', function () {
@@ -50,8 +59,6 @@ gulp.task('client-bubblesort', function () {
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.client_js));
-        // Connect livereload
-        //.pipe(livereload({ start: true }));
 });
 
 gulp.task('client-gameoflife', function () {
@@ -74,8 +81,6 @@ gulp.task('client-gameoflife', function () {
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.client_js));
-    // Connect livereload
-    //.pipe(livereload({ start: true }));
 });
 
 
@@ -99,8 +104,6 @@ gulp.task('observer-bubblesort', function () {
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.observer_js));
-        // Connect livereload
-        //.pipe(livereload({ start: true }));
 });
 
 gulp.task('observer-gameoflife', function () {
@@ -123,10 +126,32 @@ gulp.task('observer-gameoflife', function () {
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.observer_js));
-    // Connect livereload
-    //.pipe(livereload({ start: true }));
 });
 
+gulp.task('creator-jsx', function () {
+
+    return gulp.src(globs.creator_jsx)
+        // Prevent errors from killing watch task
+        .pipe(plumber())
+        // Initialise source mappings
+        .pipe(sourcemaps.init())
+        // Concatenate all source files
+        //.pipe(concat('creator.min.js'))
+        // Transpile JSX and ES6 to ES5
+        .pipe(babel())
+        // Minify
+        .pipe(uglify())
+        // Save Source mappings
+        .pipe(rename({
+            extname: '.min.js'
+        }))
+        .pipe(sourcemaps.write('.', {
+            sourceRoot: '../../' + globs.creator + '/',
+            sourceMappingURLPrefix: '/' + output.creator_js
+        }))
+        // Output to `dist/js`
+        .pipe(gulp.dest(output.creator_js));
+});
 
 gulp.task('observer-css', function () {
 
@@ -134,7 +159,6 @@ gulp.task('observer-css', function () {
         .pipe(plumber())
         .pipe(concat('observer.css'))
         .pipe(gulp.dest(output.observer_css));
-    //.pipe(livereload({ start: true }));
 });
 
 gulp.task('client-css', function () {
@@ -143,9 +167,21 @@ gulp.task('client-css', function () {
         .pipe(plumber())
         .pipe(concat('client.css'))
         .pipe(gulp.dest(output.client_css));
-    //.pipe(livereload({ start: true }));
 });
 
+gulp.task('creator-css', function () {
+
+    return gulp.src(globs.creator_css)
+        .pipe(plumber())
+        .pipe(concat('creator.css'))
+        .pipe(gulp.dest(output.creator_css));
+});
+
+gulp.task('default-css', function () {
+
+    return gulp.src(globs.default_css)
+        .pipe(gulp.dest(output.default_css));
+});
 
 gulp.task('bower', function () {
     return bower();
@@ -153,22 +189,32 @@ gulp.task('bower', function () {
 
 gulp.task('deploy', [
     'bower',
+    'default-css',
     'observer-bubblesort',
     'observer-gameoflife',
     'observer-css',
     'client-bubblesort',
     'client-gameoflife',
-    'client-css'
+    'client-css',
+    'creator-jsx',
+    'creator-css'
 ]);
 
 gulp.task('watch', function () {
     livereload.listen();
+    gulp.watch(globs.default_css, ['default-css']);
+
     gulp.watch(globs.client_jsx_bubblesort, ['client-bubblesort']);
     gulp.watch(globs.client_jsx_gameoflife, ['client-gameoflife']);
     gulp.watch(globs.client_css, ['client-css']);
     gulp.watch(globs.client_html, []);
+
     gulp.watch(globs.observer_jsx_bubblesort, ['observer-bubblesort']);
     gulp.watch(globs.observer_jsx_gameoflife, ['observer-gameoflife']);
     gulp.watch(globs.observer_css, ['observer-css']);
     gulp.watch(globs.observer_html, []);
+
+    gulp.watch(globs.creator_jsx, ['creator-jsx']);
+    gulp.watch(globs.creator_css, ['creator-css']);
+    gulp.watch(globs.creator_html, []);
 });
