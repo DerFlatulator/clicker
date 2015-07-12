@@ -3,6 +3,8 @@ from django.http import Http404
 
 from api.models import ClickerClass
 
+from itertools import ifilter
+
 
 def observer_index(request):
     class_list = ClickerClass.objects.all()[:50]
@@ -15,10 +17,12 @@ def observer_index(request):
 def react_app(request, class_name):
     class_list = ClickerClass.objects.all()[:5]
 
-    if not filter(lambda d: d.class_name == class_name, class_list):
+    context_class = next(ifilter(lambda d: d.class_name == class_name, class_list), None)
+    if not context_class:
         raise Http404("Class does not exist.")
 
     return render(request, 'observer/class_app.html', {
         'class_name': class_name,
+        'long_name': context_class.long_name,
         'class_list': class_list
     })

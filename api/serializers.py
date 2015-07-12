@@ -7,7 +7,7 @@ import re
 from . import models
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'username', 'email', 'groups')
@@ -19,7 +19,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'name')
 
 
-class BubbleSortSerializer(serializers.HyperlinkedModelSerializer):
+class BubbleSortSerializer(serializers.ModelSerializer):
     list_size = serializers.IntegerField(source='get_list_size', read_only=True)
     sorted_list = serializers.CharField(source='get_list_sorted', read_only=True)
     current_list = serializers.ListField(source='get_list_current', read_only=True)
@@ -42,11 +42,13 @@ class BubbleSortSwapSerializer(serializers.ModelSerializer):
         }
 
 
-class GameOfLifeSerializer(serializers.HyperlinkedModelSerializer):
+class GameOfLifeSerializer(serializers.ModelSerializer):
     serialized = serializers.CharField(source='__unicode__', read_only=True)
+    cells = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = models.GameOfLife
+        # fields = ('cells', 'serialized')
 
 
 class GameOfLifeCellSerializer(serializers.ModelSerializer):
@@ -61,7 +63,7 @@ class GameOfLifeCellSerializer(serializers.ModelSerializer):
 
 
 # noinspection PyMethodMayBeStatic
-class ClickerClassSerializer(serializers.HyperlinkedModelSerializer):
+class ClickerClassSerializer(serializers.ModelSerializer):
 
     def validate_class_name(self, class_name):
         if not re.match(r"^[a-z\-_0-9]+$", class_name):

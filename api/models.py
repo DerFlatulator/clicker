@@ -103,7 +103,7 @@ class GameOfLifeCell(models.Model):
     row = models.IntegerField(null=False, default=0)
     cell_name = models.CharField(max_length=10)
     changed = models.NullBooleanField(null=True)
-    game_of_life = models.ForeignKey(GameOfLife)
+    game_of_life = models.ForeignKey(GameOfLife, related_name='cells')
 
     def get_cell_name(self):
         cell_name = ""
