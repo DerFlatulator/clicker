@@ -115,7 +115,7 @@ class GameOfLife extends React.Component {
                            &nbsp;is <strong> exactly 3</strong>.</h5>
                 )}
 
-                <div id="neighbours" className="modal modal-fixed-footer">
+                <div id="neighbours" className="modal modal-fixed-footer textLeft">
                     <div className="modal-content">
                         <h4>Neighbours</h4>
                         <p>A neighbour is any cell that is next to your cell. This includes diagonals.</p>
@@ -124,6 +124,22 @@ class GameOfLife extends React.Component {
                             <li className="collection-item">Cells on an edge have five neighbours.</li>
                             <li className="collection-item">All other cells have a total of eight neighbours.</li>
                         </ul>
+
+                        <div className="row">
+                            <div className="col s12 m7">
+                                <div className="card">
+                                    <div className="card-image">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Moore_neighborhood_with_cardinal_directions.svg/300px-Moore_neighborhood_with_cardinal_directions.svg.png"></img>
+                                    </div>
+                                    <div className="card-content">
+                                        &quot;<a href="https://commons.wikimedia.org/wiki/File:Moore_neighborhood_with_cardinal_directions.svg#/media/File:Moore_neighborhood_with_cardinal_directions.svg">Moore neighborhood with cardinal directions</a>&quot; by <a href="//commons.wikimedia.org/wiki/User:MorningLemon" title="User:MorningLemon">MorningLemon</a> - <span>Own work</span>. Licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0" title="Creative Commons Attribution-Share Alike 4.0">CC BY-SA 4.0</a> via <a href="https://commons.wikimedia.org/wiki/">Wikimedia Commons</a>.
+                                    </div>
+                                    <div className="card-action">
+                                        <a href="https://en.wikipedia.org/wiki/Moore_neighborhood">Read more on Wikipedia</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="modal-footer">
                         <a href="#!" className="modal-action modal-close waves-effect waves-green btn-flat">Got it!</a>

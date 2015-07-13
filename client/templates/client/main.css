@@ -14,3 +14,11 @@
 a.modal-trigger {
     text-decoration: underline;
 }
+
+.textLeft {
+    text-align: left;
+}
+
+.textRight {
+    text-align: right;
+}
