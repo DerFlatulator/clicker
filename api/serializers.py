@@ -10,7 +10,7 @@ from . import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        fields = ('id', 'username', 'email', 'groups')
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -56,6 +56,7 @@ class GameOfLifeCellSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.GameOfLifeCell
         exclude = ('id', 'changed')
+        unique_together = ('game_of_life', 'cell_name')
         extra_kwargs = {
             'url': {'view_name': 'gameoflifecell-detail', 'lookup_field': 'cell_name'}
         }

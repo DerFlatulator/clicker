@@ -1,4 +1,6 @@
+braces
 Django
 djangorestframework
 redis
 drf-nested-routers
+django[bcrypt]

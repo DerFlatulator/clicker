@@ -14,5 +14,13 @@
       "class_name": "bubblesort",
       "long_name": "Bubble Sort"
     }
+  },
+  {
+    "model": "api.clickerclass",
+    "pk": 3,
+    "fields": {
+      "class_name": "asyncgameoflife",
+      "long_name": "Asynchronous Game of Life"
+    }
   }
 ]

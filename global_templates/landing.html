@@ -6,17 +6,46 @@
 {% block content %}
     <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
-            <a id="logo-container" href="#" class="brand-logo">Clicker++</a>
+            <a id="logo-container" href="#" class="left brand-logo">Clicker++</a>
 
             <ul class="right hide-on-med-and-down">
                 <li><a href="/client/">Client</a></li>
-                <li><a href="/creator/">Creator</a></li>
                 <li><a href="/observer/">Observer</a></li>
+                <li><a class="dropdown-button" data-beloworigin="true"
+                       href="#!" data-activates="dropdown1">Creator<i class="mdi-navigation-arrow-drop-down right"></i></a></li>
+                <ul id='dropdown1' class='dropdown-content'>
+                    {% if user.is_authenticated %}
+                        <li><a href="/creator/">{{ user.username }}</a></li>
+                        <li><a href="/logout/">Log out</a></li>
+                    {% else %}
+                        <li><a href="/login/">Log In</a></li>
+                        <li><a href="/signup/">Register</a></li>
+                    {% endif %}
+                </ul>
             </ul>
+
             <ul id="nav-mobile" class="side-nav">
                 <li><a href="/client/">Client</a></li>
-                <li><a href="/creator/">Creator</a></li>
                 <li><a href="/observer/">Observer</a></li>
+                <li class="divider"></li>
+                <li class="no-padding">
+                    <ul class="collapsible collapsible-accordion">
+                        <li>
+                            <a class="collapsible-header">Creator</a>
+                            <div class="collapsible-body">
+                                <ul>
+                                    {% if user.is_authenticated %}
+                                        <li><a href="/creator/">{{ user.username }}'s classes</a></li>
+                                        <li><a href="/logout/">Log out</a></li>
+                                    {% else %}
+                                        <li><a href="/login/">Log In</a></li>
+                                        <li><a href="/signup/">Register</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
             </ul>
 
             <a href="#" data-activates="nav-mobile" class="button-collapse">
@@ -24,7 +53,6 @@
             </a>
         </div>
     </nav>
-
     <div class="container">
         <div class="section">
 
@@ -69,5 +97,12 @@
         $('.button-collapse').sideNav({
             closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
         });
+
+{% if messages %}
+    {% for message in messages %}
+        Materialize.toast('{{ message |escapejs }}', 3000);
+    {% endfor %}
+{% endif %}
+
     </script>
 {% endblock %}

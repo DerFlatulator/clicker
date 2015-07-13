@@ -18,8 +18,8 @@
     </nav>
 
     <div class="container">
-        <div class="section">
 
+        <div class="section">
             <div class="row">
                 <div class="card">
                     {% block react_outlet %}
@@ -59,8 +59,9 @@
     <script type="text/javascript" src="{% static "components/url-parser/purl.js" %}"></script>
     <script type="text/javascript" src="{% static "components/jquery-cookie/jquery.cookie.js" %}"></script>
     <script type="text/javascript" src="{% static "components/classnames/index.js" %}"></script>
-
+    {% block react_js %}
     <script type="text/javascript" src="{% static "components/react/react.js" %}"></script>
+    {% endblock %}
     <script type="text/javascript" src="{% static "components/materialize/dist/js/materialize.min.js" %}"></script>
     <script type="text/javascript">
         $('.button-collapse').sideNav({

@@ -20,13 +20,16 @@ from client import urls as client_urls
 from observer import urls as observer_urls
 from creator import urls as creator_urls
 
-from views import landing
+import views as views
 
 urlpatterns = [
-    url(r'^$', landing),
+    url(r'^$', views.LandingView.as_view(), name='home'),
+    url(r'^signup/', views.SignUpView.as_view(), name='signup'),
+    url(r'^login/', views.LoginView.as_view(), name='login'),
+    url(r'^logout/', views.LogOutView.as_view(), name='logout'),
     url(r'^api/', include('api.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^client/', include(client_urls), name='client_app'),
     url(r'^observer/', include(observer_urls), name='observer_app'),
-    url(r'^creator/', include(creator_urls), name='creator_app')
+    url(r'^creator/', include(creator_urls), name='creator_app'),
 ]
