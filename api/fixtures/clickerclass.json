@@ -1,0 +1,18 @@
+[
+  {
+    "model": "api.clickerclass",
+    "pk": 1,
+    "fields": {
+      "class_name": "gameoflife",
+      "long_name": "Game of Life"
+    }
+  },
+  {
+    "model": "api.clickerclass",
+    "pk": 2,
+    "fields": {
+      "class_name": "bubblesort",
+      "long_name": "Bubble Sort"
+    }
+  }
+]
