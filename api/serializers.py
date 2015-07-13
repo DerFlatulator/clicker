@@ -48,7 +48,6 @@ class GameOfLifeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.GameOfLife
-        # fields = ('cells', 'serialized')
 
 
 class GameOfLifeCellSerializer(serializers.ModelSerializer):

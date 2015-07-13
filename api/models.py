@@ -99,9 +99,9 @@ class GameOfLife(models.Model):
 
 class GameOfLifeCell(models.Model):
     alive = models.BooleanField(null=False, default=False)
-    col = models.IntegerField(null=False, default=0)
-    row = models.IntegerField(null=False, default=0)
-    cell_name = models.CharField(max_length=10)
+    col = models.IntegerField(null=False, default=0, editable=False)
+    row = models.IntegerField(null=False, default=0, editable=False)
+    cell_name = models.CharField(max_length=10, editable=False, unique=True)
     changed = models.NullBooleanField(null=True)
     game_of_life = models.ForeignKey(GameOfLife, related_name='cells')
 
