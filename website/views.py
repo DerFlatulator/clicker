@@ -1,17 +1,23 @@
 from django.contrib import auth
 from django.core.urlresolvers import reverse_lazy
-from django.shortcuts import render
 from django.views import generic
 from django.conf import settings
 from django.contrib import messages
+
+from api import models
 
 from forms import RegistrationForm, LoginForm
 
 from braces import views
 
 
-class LandingView(generic.TemplateView, views.FormMessagesMixin):
+class LandingView(generic.TemplateView, views.MessageMixin):
     template_name = 'landing.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(LandingView, self).get_context_data(**kwargs)
+        context['class_list'] = models.ClickerClass.objects.all()[:10]
+        return context
 
 
 class SignUpView(generic.CreateView, views.AnonymousRequiredMixin, views.FormValidMessageMixin):
@@ -21,7 +27,7 @@ class SignUpView(generic.CreateView, views.AnonymousRequiredMixin, views.FormVal
     form_valid_message = 'All information is valid.'
 
     def get_success_url(self):
-        self.messages.success("Account created, You may now log in.")
+        self.messages.success("Account created. You may now log in.")
         return reverse_lazy('home')
 
 
@@ -50,5 +56,5 @@ class LogOutView(generic.RedirectView, views.LoginRequiredMixin, views.MessageMi
 
     def get(self, request, *args, **kwargs):
         auth.logout(request)
-        messages.success(request, "You've been logged out.")
+        messages.warning(request, "You've been logged out.")
         return super(LogOutView, self).get(request, *args, **kwargs)

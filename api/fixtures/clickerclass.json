@@ -20,7 +20,7 @@
     "pk": 3,
     "fields": {
       "class_name": "asyncgameoflife",
-      "long_name": "Asynchronous Game of Life"
+      "long_name": "Async. Game of Life"
     }
   }
 ]

@@ -1,0 +1,15 @@
+{% extends "react_app.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Log in | Creator{% endblock %}
+
+{% block footer_class %}grey lighten-3{% endblock %}
+
+{% block react_outlet %}
+    <h4>Log in to your creator account</h4>
+
+    {% crispy form %}
+{% endblock %}
+
+{% block react_js %}{# don't load React #}{% endblock %}

@@ -84,7 +84,7 @@ class GameOfLife extends React.Component {
 
         return (
             <div>
-                <h2>Game of Life</h2>
+                <h3>Asynchronous Game of Life</h3>
                 <div className="gameOfLife">
                     <div className="golCornerSpacer">&nbsp;</div>
 

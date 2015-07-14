@@ -1,14 +1,17 @@
 {% extends "default.html" %}
 {% load staticfiles %}
+{% load website_filters %}
+
 {% block styles %}
     <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
 {% endblock %}
 {% block content %}
-    <nav class="light-blue lighten-1" role="navigation">
+    <nav class="indigo darken-1" role="navigation">
         <div class="nav-wrapper container">
             <a id="logo-container" href="/" class="brand-logo">Clicker++</a>
 
             {% block nav_items %}
+                {% include "nav.html" with app="home" %}
             {% endblock %}
 
             <a href="#" data-activates="nav-mobile" class="button-collapse">
@@ -21,25 +24,23 @@
 
         <div class="section">
             <div class="row">
-                <div class="card">
+                <div id="react-main" class="col s12">
+                    <div class="card-panel hoverable">
                     {% block react_outlet %}
-                    <div class="col s12" id="react-main">
 
-                    </div>
                     {% endblock %}
+                    </div>
                 </div>
-
             </div>
-
         </div>
-        <br><br>
 
-        <div class="section">
-
-        </div>
+        {% block extra_sections %}
+        {% endblock %}
     </div>
 
-    <footer class="page-footer {% block footer_class %}yellow lighten-2{% endblock %}">
+    <div class="section dummy"></div>
+
+    <footer class="page-footer {% block footer_class %}grey lighten-3{% endblock %}">
         <div class="container">
             <div class="row">
                 {% block footer_content %}
@@ -47,7 +48,6 @@
             </div>
         </div>
         <div class="footer-copyright">
-
         </div>
     </footer>
 {% endblock %}
@@ -64,8 +64,18 @@
     {% endblock %}
     <script type="text/javascript" src="{% static "components/materialize/dist/js/materialize.min.js" %}"></script>
     <script type="text/javascript">
-        $('.button-collapse').sideNav({
-            closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
+        $(function () {
+            $('.button-collapse').sideNav({
+                closeOnClick: true
+            });
+            $('.modal-trigger').leanModal();
+            $('.tooltip').tooltip({delay: 50});
         });
+
+    {% if messages %}
+        {% for message in messages %}
+        Materialize.toast('{{ message |escapejs }}', 3000, '{{ message.tags |message_class }}');
+        {% endfor %}
+    {% endif %}
     </script>
 {% endblock %}

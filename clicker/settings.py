@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     'client',
     'observer',
     'creator',
+    'website'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -89,7 +90,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'client/templates'),
             os.path.join(BASE_DIR, 'observer/templates'),
             os.path.join(BASE_DIR, 'creator/templates'),
-            os.path.join(BASE_DIR, 'global_templates')
+            os.path.join(BASE_DIR, 'creator/templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -102,6 +103,9 @@ TEMPLATES = [
         },
     },
 ]
+
+CRISPY_TEMPLATE_PACK = 'materialize_css_forms'
+
 
 WSGI_APPLICATION = 'clicker.wsgi.application'
 
@@ -134,8 +138,6 @@ DATABASES = {
 }
 
 
-CRISPY_TEMPLATE_PACK = 'materialize_css_forms'
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -165,5 +167,5 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'client/templates'),
     os.path.join(BASE_DIR,  'observer/templates'),
     os.path.join(BASE_DIR,  'creator/templates'),
-    os.path.join(BASE_DIR,  'global_templates')
+    os.path.join(BASE_DIR,  'website/templates')
 )

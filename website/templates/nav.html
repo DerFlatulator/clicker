@@ -1,0 +1,95 @@
+<ul class="right hide-on-med-and-down">
+    <li {% if app == 'home' %}class="active"{% endif %}>
+        <a href="/"><i class="material-icons">home</i></a>
+    </li>
+    <li {% if app == 'client' %}class="active"{% endif %}>
+        <a href="/client/">
+{#            <i class="material-icons left hide-on-med-and-down">devices</i>#}
+{#            <i class="material-icons hide-on-large-only">devices</i>#}
+            <span class="hide-on-med-and-down">Client</span></a>
+    </li>
+    <li {% if app == 'observer' %}class="active"{% endif %}>
+        <a href="/observer/">
+{#            <i class="material-icons left hide-on-med-and-down">remove_red_eye</i>#}
+{#            <i class="material-icons hide-on-large-only">remove_red_eye</i> #}
+            <span class="hide-on-med-and-down">Observer</span>
+
+        </a>
+    </li>
+    <li {% if app == 'creator' %}class="active"{% endif %}>
+        <a class="dropdown-button" data-beloworigin="true"
+           href="#!" data-activates="dropdown_creator">
+{#            <i class="material-icons left">create</i>#}
+            <span class="hide-on-med-and-down">Creator</span>
+{#            <span class="hide-on-large-only"></span>#}
+            <i class="mdi-navigation-arrow-drop-down right"></i></a>
+    </li>
+    <ul id='dropdown_creator' class='dropdown-content'>
+        {% if user.is_authenticated %}
+            <li><a class="truncate" href="/creator/">{{ user.username }}</a></li>
+            <li><a href="/logout/">Log out</a></li>
+        {% else %}
+            <li><a href="/login/">Log In</a></li>
+            <li><a href="/signup/">Register</a></li>
+        {% endif %}
+    </ul>
+</ul>
+
+<ul id="nav-mobile" class="side-nav">
+    <li><a href="/">Home</a></li>
+    <li class="divider"></li>
+    <li><a href="/client/">Client Index</a></li>
+    <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+            <li>
+                <a class="collapsible-header">Client Classes</a>
+                <div class="collapsible-body">
+                    <ul>
+                        {% for c in class_list %}
+                            <li {% if class_name == c.class_name %} class="active" {% endif %}>
+                                <a class="truncate" href="/client/{{ c.class_name }}/">{{ c.long_name }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </li>
+    <li class="divider"></li>
+    <li><a href="/observer/">Observer Index</a></li>
+    <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+            <li>
+                <a class="collapsible-header">Observer Classes</a>
+                <div class="collapsible-body">
+                    <ul>
+                        {% for c in class_list %}
+                            <li {% if class_name == c.class_name %} class="active" {% endif %}>
+                                <a class="truncate" href="/observer/{{ c.class_name }}/">{{ c.long_name }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </li>
+    <li class="divider"></li>
+    <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+            <li>
+                <a class="collapsible-header">Creator</a>
+                <div class="collapsible-body">
+                    <ul>
+                        {% if user.is_authenticated %}
+                            <li><a href="/creator/">{{ user.username }}'s classes</a></li>
+                            <li><a href="/logout/">Log out</a></li>
+                        {% else %}
+                            <li><a href="/login/">Log In</a></li>
+                            <li><a href="/signup/">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </li>
+</ul>

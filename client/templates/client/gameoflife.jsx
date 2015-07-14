@@ -27,11 +27,6 @@ class GameOfLife extends React.Component {
                 console.error(this.props.cellURL, status, err.toString());
             }
         });
-
-        $(function () {
-            $('.modal-trigger').leanModal();
-            $('.tooltip').tooltip({delay: 50});
-        }.bind(this));
     }
 
     /**

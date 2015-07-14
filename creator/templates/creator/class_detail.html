@@ -16,14 +16,14 @@
 {% endblock %}
 
 {% block footer_class %}
-    purple lighten-2
+    light-blue darken-3
 {% endblock %}
 
 {% block scripts %}
     {{ block.super }}
     <script type="text/javascript">
         window.$context = {
-            class_name: "{{ class_name | safe }}"
+            class_name: "{{ class_name |escapejs }}"
         };
     </script>
     <script type="text/javascript" src="{% static "js/creator/class_detail.min.js" %}"></script>

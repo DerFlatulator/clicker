@@ -93,7 +93,7 @@ class GameOfLife extends React.Component {
 
         return (
             <div className="sortPanel">
-                <h5>You are responsible for <strong>cell {this.props.cellName}</strong>.</h5>
+                <p className="flow-text">You are responsible for <strong>cell {this.props.cellName}</strong>.</p>
 
                 <a onClick={this.swap.bind(this)} className={classes}>
                     <i className="mdi-action-invert-colors left"></i>
@@ -101,18 +101,18 @@ class GameOfLife extends React.Component {
                 </a>
 
                 {this.isAlive() ? (
-                    <h5>Click <span className="red-text">DIE</span> when the number of
+                    <p className="flow-text">Click <span className="red-text">DIE</span> when the number of
                         <span className="green-text"> alive </span>
                         <a href="#neighbours" className="modal-trigger tooltip"
                            data-tooltip="Click for info"> neighbours</a>
                         &nbsp;is <strong> more than 3 </strong>
-                        or <strong> less than 2</strong>.</h5>
+                        or <strong> less than 2</strong>.</p>
                 ) : (
-                    <h5>Click <span className="green-text">LIVE</span> when the number of
+                    <p className="flow-text">Click <span className="green-text">LIVE</span> when the number of
                         <span className="green-text"> alive </span>
                         <a href="#neighbours" className="modal-trigger tooltip"
                            data-tooltip="Click for info"> neighbours</a>
-                           &nbsp;is <strong> exactly 3</strong>.</h5>
+                           &nbsp;is <strong> exactly 3</strong>.</p>
                 )}
 
                 <div id="neighbours" className="modal modal-fixed-footer textLeft">

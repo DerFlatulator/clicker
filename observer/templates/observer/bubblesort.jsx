@@ -67,7 +67,7 @@ class BubbleSort extends React.Component {
 
         return (
             <div>
-                <h2>Bubble Sort</h2>
+                <h3>Bubble Sort</h3>
                 <div className="sortList">
                     {this.state.list.map((item, index) => {
                         var colour = this.colourFromValue(item);

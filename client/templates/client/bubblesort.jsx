@@ -38,13 +38,13 @@ class BubbleSort extends React.Component {
 
         return (
             <div className="sortPanel">
-                <h5>You are responsible for <strong>interval {this.state.indices[0] + 1}</strong>.</h5>
+                <p className="flow-text">You are responsible for <strong>interval {this.state.indices[0] + 1}</strong>.</p>
                 <a onClick={this.swap.bind(this)} className={classes}>
-                    <i className="mdi-action-swap-horiz left"></i>
+                    <i className="material-icons left">swap_horiz</i>
                     Swap!
                 </a>
-                <h5>Click SWAP when the number on the <em>left</em> is <strong>greater </strong>
-                    than the number on the <em>right</em>.</h5>
+                <p className="flow-text">Click SWAP when the number on the <em>left</em> is <strong>greater </strong>
+                    than the number on the <em>right</em>.</p>
             </div>
         );
     }

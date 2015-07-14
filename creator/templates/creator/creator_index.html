@@ -1,1 +1,30 @@
-<h1>TODO</h1>
+{% extends "react_app.html" %}
+{% load staticfiles %}
+
+{% block title %}{{ user.username }} | Creator{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" media="screen,projection" href="{% static "css/creator.css" %}" />
+{% endblock %}
+
+{% block scripts_head %}
+{% endblock %}
+
+{% block nav_items %}
+    {% include "nav.html" with app="creator" %}
+{% endblock %}
+
+{% block footer_class %}
+    light-blue darken-3
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+        window.$context = {
+            class_name: "{{ class_name |escapejs }}"
+        };
+    </script>
+    <script type="text/javascript" src="{% static "js/creator/creator_index.min.js" %}"></script>
+{% endblock %}
