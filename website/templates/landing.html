@@ -7,6 +7,10 @@
     <link rel="stylesheet" media="screen,projection" href="{% static "css/lib/materialize/materialize.min.css" %}" />
 {% endblock %}
 
+{% block nav_items %}
+    {% include "nav.html" with app="home" %}
+{% endblock %}
+
 {% block react_outlet %}
     <h4>Clicker++</h4>
     <p class="flow-text">

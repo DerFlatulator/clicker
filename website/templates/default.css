@@ -21,3 +21,23 @@
 .dummy {
     height: 10rem;
 }
+
+@media screen and (min-width: 993px) {
+    #toast-container {
+        right: initial;
+        left: 7%;
+    }
+
+    .toast {
+        float: left !important;
+        min-width: 20%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #toast-container {
+        min-width: 90% !important;
+        bottom: 6% !important;
+        left: 5%;
+    }
+}
