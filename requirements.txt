@@ -1,4 +1,4 @@
-braces
+django-braces
 Django
 djangorestframework
 redis
