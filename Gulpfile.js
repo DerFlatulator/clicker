@@ -57,7 +57,7 @@ gulp.task('client-jsx', function () {
         }))
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.client + '/',
-            sourceMappingURLPrefix: '/static/js/'
+            sourceMappingURLPrefix: '/static/js/client/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.client_js));
@@ -80,7 +80,7 @@ gulp.task('observer-jsx', function () {
         }))
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.observer + '/',
-            sourceMappingURLPrefix: '/static/js/'
+            sourceMappingURLPrefix: '/static/js/observer/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.observer_js));
@@ -103,7 +103,7 @@ gulp.task('creator-jsx', function () {
         }))
         .pipe(sourcemaps.write('.', {
             sourceRoot: '../../' + globs.creator + '/',
-            sourceMappingURLPrefix: '/static/js/'
+            sourceMappingURLPrefix: '/static/js/creator/'
         }))
         // Output to `dist/js`
         .pipe(gulp.dest(output.creator_js));
