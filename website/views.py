@@ -1,8 +1,7 @@
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.core.urlresolvers import reverse_lazy
 from django.views import generic
 from django.conf import settings
-from django.contrib import messages
 
 from api import models
 
