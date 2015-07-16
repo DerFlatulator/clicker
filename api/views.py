@@ -56,16 +56,9 @@ class GameOfLifeCellViewSet(viewsets.ModelViewSet):
     queryset = models.GameOfLifeCell.objects.all()
     lookup_field = 'cell_name'
 
-    def list(self, request, gameoflife_pk=None, **kwargs):
-        qs = self.queryset.filter(game_of_life=gameoflife_pk)
-        sz = self.serializer_class(qs, many=True, context={'request': request})
-        return Response(sz.data)
-
-    def retrieve(self, request, cell_name=None, gameoflife_pk=None):
-        qs = get_object_or_404(self.queryset, cell_name=cell_name, game_of_life=gameoflife_pk)
-        sz = self.serializer_class(qs, context={'request': request})
-        return Response(sz.data)
-
+    def filter_queryset(self, _):
+        gameoflife_pk = self.kwargs['gameoflife_pk']
+        return self.queryset.filter(game_of_life_id=gameoflife_pk)
 
 # Admin
 

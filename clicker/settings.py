@@ -39,6 +39,15 @@ class ObserverConfig(AppConfig):
         from observer import signals
 
 
+class APIConfig(AppConfig):
+    name = 'api'
+
+    def ready(self):
+        super(APIConfig, self).ready()
+        print "API App ready()"
+        from api import signals
+
+
 # Application definition
 
 INSTALLED_APPS = (

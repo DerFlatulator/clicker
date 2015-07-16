@@ -1,13 +1,11 @@
 'use strict';
 
 /*
- * TODO refactor:
  *  1. io.on 'connection'
  *  2. wait for receive message
  *  3. check recv msg for subscription. eg: 'subscribe': "gameoflife.observer"
- *  4. attach hooks from redis --> socket
+ *  4. hooks from redis --> socket
  *
- * TODO add more redis channels
  *  <namespace>.<device>
  */
 
@@ -77,53 +75,3 @@ redisChannels.forEach(function (channel) {
 //     io.set('log level', 1);
 //});
 
-/**
- * Listen for connections from clients
- * TODO [this section is redundant. remove when above is tested]
- */
-io.of('/').on('connection', function (socket) {
-
-    console.log("* Observer connection [" + socket.client.id + ", " + socket.conn.remoteAddress +
-            "] - Time: " + socket.handshake.time);
-
-    socket.subscriptions = {};
-
-    /**
-     * Make socket subscriptions from clients to redis redisChannels.
-     * If the channel does not exist, emit an error
-     */
-    socket.on('subscribe', function (channel) {
-        if (! (channel in redisChannels) ) {
-            socket.emit('error', {error: "unknown channel: " + channel});
-        } else {
-            socket.subscriptions[channel] = true;
-        }
-    });
-
-    /**
-     * Remove a socket subscription
-     */
-    socket.on('unsubscribe', function (channel) {
-        delete socket.subscriptions[channel];
-    });
-
-    /**
-     * Called when an observer disconnects
-     */
-    socket.on('disconnect', function () {
-        console.log('* Observer disconnection [' + socket.client.id + "] - Time: " + socket.handshake.time);
-    });
-
-    /**
-     * Attach a callback from redis,
-     * forward it to the observer iff they are subscribed to the redisChannel
-     * [redis message ---> observer]
-     */
-    redisClient.on('message', function (channel, message) {
-        if (channel in socket.subscriptions) {
-            console.log("* Forwarding message from <" + channel + ">: " + message +
-            " [to: " + socket.client.id + "]");
-            socket.emit(channel, message);
-        }
-    });
-});

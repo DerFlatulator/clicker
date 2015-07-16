@@ -14,7 +14,7 @@ urlpatterns = [
 view_sets = [
     views.UserViewSet,
     views.GroupViewSet,
-    (views.ClickerClassViewSet, "clicker"),
+    (views.ClickerClassViewSet, "class"),
     views.BubbleSortViewSet,
     views.GameOfLifeViewSet,
 ]

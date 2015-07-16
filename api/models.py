@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User, Group
 
 import string
 
@@ -101,7 +102,7 @@ class GameOfLifeCell(models.Model):
     alive = models.BooleanField(null=False, default=False)
     col = models.IntegerField(null=False, default=0, editable=False)
     row = models.IntegerField(null=False, default=0, editable=False)
-    cell_name = models.CharField(max_length=10, editable=False, unique=True)
+    cell_name = models.CharField(max_length=10, editable=False)
     changed = models.NullBooleanField(null=True)
     game_of_life = models.ForeignKey(GameOfLife, related_name='cells')
 
@@ -139,8 +140,28 @@ class GameOfLifeCell(models.Model):
 
 
 class ClickerClass(models.Model):
-    class_name = models.CharField(max_length=50, null=False)
+    class_name = models.CharField(max_length=50, null=False, unique=True)
     long_name = models.CharField(max_length=255, null=False)
 
     def __unicode__(self):
         return "Class: {} ({})".format(self.class_name, self.long_name)
+
+
+# Registration
+
+
+# class Client(models.Model):
+#     id_code = models.CharField(max_length=20, blank=True)
+#     name = models.CharField(max_length=100, blank=True)
+#     classes = models.ManyToManyField(ClickerClass)
+#
+#
+# class RegisteredDevice(models.Model):
+#     date_created = models.DateTimeField(auto_created=True)
+#     user_agent = models.CharField(max_length=200, blank=True)
+#     client = models.ForeignKey(Client, blank=True)
+#
+#
+# class Creator(models.Model):
+#     user = models.OneToOneField(User)
+#     classes = models.ManyToManyField(ClickerClass)
