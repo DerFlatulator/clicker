@@ -1,5 +1,11 @@
 'use strict';
 
+import $ from 'jquery';
+import classNames from 'classnames';
+import React from 'react';
+import 'jquery.cookie'; // $.cookie
+import querystring from 'querystring';
+
 class GameOfLife extends React.Component {
 
     constructor(props) {
@@ -155,8 +161,9 @@ let run = function () {
         beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
     });
 
-    var instance = parseInt($.url().param('instance')) || 1,
-        cellName = $.url().param('cell_name') || "A1",
+    var qs = querystring.parse(window.location.search.substring(1)),
+        instance = parseInt(qs.instance) || 1,
+        cellName = qs.cell || "A1",
         url = `/api/gameoflife/${instance}/`,
         cellURL = url + `cell/${cellName}/`;
 

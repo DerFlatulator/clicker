@@ -16,9 +16,6 @@
     "jquery": "~2.1.4",
     "jquery-legacy": "jquery#1.10",
     "react": "~0.13.3",
-    "materialize": "~0.97.0",
-    "url-parser": "~2.3.1",
-    "jquery-cookie": "~1.4.1",
-    "classnames": "~2.1.2"
+    "materialize": "~0.97.0"
   }
 }

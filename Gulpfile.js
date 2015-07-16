@@ -1,169 +1,168 @@
 'use strict';
 
+var source = require('vinyl-source-stream');
 var gulp = require('gulp');
-// var browserify = require('browserify');
-// var transform = require('vinyl-transform');
+var glob = require('glob');
+var eventstream = require('event-stream');
+var browserify = require('browserify');
+var watchify = require('watchify');
+var babelify = require('babelify');
+var minifyify = require('minifyify');
+var gutil = require('gulp-util');
 var sourcemaps = require('gulp-sourcemaps');
+var minifycss = require('gulp-minify-css');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var uglify = require('gulp-uglify');
-// var livereload = require('gulp-livereload');
+var streamify = require('gulp-streamify');
+var autoprefixer = require('gulp-autoprefixer');
 var rename = require('gulp-rename');
 var bower = require('gulp-bower');
+var livereload = require('gulp-livereload');
+
+
+var apps_glob =  '+(creator|observer|client|website)';
 
 var globs = {
-    client: 'client/templates/client',
-    client_jsx: 'client/templates/client/*.jsx',
-    client_html: 'client/templates/client/*.html',
-    client_css: 'client/templates/client/*.css',
-
-    observer: 'observer/templates/observer',
-    observer_jsx: 'observer/templates/observer/*.jsx',
-    observer_html: 'observer/templates/observer/*.html',
-    observer_css: 'observer/templates/observer/*.css',
-
-    creator: 'creator/templates/creator',
-    creator_html: 'creator/templates/creator/*.html',
-    creator_jsx: 'creator/templates/creator/*.jsx',
-    creator_css: 'creator/templates/creator/*.css',
-
-    default_css: 'website/templates/default.css'
-};
-var output = {
-    client_js: 'dist/js/client/',
-    client_css: 'dist/css/',
-    observer_js: 'dist/js/observer/',
-    observer_css: 'dist/css/',
-    creator_js: 'dist/js/creator/',
-    creator_css: 'dist/css/',
-    default_css: 'dist/css/'
+    all_html: apps_glob + '/templates/**/*.html',
+    all_css: apps_glob + '/templates/**/*.css',
+    all_jsx: apps_glob + '/templates/**/*.jsx'
 };
 
-gulp.task('client-jsx', function () {
+var get_jsx_apps = function (glob_pattern, output_dir) {
+    return glob.sync(glob_pattern).map(function (file) {
+        return {
+            input_dir: glob_pattern.substring(0, glob_pattern.lastIndexOf("/") + 1),
+            entry: file.substring(glob_pattern.lastIndexOf("/") + 1),
+            output_dir: output_dir,
+            map_url: output_dir.replace("dist/", "/static/")
+        };
+    });
+};
 
-    return gulp.src(globs.client_jsx)
-        // Prevent errors from killing watch task
-        .pipe(plumber())
-        // Initialise source mappings
-        .pipe(sourcemaps.init())
-        // Transpile JSX and ES6 to ES5
-        .pipe(babel())
-        // Minify
-        .pipe(uglify())
-        // Save Source mappings
-        .pipe(rename({
-            extname: '.min.js'
-        }))
-        .pipe(sourcemaps.write('.', {
-            sourceRoot: '../../' + globs.client + '/',
-            sourceMappingURLPrefix: '/static/js/client/'
-        }))
-        // Output to `dist/js`
-        .pipe(gulp.dest(output.client_js));
-});
+var get_css_app = function (glob_pattern, output) {
+    return {
+        input_glob: glob_pattern,
+        output_name: output.substring(output.lastIndexOf("/") + 1),
+        output_dir: output.substring(0, output.lastIndexOf("/") + 1)
+    };
+};
 
-gulp.task('observer-jsx', function () {
+var path = {
+    jsx: [].concat(
+        get_jsx_apps('client/templates/client/*.jsx', 'dist/js/client/'),
+        get_jsx_apps('observer/templates/observer/*.jsx', 'dist/js/observer/'),
+        get_jsx_apps('creator/templates/creator/*.jsx', 'dist/js/creator/'),
+        get_jsx_apps('website/templates/*.jsx', 'dist/js/')
+    ),
+    css: [].concat(
+        get_css_app('client/templates/**/*.css', 'dist/css/client.css'),
+        get_css_app('observer/templates/**/*.css', 'dist/css/observer.css'),
+        get_css_app('creator/templates/**/*.css', 'dist/css/creator.css'),
+        get_css_app('website/templates/**/*.css', 'dist/css/default.css')
+    )
+};
 
-    return gulp.src(globs.observer_jsx)
-        // Prevent errors from killing watch task
-        .pipe(plumber())
-        // Initialise source mappings
-        .pipe(sourcemaps.init())
-        // Transpile JSX and ES6 to ES5
-        .pipe(babel())
-        // Minify
-        .pipe(uglify())
-        // Save Source mappings
-        .pipe(rename({
-            extname: '.min.js'
-        }))
-        .pipe(sourcemaps.write('.', {
-            sourceRoot: '../../' + globs.observer + '/',
-            sourceMappingURLPrefix: '/static/js/observer/'
-        }))
-        // Output to `dist/js`
-        .pipe(gulp.dest(output.observer_js));
-});
-
-gulp.task('creator-jsx', function () {
-
-    return gulp.src(globs.creator_jsx)
-        // Prevent errors from killing watch task
-        .pipe(plumber())
-        // Initialise source mappings
-        .pipe(sourcemaps.init())
-        // Transpile JSX and ES6 to ES5
-        .pipe(babel())
-        // Minify
-        .pipe(uglify())
-        // Save Source mappings
-        .pipe(rename({
-            extname: '.min.js'
-        }))
-        .pipe(sourcemaps.write('.', {
-            sourceRoot: '../../' + globs.creator + '/',
-            sourceMappingURLPrefix: '/static/js/creator/'
-        }))
-        // Output to `dist/js`
-        .pipe(gulp.dest(output.creator_js));
-});
-
-gulp.task('observer-css', function () {
-
-    return gulp.src(globs.observer_css)
-        .pipe(plumber())
-        .pipe(concat('observer.css'))
-        .pipe(gulp.dest(output.observer_css));
-});
-
-gulp.task('client-css', function () {
-
-    return gulp.src(globs.client_css)
-        .pipe(plumber())
-        .pipe(concat('client.css'))
-        .pipe(gulp.dest(output.client_css));
-});
-
-gulp.task('creator-css', function () {
-
-    return gulp.src(globs.creator_css)
-        .pipe(plumber())
-        .pipe(concat('creator.css'))
-        .pipe(gulp.dest(output.creator_css));
-});
-
-gulp.task('default-css', function () {
-
-    return gulp.src(globs.default_css)
-        .pipe(gulp.dest(output.default_css));
+gulp.task('build-css', function () {
+    var tasks = path.css.map(function (css_task) {
+        return gulp.src(css_task.input_glob)
+            .pipe(plumber())
+            .pipe(sourcemaps.init())
+            .pipe(autoprefixer())
+            .pipe(minifycss({ compatibility: 'ie8' }))
+            .pipe(concat(css_task.output_name))
+            .pipe(sourcemaps.write())
+            .pipe(gulp.dest(css_task.output_dir))
+            .pipe(livereload());
+    });
+    return eventstream.merge.apply(null, tasks);
 });
 
 gulp.task('bower', function () {
     return bower();
 });
 
-gulp.task('deploy', [
-    'bower',
-    'default-css',
-    'observer-jsx', 'observer-css',
-    'client-jsx', 'client-css',
-    'creator-jsx', 'creator-css'
-]);
+gulp.task('watch-jsx', ['bower'], function() {
 
-gulp.task('watch', function () {
-    // livereload.listen();
-    gulp.watch(globs.default_css, ['default-css']);
+    var tasks = path.jsx.map(function (app) {
+        var b = browserify({
+            entries: [app.input_dir + app.entry],
+            debug: true,
+            cache: {},
+            packageCache: {},
+            fullPaths: true
+        })
+            .transform(babelify)
+            .transform({
+                global: true
+            }, 'browserify-shim')
+            .plugin('minifyify', {
+                map: app.output_dir + app.entry + '.map',
+                output: app.output_dir + app.entry + '.map'
+            });
 
-    gulp.watch(globs.client_jsx, ['client-jsx']);
-    gulp.watch(globs.client_css, ['client-css']);
-    gulp.watch(globs.client_html, []);
+        var watcher  = watchify(b);
 
-    gulp.watch(globs.observer_jsx, ['observer-jsx']);
-    gulp.watch(globs.observer_css, ['observer-css']);
-    gulp.watch(globs.observer_html, []);
+        return watcher
+            .on('update', function () {
+                watcher.bundle()
+                    .pipe(plumber())
+                    .pipe(source(app.entry))
+                    .pipe(rename({ extname: '.bundle.js' }))
+                    .pipe(gulp.dest(app.output_dir))
+                    .pipe(livereload());
+            })
+            .on('time', function (time) {
+                gutil.log('Transformed',
+                    "'" + gutil.colors.cyan(app.input_dir + app.entry) + "'",
+                    'to',
+                    "'" + gutil.colors.cyan(gutil.replaceExtension(app.output_dir + app.entry, '.bundle.js')) + "'",
+                    'after',
+                    gutil.colors.magenta(String(time/1000) + " s"));
+            })
+            .bundle()
+            .pipe(plumber())
+            .pipe(source(app.entry))
+            .pipe(rename({ extname: '.bundle.js' }))
+            .pipe(gulp.dest(app.output_dir))
+            .pipe(livereload());
+    });
 
-    gulp.watch(globs.creator_jsx, ['creator-jsx']);
-    gulp.watch(globs.creator_css, ['creator-css']);
-    gulp.watch(globs.creator_html, []);
+    return eventstream.merge.apply(null, tasks);
+});
+
+gulp.task('build-jsx', ['bower'], function () {
+    var tasks = path.jsx.map(function (app) {
+        return browserify({
+            entries: [app.input_dir + app.entry],
+            debug: true,
+            cache: {},
+            packageCache: {},
+            fullPaths: true
+        })
+            .transform(babelify)
+            .transform({
+                global: true
+            }, 'browserify-shim')
+            .plugin('minifyify', {
+                map: app.output_dir.replace("dist/", "/static/") + app.entry + '.map',
+                output: app.output_dir + app.entry + '.map'
+            })
+            .bundle()
+            .pipe(source(app.entry))
+            .pipe(rename({ extname: '.bundle.js' }))
+            .pipe(gulp.dest(app.output_dir));
+    });
+
+    return eventstream.merge.apply(null, tasks);
+});
+
+gulp.task('default', ['deploy']);
+
+gulp.task('deploy', ['build-jsx', 'build-css']);
+
+gulp.task('watch', ['watch-jsx', 'build-css'], function () {
+    livereload.listen();
+    gulp.watch(globs.all_css, ['build-css']);
 });

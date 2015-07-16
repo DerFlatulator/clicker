@@ -1,7 +1,11 @@
 /**
  * :file: creator/creator_index
  */
-     
+
+import React from 'react';
+import $ from 'jquery';
+import 'jquery.cookie';
+
 class CreatorIndex extends React.Component {
     constructor(props) {
         super(props);

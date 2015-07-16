@@ -1,5 +1,11 @@
 'use strict';
 
+import $ from 'jquery';
+import classNames from 'classnames';
+import React from 'react';
+import 'jquery.cookie'; // $.cookie
+import querystring from 'querystring';
+
 class GameOfLife extends React.Component {
 
     constructor(props) {
@@ -138,9 +144,10 @@ class GameOfLife extends React.Component {
 }
 
 let run = function () {
-    var socketBase = `//${window.location.hostname}:4000/`,
+    var qs = querystring.parse(window.location.search.substring(1)),
+        socketBase = `//${window.location.hostname}:4000/`,
         socketURL = socketBase + 'socket.io/socket.io.js',
-        instance = parseInt($.url().param('instance')) || 1,
+        instance = parseInt(qs.instance) || 1,
         url = `/api/gameoflife/${instance}/`,
         channel = socketBase + "gameoflife.observer";
 

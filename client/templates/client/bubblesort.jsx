@@ -1,5 +1,11 @@
 'use strict';
 
+import $ from 'jquery';
+import classNames from 'classnames';
+import React from 'react';
+import 'jquery.cookie'; // $.cookie
+import querystring from 'querystring';
+
 class BubbleSort extends React.Component {
 
     constructor(props) {
@@ -55,8 +61,9 @@ let run = function () {
         beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
     });
 
-    var instance = parseInt($.url().param('instance')) || 1,
-        lower_index = parseInt($.url().param('lower_index')) || 0,
+    var qs = querystring.parse(window.location.search.substring(1)),
+        instance = parseInt(qs.instance) || 1,
+        lower_index = parseInt(qs.lower_index) || 0,
         url = `/api/bubblesort/${instance}/`,
         swapURL = `${url}swap/`;
 
