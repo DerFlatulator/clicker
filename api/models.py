@@ -161,7 +161,6 @@ class ClickerClass(models.Model):
 #     user_agent = models.CharField(max_length=200, blank=True)
 #     client = models.ForeignKey(Client, blank=True)
 #
-#
 # class Creator(models.Model):
 #     user = models.OneToOneField(User)
 #     classes = models.ManyToManyField(ClickerClass)

@@ -6,4 +6,5 @@ from api import models
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def user_post_save(sender, instance, created, **kwargs):
-    models.Creator(user=instance).save()
+    # models.Creator(user=instance).save()
+    pass

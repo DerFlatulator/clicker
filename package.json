@@ -8,7 +8,7 @@
   },
   "main": "dispatch/dispatcher.js",
   "scripts": {
-    "start": "node dispatch/dispatcher.js",
+    "start": "node dispatch/dispatcher",
     "test": "echo TODO",
     "build": "gulp"
   },
