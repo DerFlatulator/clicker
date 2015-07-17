@@ -1,7 +1,10 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User, Group
 
 import string
+import random
+import hashlib
 
 
 class BubbleSort(models.Model):
@@ -142,24 +145,48 @@ class GameOfLifeCell(models.Model):
 class ClickerClass(models.Model):
     class_name = models.CharField(max_length=50, null=False, unique=True)
     long_name = models.CharField(max_length=255, null=False)
+    # # Compute this instead
+    # connected_students = models.IntegerField(default=0, null=False)
 
     def __unicode__(self):
         return "Class: {} ({})".format(self.class_name, self.long_name)
+
+    def get_connected_devices(self):
+        return self.registereddevice_set.count()
 
 
 # Registration
 
 
-# class Client(models.Model):
-#     id_code = models.CharField(max_length=20, blank=True)
-#     name = models.CharField(max_length=100, blank=True)
-#     classes = models.ManyToManyField(ClickerClass)
-#
-#
-# class RegisteredDevice(models.Model):
-#     date_created = models.DateTimeField(auto_created=True)
-#     user_agent = models.CharField(max_length=200, blank=True)
-#     client = models.ForeignKey(Client, blank=True)
+class Client(models.Model):
+    id_code = models.CharField(max_length=20, blank=True, default='N/A')
+    name = models.CharField(max_length=100, blank=True, default='Anonymous')
+    classes = models.ManyToManyField(ClickerClass)
+
+
+class RegisteredDevice(models.Model):
+    device_id = models.CharField(max_length=32, editable=False, primary_key=True)
+    date_created = models.DateTimeField(null=False, editable=False, blank=True)
+    user_agent = models.CharField(max_length=200, null=True, blank=True)
+    client = models.ForeignKey(Client, null=True, blank=True)
+    classes = models.ManyToManyField(ClickerClass)
+
+    @staticmethod
+    def compute_hash():
+        val = list(str(timezone.now()))
+        random.shuffle(val)
+        val = ''.join(val)
+        return hashlib.md5(val).hexdigest()
+
+    def save(self, **kwargs):
+        if not self.device_id:
+            self.date_created = timezone.now()
+            self.device_id = RegisteredDevice.compute_hash()
+            print self.device_id
+
+        super(RegisteredDevice, self).save(kwargs)
+
+
 #
 # class Creator(models.Model):
 #     user = models.OneToOneField(User)

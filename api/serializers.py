@@ -7,6 +7,7 @@ import re
 from . import models
 
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -65,6 +66,8 @@ class GameOfLifeCellSerializer(serializers.ModelSerializer):
 # noinspection PyMethodMayBeStatic
 class ClickerClassSerializer(serializers.ModelSerializer):
 
+    connected_devices = serializers.IntegerField(source='get_connected_devices', read_only=True)
+
     def validate_class_name(self, class_name):
         if not re.match(r"^[a-z\-_0-9]+$", class_name):
             raise serializers.ValidationError('Must be all lower-case with hyphens or underscores.')
@@ -72,3 +75,13 @@ class ClickerClassSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ClickerClass
+
+
+class ConnectionSerializer(serializers.ModelSerializer):
+
+    classes = ClickerClassSerializer(many=True)
+
+    class Meta:
+        depth = 1
+        read_only = ('device_id', )
+        model = models.RegisteredDevice

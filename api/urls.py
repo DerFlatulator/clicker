@@ -17,6 +17,7 @@ view_sets = [
     (views.ClickerClassViewSet, "class"),
     views.BubbleSortViewSet,
     views.GameOfLifeViewSet,
+    (views.ConnectionViewSet, "connect")
 ]
 
 
@@ -43,7 +44,7 @@ def nested(view, uri=None, parent=None):
 
 nested_routers = [
     nested(views.GameOfLifeCellViewSet, uri="cell", parent="gameoflife"),
-    nested(views.BubbleSortSwapViewSet, uri="swap", parent="bubblesort")
+    nested(views.BubbleSortSwapViewSet, uri="swap", parent="bubblesort"),
 ]
 
 for nested_router in nested_routers:
