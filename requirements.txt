@@ -4,3 +4,4 @@ djangorestframework
 redis
 drf-nested-routers
 django[bcrypt]
+drf-extensions

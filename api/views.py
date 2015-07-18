@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from . import serializers
 from . import models
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
 
 def generic_serializer_view_set_factory(_model, _serializer=HyperlinkedModelSerializer):
@@ -34,9 +35,9 @@ class BubbleSortSwapViewSet(viewsets.ModelViewSet):
     queryset = models.BubbleSortSwap.objects.all()
     serializer_class = serializers.BubbleSortSwapSerializer
 
-    def filter_queryset(self, _):
-        bubblesort_pk = self.kwargs['bubblesort_pk']
-        return self.queryset.filter(bubble_sort_id=bubblesort_pk)
+    # def filter_queryset(self, _):
+    #     bubblesort_pk = self.kwargs['bubblesort_pk']
+    #     return self.queryset.filter(bubble_sort_id=bubblesort_pk)
 
 
 class ClickerClassViewSet(viewsets.ModelViewSet):
@@ -48,20 +49,16 @@ class BubbleSortViewSet(viewsets.ModelViewSet):
     queryset = models.BubbleSort.objects.all()
     serializer_class = serializers.BubbleSortSerializer
 
-
 class GameOfLifeViewSet(viewsets.ModelViewSet):
     queryset = models.GameOfLife.objects.all()
     serializer_class = serializers.GameOfLifeSerializer
+    # lookup_field = 'game_of_life'
 
 
 class GameOfLifeCellViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.GameOfLifeCellSerializer
     queryset = models.GameOfLifeCell.objects.all()
-    lookup_field = 'cell_name'
-
-    def filter_queryset(self, _):
-        gameoflife_pk = self.kwargs['gameoflife_pk']
-        return self.queryset.filter(game_of_life_id=gameoflife_pk)
+    serializer_class = serializers.GameOfLifeCellSerializer
+    # lookup_field = 'id'
 
 
 class ConnectionViewSet(viewsets.ModelViewSet):

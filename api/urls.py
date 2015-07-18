@@ -1,7 +1,8 @@
 from django.conf.urls import url, include
 
 from rest_framework.routers import DefaultRouter
-from rest_framework_nested.routers import NestedSimpleRouter
+# from rest_framework_nested.routers import NestedSimpleRouter
+# from rest_framework_extensions.routers import ExtendedDefaultRouter
 
 import api.views as views
 
@@ -15,9 +16,11 @@ view_sets = [
     views.UserViewSet,
     views.GroupViewSet,
     (views.ClickerClassViewSet, "class"),
-    views.BubbleSortViewSet,
+    (views.ConnectionViewSet, "connect"),
     views.GameOfLifeViewSet,
-    (views.ConnectionViewSet, "connect")
+    views.GameOfLifeCellViewSet,
+    views.BubbleSortViewSet,
+    views.BubbleSortSwapViewSet
 ]
 
 
@@ -28,29 +31,27 @@ for view_set in view_sets:
     else:
         view_name = view_set.__name__.replace("ViewSet", "").lower()
 
-    router.register(view_name, view_set)
+    router.register(view_name, view_set, base_name=view_name)
 
-urlpatterns.append(url(r'^', include(router.urls)))
 
 #
 # Begin nested routes
 #
 
+# router.register(r'gameoflife',
+#                 views.GameOfLifeViewSet,
+#                 base_name='gameoflife') \
+#       .register(r'cell', views.GameOfLifeCellViewSet,
+#                 base_name='gameoflife-cell',
+#                 parents_query_lookups=['cell_name'])
+#
+# router.register(r'bubblesort',
+#                 views.BubbleSortViewSet,
+#                 base_name='bubblesort') \
+#       .register(r'swap',
+#                 views.BubbleSortSwapViewSet,
+#                 base_name='bubblesort-swap',
+#                 parents_query_lookups=['bubble_sort'])
 
-def nested(view, uri=None, parent=None):
-    nested_simple_router = NestedSimpleRouter(router, parent, lookup=parent)
-    nested_simple_router.register(uri, view, base_name=(parent + uri))
-    return nested_simple_router
 
-nested_routers = [
-    nested(views.GameOfLifeCellViewSet, uri="cell", parent="gameoflife"),
-    nested(views.BubbleSortSwapViewSet, uri="swap", parent="bubblesort"),
-]
-
-for nested_router in nested_routers:
-    urlpatterns.append(url(r'^', include(nested_router.urls)))
-
-
-# gameoflife_router = NestedSimpleRouter(router, r'gameoflife', lookup='gameoflife')
-# gameoflife_router.register(r'cell', views.GameOfLifeCellViewSet, base_name='gameoflifecell')
-
+urlpatterns.append(url(r'^', include(router.urls)))

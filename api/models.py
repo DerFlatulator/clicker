@@ -25,6 +25,10 @@ class BubbleSort(models.Model):
         return ','.join(sorted(self.shuffled.split(',')))
 
     @property
+    def get_swaps(self):
+        return self.bubblesortswap_set.all()
+
+    @property
     def get_list_current(self):
         """
         Get the current representation of the list by querying `BubbleSortSwap`
@@ -32,8 +36,7 @@ class BubbleSort(models.Model):
         :return: A str representation of the current list
         """
         current = self.shuffled.split(',')
-        swaps = BubbleSortSwap.objects.filter(bubble_sort=self.id)
-        for swap in swaps:
+        for swap in self.get_swaps:
             tmp = current[swap.lower_index]
             current[swap.lower_index] = current[swap.lower_index + 1]
             current[swap.lower_index + 1] = tmp
@@ -47,7 +50,7 @@ class BubbleSort(models.Model):
 
 class BubbleSortSwap(models.Model):
     lower_index = models.IntegerField(null=False)
-    bubble_sort = models.ForeignKey(BubbleSort)
+    bubble_sort = models.ForeignKey(BubbleSort, related_name='swaps')
 
     def __unicode__(self):
         return "[{}] Swap {} and {}.".format(self.bubble_sort_id, self.lower_index, self.lower_index + 1)
@@ -87,8 +90,12 @@ class GameOfLife(models.Model):
                             GameOfLifeCell.objects.get(col=x, row=y, game_of_life=self).delete()
 
     @property
+    def get_cells(self):
+        return GameOfLifeCell.objects.filter(game_of_life=self.id)
+
+    @property
     def get_current_state(self):
-        cells = GameOfLifeCell.objects.filter(game_of_life=self.id)
+        cells = self.get_cells
         gol = [[False] * self.num_cols for _ in range(self.num_rows)]
         for cell in cells:
             if cell.alive:
@@ -153,6 +160,21 @@ class ClickerClass(models.Model):
 
     def get_connected_devices(self):
         return self.registereddevice_set.count()
+
+
+# class Interaction(models.Model):
+#     READY = 'R'
+#     ACTIVE = 'A'
+#     COMPLETE = 'C'
+#     INTERACTION_STATES = (
+#         (READY, 'Ready'),
+#         (ACTIVE, 'Active'),
+#         (COMPLETE, 'Complete')
+#     )
+#
+#     clicker_class = models.ForeignKey(ClickerClass, related_name='interactions')
+#     data_json = models.TextField(default='{}', null=False, blank=True)
+#     state = models.CharField(max_length='2', choices=INTERACTION_STATES, default=READY)
 
 
 # Registration
