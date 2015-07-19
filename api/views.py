@@ -1,4 +1,3 @@
-from django.contrib.admin.utils import lookup_field
 from django.contrib.auth.models import User, Group
 from django.core import exceptions
 from rest_framework import viewsets
@@ -6,13 +5,11 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.serializers import HyperlinkedModelSerializer
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from . import serializers
 from . import models
-from rest_framework_extensions.mixins import NestedViewSetMixin
-
+from .permissions import DeviceIsRegisteredPermission
 
 def generic_serializer_view_set_factory(_model, _serializer=HyperlinkedModelSerializer):
     class GenericSerializerViewSet(viewsets.ModelViewSet):
@@ -69,67 +66,78 @@ class ConnectionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ConnectionSerializer
     queryset = models.RegisteredDevice.objects.all()
 
+    """
+    TODO uncomment permission_classes line below
+    """
+    # permission_classes = (DeviceIsRegisteredPermission,)
+
     def filter_queryset(self, queryset):
-        print self.request.data
         return queryset
 
     def create(self, request, *args, **kwargs):
-
-        # if 'DEVICE_ID' in request.COOKIES:
-        #     if 'classes' not in request.data:
-        #         raise Exception("request did not contain `classes` field")
-        #
-        #     try:
-        #         device = models.RegisteredDevice.objects.get(device_id=request.COOKIES['DEVICE_ID'])
-        #     except exceptions.ObjectDoesNotExist:
-        #         return Response({'error': 'Device ID not found'}, status=status.HTTP_404_NOT_FOUND)
-        #
-        #     try:
-        #         for clicker_class in request.data['classes']:
-        #             clicker_class = models.ClickerClass.objects.get(class_name=clicker_class)
-        #             if not len(device.classes.filter(class_name=clicker_class)):
-        #                 device.classes.add(clicker_class)
-        #
-        #     except exceptions.ObjectDoesNotExist:
-        #         return Response({'error': '`clicker_class` not found'}, status=status.HTTP_404_NOT_FOUND)
-
         if 'HTTP_USER_AGENT' in request.META:
+            mutable = request.data._mutable
+            request.data._mutable = True
             request.data['user_agent'] = request.META['HTTP_USER_AGENT']
+            request.data._mutable = mutable
 
-        return super(ConnectionViewSet, self).create(request, *args, **kwargs)
+        if 'device_id' in request.session:
+            try:
+                device = models.RegisteredDevice.objects.get(device_id=request.session['device_id'])
+                return Response(self.serializer_class(device, context={'request': request}).data,
+                                status=status.HTTP_200_OK)
+            except exceptions.ObjectDoesNotExist:
+                pass
+
+        response = super(ConnectionViewSet, self).create(request, *args, **kwargs)
+        request.session['device_id'] = response.data['device_id']
+        return response
 
     @detail_route(methods=['get', 'patch', 'put', 'delete'])
     def classes(self, request, **kwargs):
         """
-        POST was throwing an exception in DRF's template... TODO investigate that.
-        POST can be accomplished with DELETE/PATCH anyway
+        Action to modify the ManyToMany relationship from `RegisteredDevice` to `ClickerClass`
         """
 
         collection = self.get_object()
         serializer = serializers.ClickerClassSerializer
 
+        s = status.HTTP_405_METHOD_NOT_ALLOWED
+
         if request.method == 'DELETE':
             collection.classes.clear()
+            s = status.HTTP_202_ACCEPTED
 
         if request.method == 'PATCH' or request.method == 'PUT':
-            add_items_id = request.DATA.pop('add', [])
-            items_add = models.ClickerClass.objects.filter(class_name__in=add_items_id).all()
+            add_class_names = request.DATA.get('add', [])
+            items_add = models.ClickerClass.objects.filter(class_name__in=add_class_names).all()
+            length = len(collection.classes.all())
             collection.classes.add(*items_add)
+            if len(collection.classes.all()) > length:
+                s = status.HTTP_201_CREATED
+            else:
+                s = status.HTTP_200_OK
 
         if request.method == 'PATCH':
-            remove_items_id = request.DATA.pop('remove', [])
-            items_remove = models.ClickerClass.objects.filter(class_name__in=remove_items_id).all()
+            remove_class_names = request.DATA.get('remove', [])
+            items_remove = models.ClickerClass.objects.filter(class_name__in=remove_class_names).all()
             collection.classes.remove(*items_remove)
+            s = status.HTTP_202_ACCEPTED
 
+        """
+        POST was throwing an exception in DRF's template... TODO investigate that.
+        POST can be accomplished with DELETE/PATCH anyway
+        """
         # if request.method == 'POST':
-        #     add_items_id = request.DATA.pop('only', [])
-        #     items_add = models.ClickerClass.objects.filter(class_name__in=add_items_id).all()
+        #     add_class_names = request.DATA.pop('only', [])
+        #     items_add = models.ClickerClass.objects.filter(class_name__in=add_class_names).all()
         #     collection.classes = items_add
 
         if request.method == 'GET':
-            pass
+            s = status.HTTP_200_OK
 
-        return Response(serializer(collection.classes, many=True).data, status=status.HTTP_202_ACCEPTED)
+        serialized = serializer(collection.classes, many=True, context={'request': request})
+        return Response(serialized.data, status=s)
 
 
 # Admin

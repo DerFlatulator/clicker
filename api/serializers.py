@@ -30,7 +30,7 @@ class BubbleSortSwapSerializer(serializers.HyperlinkedModelSerializer):
         model = models.BubbleSortSwap
 
 
-class BubbleSortSerializer(serializers.ModelSerializer):
+class BubbleSortSerializer(serializers.HyperlinkedModelSerializer):
     list_size = serializers.IntegerField(source='get_list_size', read_only=True)
     sorted_list = serializers.CharField(source='get_list_sorted', read_only=True)
     current_list = serializers.ListField(source='get_list_current', read_only=True)
@@ -82,7 +82,9 @@ class ClickerClassSerializer(serializers.HyperlinkedModelSerializer):
 
 class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
 
-    classes = ClickerClassSerializer(many=True)
+    classes = ClickerClassSerializer(many=True, read_only=True)
+    classes_url = serializers.HyperlinkedRelatedField(source='pk', view_name='connect-classes', read_only=True)
+    device_id = serializers.CharField(source='pk', read_only=True)
 
     class Meta:
         depth = 1

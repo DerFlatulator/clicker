@@ -151,6 +151,130 @@ class GameOfLife extends React.Component {
     }
 }
 
+class BaseComponent extends React.Component {
+    _bind(...methods) {
+        methods.forEach(method => this[method] = this[method].bind(this));
+    }
+}
+
+class App extends BaseComponent {
+    constructor(props) {
+        super (props);
+        this.state = {
+            device_id: null,
+            connect_state: 'disconnected'
+        };
+        this._bind('register', 'connect', 'onRegistered', 'getDeviceID', 'isRegisteredToClass', 'componentDidMount');
+    }
+
+    componentDidMount() {
+        this.setState({
+            connected: this.isRegisteredToClass(this.props.clickerClass)
+        });
+    }
+
+    /**
+     * :return: the device_id or false
+     */
+    getDeviceID() {
+        if ('localStorage' in window) {
+            var device_id = window.localStorage.getItem('device_id');
+            if (device_id != null)
+                return device_id;
+        }
+        return false;
+    }
+
+    isRegisteredToClass(clickerClass) {
+        if ('localStorage' in window) {
+            return window.localStorage.getItem(`registered:${clickerClass}`) === "true";
+        }
+        return false;
+    }
+
+    connect() {
+        this.setState({ connect_state: 'connecting' });
+        console.log('connecting');
+
+        var device_id = this.getDeviceID();
+        if (device_id) {
+            console.log('registering (already had device_id)');
+
+            this.register({ device_id, classes: [] }).then(this.onRegistered);
+        } else {
+            $.post('/api/connect/', (data) => {
+                console.log('registering (retrieved device_id)');
+                this.register(data).then(this.onRegistered);
+            }).fail(console.error.bind(console));
+        }
+    }
+
+    register(data) {
+        console.log(data);
+        this.setState({
+            device_id: data.device_id,
+            connect_state: 'registering'
+        });
+        if ('localStorage' in window)
+            window.localStorage.setItem('device_id', data.device_id);
+
+        var isRegistered = data.classes.map(url => url.split("/").pop())
+                                       .indexOf(this.props.clickerClass) > -1;
+
+        return new Promise((resolve, reject) => {
+            if (!isRegistered) {
+                $.ajax({
+                    url: `/api/connect/${data.device_id}/classes/`,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "add": [this.props.clickerClass]
+                    }),
+                    success: resolve,
+                    error: reject
+                });
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    onRegistered() {
+        this.setState({
+            connected: true,
+            connect_state: 'connected'
+        });
+        if ('localStorage' in window) {
+            window.localStorage.setItem(`registered:${this.props.clickerClass}`, "true");
+        }
+    }
+
+    render() {
+        if (this.state.connected) {
+            return (
+                <GameOfLife {...this.props}/>
+            );
+        }
+        else {
+            var buttonClasses = classNames('waves-effect waves-light btn-large', {
+               'disabled': this.state.connect_state === 'connecting'
+            });
+
+            return (
+                <div className={'card-panel'}>
+                    <p className={'flow-text'}>
+                        You are not connected to this class.
+                    </p>
+
+                    <a onClick={this.connect} className={buttonClasses}>
+                        Connect
+                    </a>
+                </div>
+            );
+        }
+    }
+}
+
 let run = function () {
     $.ajaxSetup({
         beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
@@ -158,12 +282,12 @@ let run = function () {
 
     var qs = querystring.parse(window.location.search.substring(1)),
         instance = parseInt(qs.instance) || 1,
-        cellName = qs.cell || "A1",
+        cellId = parseInt(qs.cellId) || 1,
         url = `/api/gameoflife/${instance}/`,
-        cellURL = url + `cell/${cellName}/`;
+        cellURL = `/api/gameoflifecell/${cellId}/`;
 
     React.render(
-        <GameOfLife url={url} cellURL={cellURL} cellName={cellName} date={new Date()}/>,
+        <App url={url} clickerClass={'gameoflife'} cellURL={cellURL} date={new Date()}/>,
         document.getElementById('react-main')
     );
 };

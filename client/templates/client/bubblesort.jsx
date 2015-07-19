@@ -27,7 +27,7 @@ class BubbleSort extends React.Component {
         $.post(this.props.swapURL, {
             lower_index: this.state.indices[0],
             // bubble_sort: '//' + window.location.host + this.props.url
-            bubble_sort: this.props.instance
+            bubble_sort: this.props.url
         }, this.swapDone.bind(this)).fail(this.swapDone.bind(this)).always(this.swapDone.bind(this));
     }
 
@@ -65,10 +65,10 @@ let run = function () {
         instance = parseInt(qs.instance) || 1,
         lower_index = parseInt(qs.lower_index) || 0,
         url = `/api/bubblesort/${instance}/`,
-        swapURL = `${url}swap/`;
+        swapURL = `/api/bubblesortswap/`;
 
     React.render(
-        <BubbleSort instance={instance} swapURL={swapURL} lower_index={lower_index} date={new Date()}/>,
+        <BubbleSort instance={instance} url={url} swapURL={swapURL} lower_index={lower_index} date={new Date()}/>,
         document.getElementById('react-main')
     );
 };
