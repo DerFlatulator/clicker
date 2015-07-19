@@ -26,7 +26,7 @@ class BubbleSort(models.Model):
 
     @property
     def get_swaps(self):
-        return self.bubblesortswap_set.all()
+        return self.swaps.all()
 
     @property
     def get_list_current(self):
