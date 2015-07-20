@@ -1,12 +1,15 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from api import models
+
 import redis
 import json
 
 from api.models import BubbleSortSwap, GameOfLifeCell, Interaction
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
+live_sessions = {}  # TODO these need to be removed at some point.
 
 # TODO make the client publishing more intelligent
 
@@ -24,6 +27,10 @@ def save_game_of_life_cell(sender, instance, **kwargs):
     if not instance.changed:
         return
 
+    gol_id = instance.game_of_life_id
+    if not ('gameoflife#{}'.format(gol_id)) in live_sessions:
+        return
+
     print "Publishing to redis:gameoflife.client"
     r.publish('gameoflife.client', json.dumps({
         'row': instance.row,
@@ -38,10 +45,19 @@ def save_interaction(sender, instance, created, **kwargs):
     if created:
         return
 
-    if instance.gameoflife:
+    if hasattr(instance, 'gameoflife'):
         data = json.loads(instance.data_json)
         if 'assignments' not in data:
             return
 
+        data['event_type'] = 'new_interaction'
+        # provide pks for the clients
+        data['cell_pks'] = {}
+        cells = models.GameOfLifeCell.objects.filter(game_of_life_id=data['game_of_life'])
+        for device_id  in data['assignments']:
+            cell_name = data['assignments'][device_id]
+            data['cell_pks'][cell_name] = cells.get(cell_name=cell_name).pk
+
         print "Publishing to redis:gameoflife.client"
-        r.publish('gameoflife.client', instance.data_json)
+        r.publish('gameoflife.client', json.dumps(data))
+        live_sessions['gameoflife#{}'.format(data['game_of_life'])] = data

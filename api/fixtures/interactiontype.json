@@ -1,0 +1,26 @@
+[
+  {
+    "model": "api.interactiontype",
+    "pk": 1,
+    "fields": {
+      "slug_name": "bubblesort",
+      "long_name": "Bubble (Transposition) Sort"
+    }
+  },
+  {
+    "model": "api.interactiontype",
+    "pk": 2,
+    "fields": {
+      "slug_name": "gameoflife",
+      "long_name": "Game of Life"
+    }
+  },
+  {
+    "model": "api.interactiontype",
+    "pk": 3,
+    "fields": {
+      "slug_name": "asyncgameoflife",
+      "long_name": "Asynchronous Game of Life"
+    }
+  }
+]

@@ -21,7 +21,8 @@ view_sets = [
     views.GameOfLifeCellViewSet,
     views.BubbleSortViewSet,
     views.BubbleSortSwapViewSet,
-    views.InteractionViewSet
+    views.InteractionViewSet,
+    (views.InteractionTypeViewSet, "type")
 ]
 
 

@@ -166,9 +166,15 @@ class ClickerClass(models.Model):
     def get_connected_devices(self):
         return self.registereddevice_set.count()
 
+
 class Creator(models.Model):
     user = models.OneToOneField(User)
     classes = models.ManyToManyField(ClickerClass)
+
+
+class InteractionType(models.Model):
+    slug_name = models.SlugField()
+    long_name = models.CharField(max_length=100, default='')
 
 
 class Interaction(models.Model):
@@ -182,9 +188,21 @@ class Interaction(models.Model):
     )
 
     clicker_class = models.ForeignKey(ClickerClass, related_name='interactions')
+    interaction_type = models.ForeignKey(InteractionType, related_name='interactions')
     data_json = models.TextField(default='{}', null=False, blank=True)
     state = models.CharField(max_length='2', choices=INTERACTION_STATES, default=READY)
     creator = models.ForeignKey(Creator, related_name='interactions', editable=False)
+
+    @property
+    def state_name(self):
+        for k, v in self.INTERACTION_STATES:
+            if self.state == k:
+                return v
+
+    def __unicode__(self):
+        return "Interaction #{} ({}, {})".format(self.id,
+                                                 self.clicker_class.class_name,
+                                                 self.state_name)
 
     # Generic item
     # limit = models.Q(app_label='api', model='bubblesort') | \

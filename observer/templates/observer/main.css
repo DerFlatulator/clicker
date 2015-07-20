@@ -37,6 +37,8 @@
     height: 50px;
     background: #222;
     border: 1px ridge black;
+    text-align: center;
+    vertical-align: top;
 }
 
 .golDead {

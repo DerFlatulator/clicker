@@ -1,15 +1,19 @@
+from collections import OrderedDict
 import json
 from django.contrib.auth.models import User, Group
 from django.core import exceptions
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import permissions
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import detail_route, list_route, renderer_classes
+from rest_framework.metadata import SimpleMetadata
 from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework.response import Response
 
 from . import serializers
 from . import models
+from rest_framework_xml.renderers import XMLRenderer
+from rest_framework import renderers
 from .permissions import DeviceIsRegisteredPermission
 
 import math
@@ -50,42 +54,87 @@ class BubbleSortViewSet(viewsets.ModelViewSet):
     queryset = models.BubbleSort.objects.all()
     serializer_class = serializers.BubbleSortSerializer
 
-class GameOfLifeViewSet(viewsets.ModelViewSet):
-    queryset = models.GameOfLife.objects.all()
-    serializer_class = serializers.GameOfLifeSerializer
-    # lookup_field = 'game_of_life'
 
-    @list_route(methods=['post'])
+class GenerateMetadata(SimpleMetadata):
+    def determine_metadata(self, request, view):
+        metadata = super(GenerateMetadata, self).determine_metadata(request, view)
+
+        if 'post' in view.action_map and view.action_map['post'] == 'generate':
+            fields = OrderedDict()
+            fields['class_name'] = OrderedDict()
+            fields['class_name']['label'] = u'Class Name'
+            fields['class_name']['read_only'] = False
+            fields['class_name']['required'] = True
+            fields['class_name']['type'] = False
+            fields['class_name']['read_only'] = u'field'
+
+            metadata['actions']['POST'] = fields
+
+        return metadata
+
+
+class GameOfLifeViewSet(viewsets.ModelViewSet):
+
+    def get_serializer_class(self, *args, **kwargs):
+        if 'post' in self.action_map and self.action_map['post'] == 'generate':
+            if self.request.accepted_renderer.format == 'api':
+                return serializers.InteractionGeneratorSerializer
+
+        return serializers.GameOfLifeSerializer
+
+    queryset = models.GameOfLife.objects.all()
+
+    # lookup_field = 'game_of_life'
+    metadata_class = GenerateMetadata
+
+    @list_route(methods=['post', 'get'])
     def generate(self, request, **kwargs):
+        """
+        :param class_name: the class this interaction will be associated with
+
+        """
+        if request.method == 'GET':
+            return Response({}, status=status.HTTP_200_OK)
+
+        if not hasattr(request.user, 'creator'):
+            return Response({'detail': 'you are not a creator'}, status=status.HTTP_403_FORBIDDEN)
+
+        creator = request.user.creator
+
         class_name = request.data['class_name']
         clicker_class = models.ClickerClass.objects.get(class_name=class_name)
         class_size = clicker_class.get_connected_devices()
 
-        creator = request.user.creator.get()
-
         if class_size == 0:
             return Response({'detail': 'class size is zero'}, status=status.HTTP_403_FORBIDDEN)
 
+        if 'interaction_slug' not in request.data:
+            return Response({'detail': 'please specify an interaction type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        interaction_slug = request.data['interaction_slug']
+        interaction_type = models.InteractionType.objects.get(slug_name=interaction_slug)
+
         # create game of life instance and corresponding interaction
+        interaction = models.Interaction.objects.create(clicker_class=clicker_class,
+                                                        state=models.Interaction.READY,
+                                                        creator=creator,
+                                                        interaction_type=interaction_type)
+        interaction.save()
 
         rows = max(4, int(math.ceil(math.sqrt(class_size))))
         cols = max(4, int(math.ceil(float(class_size) / rows)))  # more-or-less square
-        game = models.GameOfLife.objects.create(num_rows=rows, num_cols=cols)  # unsaved
-
-        interaction = models.Interaction.objects.create(clicker_class=clicker_class,
-                                                        state=models.Interaction.READY,
-                                                        creator=creator)
-        interaction.save()
-
-        game.interaction = interaction
+        game = models.GameOfLife(num_rows=rows, num_cols=cols, interaction=interaction)
         game.save()
+
+        interaction.gameoflife = game
+        interaction.save()
 
         # allocate clients to cells
 
         def rand_bool():
             return random.randrange(2) == 0
 
-        clients = map(lambda d: d.device_id, clicker_class.registereddevice_set.get())
+        clients = map(lambda d: d.device_id, clicker_class.registereddevice_set.all())
         ai = [True] * ((rows * cols) - class_size)
         everything = clients + ai
         random.shuffle(everything)
@@ -94,20 +143,48 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
 
         interaction_data = {'assignments': {}}
 
+        PATTERNS = {
+            'glider': (
+                (0, 0, 1, 0),
+                (1, 0, 1, 0),
+                (0, 1, 1, 0),
+                (0, 0, 0, 0),
+            )
+        }
+
+        pattern_name = request.POST.get('pattern', None)
+        if pattern_name in PATTERNS:
+            pattern = PATTERNS[pattern_name]
+        else:
+            pattern = None
+
         for col in range(cols):
             for row in range(rows):
                 cell = game.cells.filter(game_of_life=game, row=row, col=col)[0]
-                cell.alive = rand_bool()
+
+                if pattern:
+                    if row < len(pattern) and col < len(pattern[0]):
+                        cell.alive = bool(pattern[row][col])
+                    else:
+                        cell.alive = False  # could use rand_bool() here.
+                else:
+                    cell.alive = rand_bool()
+
                 cell.save()
+
                 something = everything.pop()
-                if isinstance(something, str):
+                if isinstance(something, unicode):
                     device_id = something
                     interaction_data['assignments'][device_id] = cell.cell_name
+
+        interaction_data['game_of_life'] = game.id
+        interaction_data['interaction'] = interaction.id
 
         interaction.data_json = json.dumps(interaction_data)
         interaction.save()
 
-        return Response(self.serializer_class(game).data, status=status.HTTP_201_CREATED)
+        return Response(serializers.GameOfLifeSerializer(game, context={'request': request}).data,
+                        status=status.HTTP_201_CREATED)
 
 
 class GameOfLifeCellViewSet(viewsets.ModelViewSet):
@@ -196,6 +273,11 @@ class ConnectionViewSet(viewsets.ModelViewSet):
 
         serialized = serializer(collection.classes, many=True, context={'request': request})
         return Response(serialized.data, status=s)
+
+
+class InteractionTypeViewSet(viewsets.ModelViewSet):
+    queryset = models.InteractionType.objects.all()
+    serializer_class = serializers.InteractionTypeSerializer
 
 
 class InteractionViewSet(viewsets.ReadOnlyModelViewSet):

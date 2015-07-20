@@ -19,18 +19,21 @@ class GameOfLife extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props.cellURL);
+
         $.ajax({
             url: this.props.cellURL,
             dataType: 'json',
+            method: 'GET',
             cache: false,
-            success: data => {
+            success: (data) => {
                 console.log(data);
                 this.setState({
                     clientCell: data.alive
                 });
             },
             error: (xhr, status, err) => {
-                console.error(this.props.cellURL, status, err.toString());
+                console.error(xhr, status, err.toString());
             }
         });
     }
@@ -160,21 +163,98 @@ class BaseComponent extends React.Component {
 class App extends BaseComponent {
     constructor(props) {
         super (props);
+        this._bind('register', 'connect', 'onRegistered', 'getDeviceID',
+            'isRegisteredToClass', 'componentDidMount', 'ignoreMessage');
         this.state = {
-            device_id: null,
-            connect_state: 'disconnected'
+            device_id: this.getDeviceID(),
+            interaction_id: null,
+            connect_state: 'disconnected',
+            socketConnected: false
         };
-        this._bind('register', 'connect', 'onRegistered', 'getDeviceID', 'isRegisteredToClass', 'componentDidMount');
+
+        console.log('App#constructor');
+    }
+
+    ignoreMessage(message) {
+        if (!('localStorage' in window))
+            return false;
+        var ctr = window.localStorage.getItem('socket.io:gameoflife.client-counter');
+        if (ctr && parseInt(ctr) >= message._counter) {
+            return true;
+        } else {
+            window.localStorage.setItem('socket.io:gameoflife.client-counter', message._counter);
+            return false;
+        }
     }
 
     componentDidMount() {
+        console.log('App#didMount');
+
         this.setState({
             connected: this.isRegisteredToClass(this.props.clickerClass)
         });
+
+
+        console.log('creating socket');
+        var socket = io(this.props.channel, {
+            'multiplex': false,
+            'sync disconnect on unload': true
+        });
+
+        this.setState({ socket });
+
+        console.log(socket);
+
+        window.onbeforeunload = function () {
+            socket.disconnect();
+        };
+
+        socket.on('connect', () => {
+            this.setState({ socketConnected: true });
+            console.log('socket connected');
+            //if ('localStorage' in window) {
+            //    window.localStorage.setItem('socket.io:gameoflife.client-counter', '0');
+            //}
+        });
+
+        socket.on('message', message => {
+            console.log(message);
+
+            if (!this.state.socketConnected)
+                return;
+
+            //if (this.ignoreMessage(message))
+            //    return;
+
+            var data = JSON.parse(message);
+
+            if (data.event_type === 'new_interaction') {
+                if (this.state.device_id in data.assignments) {
+
+                    this.setState({
+                        interaction_url: `/api/interaction/${data.interaction}/`,
+                        interaction_id: data.interaction,
+                        assignments: data.assignments,
+                        instance_id: data.game_of_life,
+                        instance_url: `/api/gameoflife/${data.game_of_life}/`,
+                        cell_name: data.assignments[this.state.device_id]
+                    });
+                    this.setState({
+                        cell_url: `/api/gameoflifecell/${data.cell_pks[this.state.cell_name]}/`,
+                        connect_state: 'connected'
+                    });
+                }
+            }
+        });
+    }
+
+    componentDidUpdate() {
+        $('.modal-trigger').leanModal();
+        $('.tooltip').tooltip({delay: 50});
     }
 
     /**
-     * :return: the device_id or false
+     * :return: the device_id or null
      */
     getDeviceID() {
         if ('localStorage' in window) {
@@ -182,7 +262,7 @@ class App extends BaseComponent {
             if (device_id != null)
                 return device_id;
         }
-        return false;
+        return null;
     }
 
     isRegisteredToClass(clickerClass) {
@@ -198,6 +278,7 @@ class App extends BaseComponent {
 
         var device_id = this.getDeviceID();
         if (device_id) {
+            this.setState({ device_id });
             console.log('registering (already had device_id)');
 
             this.register({ device_id, classes: [] }).then(this.onRegistered);
@@ -242,7 +323,7 @@ class App extends BaseComponent {
     onRegistered() {
         this.setState({
             connected: true,
-            connect_state: 'connected'
+            connect_state: 'registered'
         });
         if ('localStorage' in window) {
             window.localStorage.setItem(`registered:${this.props.clickerClass}`, "true");
@@ -251,9 +332,41 @@ class App extends BaseComponent {
 
     render() {
         if (this.state.connected) {
-            return (
-                <GameOfLife {...this.props}/>
-            );
+            if (this.state.connect_state === 'connected') {
+                //return <i/>;
+                return (
+                    <GameOfLife {...this.props}
+                        socket={this.state.socket}
+                        cellName={this.state.cell_name}
+                        cellURL={this.state.cell_url}
+                        />
+                );
+            } else {
+                return (
+                    <div className={'card-panel'}>
+                        <p className={'flow-text'}>Waiting for interactions to open</p>
+                        <div className="progress">
+                            <div className="indeterminate"></div>
+                        </div>
+
+                    </div>
+                );
+            }
+
+
+            //<div className="preloader-wrapper active">
+            //    <div className="spinner-layer spinner-blue-only">
+            //        <div className="circle-clipper left">
+            //            <div className="circle"></div>
+            //        </div><div className="gap-patch">
+            //        <div className="circle"></div>
+            //    </div><div className="circle-clipper right">
+            //        <div className="circle"></div>
+            //    </div>
+            //    </div>
+            //</div>
+
+
         }
         else {
             var buttonClasses = classNames('waves-effect waves-light btn-large', {
@@ -281,14 +394,19 @@ let run = function () {
     });
 
     var qs = querystring.parse(window.location.search.substring(1)),
-        instance = parseInt(qs.instance) || 1,
-        cellId = parseInt(qs.cellId) || 1,
-        url = `/api/gameoflife/${instance}/`,
-        cellURL = `/api/gameoflifecell/${cellId}/`;
+        socketBase = `//${window.location.hostname}:4000/`,
+        socketURL = socketBase + 'socket.io/socket.io.js',
+        channel = socketBase + "gameoflife.client";
 
-    React.render(
-        <App url={url} clickerClass={'gameoflife'} cellURL={cellURL} date={new Date()}/>,
-        document.getElementById('react-main')
-    );
+    $.getScript(socketURL, function () {
+        $(() => {
+            React.render(
+                <App channel={channel}
+                     clickerClass={'gameoflife'}
+                     date={new Date()}/>,
+                document.getElementById('react-main')
+            );
+        });
+    });
 };
 run();

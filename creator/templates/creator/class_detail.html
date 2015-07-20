@@ -20,11 +20,16 @@
 {% endblock %}
 
 {% block scripts %}
+
     {{ block.super }}
     <script type="text/javascript">
         window.$context = {
-            class_name: "{{ class_name |escapejs }}"
+            class_name: "{{ class_name |escapejs }}",
+            user: "{{ username }}",
+            clicker_class: {{ class_json |safe }},
+            interactions: {{ interactions |safe }},
+            types: {{ interaction_types_json |safe }}
         };
     </script>
-    <script type="text/javascript" src="{% static "js/creator/class_detail.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/creator/class_detail.bundle.js" %}"></script>
 {% endblock %}

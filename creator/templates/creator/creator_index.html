@@ -23,7 +23,7 @@
     {{ block.super }}
     <script type="text/javascript">
         window.$context = {
-{#            class_name: "{{ class_name |escapejs }}"#}
+            classes: {{ classes_json |safe }}
         };
     </script>
     <script type="text/javascript" src="{% static "js/creator/creator_index.bundle.js" %}"></script>

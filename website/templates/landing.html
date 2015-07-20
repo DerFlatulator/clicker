@@ -26,32 +26,30 @@
             <div class="hoverable center">
                 <i class="material-icons purple-text largeIcon">devices</i>
                 <h5>Client App</h5>
-                <p class="light fixHeight">
-                    Students with tablets, phones or laptops can use this site to
-                    participate in Clicker++ classes.</p>
                 <a href="/client/" class="btn waves-effect waves-light purple">Participate
                     <i class="material-icons right">smartphone</i>
                 </a>
+                <p class="light fixHeight">
+                    Students with tablets, phones or laptops can use this site to
+                    participate in Clicker++ classes.</p>
             </div>
         </div>
         <div class="col s12 m6 l4">
             <div class="hoverable center">
                 <i class="material-icons teal-text text-darken-2 largeIcon">remove_red_eye</i>
                 <h5>Observer App</h5>
-                <p class="light fixHeight">The observer application is for viewing a class live.
-                It is intended to be ran on a projector, however it is available
-                for all to access.</p>
                 <a href="/observer/" class="btn waves-effect waves-light teal darken-2">Observe
                     <i class="material-icons right">airplay</i>
                 </a>
+                <p class="light fixHeight">The observer application is for viewing a class live.
+                It is intended to be ran on a projector, however it is available
+                for all to access.</p>
             </div>
         </div>
         <div class="col s12 m6 l4">
             <div class="hoverable center">
                 <i class="material-icons light-blue-text text-darken-3 largeIcon">create</i>
                 <h5>Creator App</h5>
-                <p class="light fixHeight">The creator app allows educators to build and manage their own
-                    classes.</p>
                 {% if user.is_authenticated %}
                     <a href="/creator/" class="btn waves-effect waves-light blue darken-3">View classes
                         <i class="material-icons right">list</i>
@@ -60,6 +58,8 @@
                     <a href="/login/">Log In</a> or
                     <a href="/signup/">Register</a>
                 {% endif %}
+                <p class="light fixHeight">The creator app allows educators to build and manage their own
+                    classes.</p>
             </div>
         </div>
     </div>

@@ -8,6 +8,8 @@ from itertools import ifilter
 
 def clicker_index(request):
     class_list = ClickerClass.objects.all()[:50]
+    for cls in class_list:
+        cls.interactions = cls.interactions.all()
 
     return render(request, 'client/clicker_index.html', {
         'class_list': class_list
@@ -16,6 +18,8 @@ def clicker_index(request):
 
 def clicker_app(request, class_name):
     class_list = ClickerClass.objects.all()[:5]
+    for cls in class_list:
+        cls.interactions = cls.interactions.all()
 
     context_class = next(ifilter(lambda d: d.class_name == class_name, class_list), None)
     if not context_class:

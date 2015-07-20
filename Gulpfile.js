@@ -98,7 +98,7 @@ gulp.task('watch-jsx', ['bower'], function() {
                 global: true
             }, 'browserify-shim')
             .plugin('minifyify', {
-                map: app.output_dir + app.entry + '.map',
+                map: /*app.output_dir +*/ app.entry + '.map',
                 output: app.output_dir + app.entry + '.map'
             });
 
@@ -146,8 +146,8 @@ gulp.task('build-jsx', ['bower'], function () {
                 global: true
             }, 'browserify-shim')
             .plugin('minifyify', {
-                map: app.output_dir.replace("dist/", "/static/") + app.entry + '.map',
-                output: app.output_dir + app.entry + '.map'
+                map: app.entry + '.map',
+                output: app.entry + '.map'
             })
             .bundle()
             .pipe(source(app.entry))

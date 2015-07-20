@@ -113,7 +113,7 @@ class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
 class CreatorNameSerializer(serializers.RelatedField):
     def to_representation(self, value):
         if isinstance(value, models.Creator):
-            return value.username
+            return value.user.username
         else:
             raise Exception('Unexpected type of related field')
 
@@ -137,14 +137,53 @@ class CreatorNameSerializer(serializers.RelatedField):
 #         return '.'.join(ct.natural_key())
 
 
+class InteractionTypeSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.InteractionType
+        extra_kwargs = {
+            'url': {
+                'view_name': 'type-detail'
+            }
+        }
+        fields = ('url', 'slug_name', 'long_name', 'interactions')
+
+
 class InteractionSerializer(serializers.HyperlinkedModelSerializer):
 
     clicker_class = serializers.HyperlinkedRelatedField(view_name='class-detail', read_only=True)
     bubblesort = BubbleSortSerializer(read_only=True)
     gameoflife = GameOfLifeSerializer(read_only=True)
     creator = CreatorNameSerializer(read_only=True)
+    interaction_slug = serializers.SlugRelatedField(source='interaction_type',
+                                                    slug_field='slug_name',
+                                                    queryset=models.Interaction.objects.all())
+    long_name = serializers.SlugRelatedField(source='interaction_type',
+                                             slug_field='long_name',
+                                             queryset=models.Interaction.objects.all())
+
+    state_name = serializers.CharField(read_only=True)
 
     class Meta:
-        # exclude = ('creator',)
         model = models.Interaction
-        # use_natural_foreign_keys = True
+        exclude = ('interaction_type',)
+        extra_kwargs = {
+            'url': {
+                'view_name': 'interaction-detail'
+            }
+        }
+
+
+class InteractionGeneratorSerializer(serializers.HyperlinkedModelSerializer):
+
+    class_name = serializers.SlugRelatedField(slug_field='class_name',
+                                              source='clicker_class',
+                                              queryset=models.ClickerClass.objects.all())
+
+    interaction_slug = serializers.SlugRelatedField(slug_field='slug_name',
+                                                    source='interaction_type',
+                                                    queryset=models.InteractionType.objects.all())
+
+    class Meta:
+        fields = ('class_name', 'interaction_slug')
+        model = models.Interaction

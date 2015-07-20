@@ -3,24 +3,24 @@
     "model": "api.clickerclass",
     "pk": 1,
     "fields": {
-      "class_name": "gameoflife",
-      "long_name": "Game of Life"
+      "class_name": "data-science",
+      "long_name": "Data Science"
     }
   },
   {
     "model": "api.clickerclass",
     "pk": 2,
     "fields": {
-      "class_name": "bubblesort",
-      "long_name": "Bubble Sort"
+      "class_name": "gameoflife",
+      "long_name": "Cellular Automata"
     }
   },
   {
     "model": "api.clickerclass",
     "pk": 3,
     "fields": {
-      "class_name": "asyncgameoflife",
-      "long_name": "Async. Game of Life"
+      "class_name": "bubblesort",
+      "long_name": "Algorithms and Data Structures"
     }
   }
 ]
