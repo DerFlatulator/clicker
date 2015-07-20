@@ -33,21 +33,12 @@ class GameOfLife extends React.Component {
             }
         });
 
-        $(function () {
-            var socket = io(this.props.channel);
-
-            socket.on('connect', function () {
-                console.log('socket connected');
-            });
-
-            socket.on('message', message => {
-                console.log(message);
-                let data = JSON.parse(message);
-                if (this.props.id == data.game_of_life) {
-                    this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
-                }
-            });
-        }.bind(this));
+        this.props.socket.on('message', message => {
+            let data = JSON.parse(message);
+            if (this.props.id == data.game_of_life && data.event_type === 'toggle_cell') {
+                this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
+            }
+        });
     }
 
     /**
@@ -123,12 +114,12 @@ class GameOfLife extends React.Component {
                                     {x + 1}
                                 </div>
 
-                                {row.map((value) => {
+                                {row.map((value, y) => {
                                     return (
                                         <span className={classNames("gol", {
                                             "red lighten-2": !value,
                                             "green darken-2": value
-                                        })}></span>
+                                        })}>{this.isAI(x,y) ? "Auto" : ""}</span>
                                     );
                                 })}
 

@@ -24,12 +24,19 @@ var redisClient = redis.createClient();
 
 var redisChannels = [
     'gameoflife.observer',
-    'bubblesort.observer'
+    'bubblesort.observer',
+    'gameoflife.client',
+    'bubblesort.client'
 ];
+
+var activeSockets = {};
 
 redisChannels.forEach(function (channel) {
 
     redisClient.subscribe(channel);
+    activeSockets[channel] = {};
+
+    var msgCounter = 1;
 
     var namespace = io.of('/' + channel);
 
@@ -38,28 +45,43 @@ redisChannels.forEach(function (channel) {
      */
     namespace.on('connection', function (socket) {
 
-        console.log("* Observer connection [" + socket.client.id + ", " + socket.conn.remoteAddress +
-        "] - Time: " + socket.handshake.time);
+        console.log("* " + (channel.indexOf('observer') > -1 ? "Observer" : "Client") +
+            " connection [" + socket.client.id + ", " + socket.conn.remoteAddress +
+            "] - Time: " + socket.handshake.time);
+
+        activeSockets[channel][socket.client.id] = socket;
 
         /**
          * Called when an observer disconnects
          */
         socket.on('disconnect', function () {
-            console.log('* Observer disconnection');
-        });
+            console.log('* ' + (channel.indexOf('observer') > -1 ? "Observer" : "Client") +
+                ' disconnection');
 
-        /**
-         * Attach a callback from redis,
-         * forward it to the observer iff they are subscribed to the redisChannel
-         * [redis message ---> observer]
-         */
-        redisClient.on('message', function (_channel, message) {
-            if (_channel === channel) {
-                console.log("* Forwarding message from <" + _channel + ">: " + message +
-                    " [to: " + socket.client.id + "]");
-                socket.send(message);
-            }
+            delete activeSockets[channel][socket.client.id];
         });
+    });
+
+
+    /**
+     * Attach a callback from redis,
+     * forward it to the observer iff they are subscribed to the redisChannel
+     * [redis message ---> observer]
+     */
+    redisClient.on('message', function (_channel, message) {
+        if (_channel === channel) {
+
+            for (var clientId in activeSockets[channel]) {
+                if (activeSockets[channel].hasOwnProperty(clientId)) {
+                    var socket = activeSockets[channel][clientId];
+                    console.log("* Forwarding message from <" + _channel + ">: " + message +
+                        " [to: " + socket.client.id + "]");
+                    //message = JSON.parse(message);
+                    //message._counter = msgCounter++;
+                    socket.emit('message', message);
+                }
+            }
+        }
     });
 });
 
