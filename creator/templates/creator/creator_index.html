@@ -23,8 +23,8 @@
     {{ block.super }}
     <script type="text/javascript">
         window.$context = {
-            class_name: "{{ class_name |escapejs }}"
+{#            class_name: "{{ class_name |escapejs }}"#}
         };
     </script>
-    <script type="text/javascript" src="{% static "js/creator/creator_index.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/creator/creator_index.bundle.js" %}"></script>
 {% endblock %}

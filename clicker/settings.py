@@ -39,6 +39,15 @@ class ObserverConfig(AppConfig):
         from observer import signals
 
 
+class ClientConfig(AppConfig):
+    name = 'client'
+
+    def ready(self):
+        super(ClientConfig, self).ready()
+        print "Client App ready()"
+        from client import signals
+
+
 class APIConfig(AppConfig):
     name = 'api'
 

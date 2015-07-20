@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User, Group
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import fields
 
 import string
 import random
@@ -9,6 +11,7 @@ import hashlib
 
 class BubbleSort(models.Model):
     shuffled = models.CommaSeparatedIntegerField(null=False, max_length=1000, default="1,3,2")  # CSV
+    interaction = models.OneToOneField('Interaction', related_name='bubblesort')
 
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
@@ -59,6 +62,7 @@ class BubbleSortSwap(models.Model):
 class GameOfLife(models.Model):
     num_rows = models.IntegerField(null=False, default=3)
     num_cols = models.IntegerField(null=False, default=4)
+    interaction = models.OneToOneField('Interaction', related_name='gameoflife')
 
     def save(self, *args, **kwargs):
         is_new = not self.pk  # new if instance hasn't been assigned a p.k.
@@ -146,6 +150,7 @@ class GameOfLifeCell(models.Model):
         return "Game of life cell: instance={}, @({}, {}), alive={}".format(
             self.game_of_life_id, self.col, self.row, self.alive)
 
+
 # Classes
 
 
@@ -161,20 +166,33 @@ class ClickerClass(models.Model):
     def get_connected_devices(self):
         return self.registereddevice_set.count()
 
+class Creator(models.Model):
+    user = models.OneToOneField(User)
+    classes = models.ManyToManyField(ClickerClass)
 
-# class Interaction(models.Model):
-#     READY = 'R'
-#     ACTIVE = 'A'
-#     COMPLETE = 'C'
-#     INTERACTION_STATES = (
-#         (READY, 'Ready'),
-#         (ACTIVE, 'Active'),
-#         (COMPLETE, 'Complete')
-#     )
-#
-#     clicker_class = models.ForeignKey(ClickerClass, related_name='interactions')
-#     data_json = models.TextField(default='{}', null=False, blank=True)
-#     state = models.CharField(max_length='2', choices=INTERACTION_STATES, default=READY)
+
+class Interaction(models.Model):
+    READY = 'R'
+    ACTIVE = 'A'
+    COMPLETE = 'C'
+    INTERACTION_STATES = (
+        (READY, 'Ready'),
+        (ACTIVE, 'Active'),
+        (COMPLETE, 'Complete')
+    )
+
+    clicker_class = models.ForeignKey(ClickerClass, related_name='interactions')
+    data_json = models.TextField(default='{}', null=False, blank=True)
+    state = models.CharField(max_length='2', choices=INTERACTION_STATES, default=READY)
+    creator = models.ForeignKey(Creator, related_name='interactions', editable=False)
+
+    # Generic item
+    # limit = models.Q(app_label='api', model='bubblesort') | \
+    #     models.Q(app_label='api', model='gameoflife')
+    #
+    # content_type = models.ForeignKey(ContentType, limit_choices_to=limit, related_name='interaction')
+    # object_id = models.PositiveIntegerField()
+    # interaction_object = fields.GenericForeignKey('content_type', 'object_id')
 
 
 # Registration
@@ -207,9 +225,3 @@ class RegisteredDevice(models.Model):
             print self.device_id
 
         super(RegisteredDevice, self).save(kwargs)
-
-
-#
-# class Creator(models.Model):
-#     user = models.OneToOneField(User)
-#     classes = models.ManyToManyField(ClickerClass)

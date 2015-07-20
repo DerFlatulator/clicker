@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User, Group
+from django.core import serializers as core_serializers
+from django.contrib.contenttypes.models import ContentType
 
 from rest_framework import serializers
 
@@ -95,3 +97,54 @@ class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
                 'view_name': 'connect-detail'
             }
         }
+
+# noinspection PyAbstractClass
+# class GenericRelatedFieldSerializer(serializers.RelatedField):
+#     def to_representation(self, value):
+#         if isinstance(value, models.GameOfLife):
+#             serializer = GameOfLifeSerializer(value)
+#         elif isinstance(value, models.BubbleSort):
+#             serializer = BubbleSortSerializer(value)
+#         else:
+#             raise Exception('Unexpected type of generic related object')
+#
+#         return serializer.data
+
+class CreatorNameSerializer(serializers.RelatedField):
+    def to_representation(self, value):
+        if isinstance(value, models.Creator):
+            return value.username
+        else:
+            raise Exception('Unexpected type of related field')
+
+
+#
+# class ContentTypeField(serializers.WritableField):
+#     def field_from_native(self, data, files, field_name, into):
+#         into[field_name] = self.from_native(data[field_name])
+#
+#     def from_native(self, data):
+#         app_label, model = data.split('.')
+#         return ContentType.objects.get(app_label=app_label, model=model)
+#
+#     # If content_type is write_only, there is no need to have field_to_native here.
+#     def field_to_native(self, obj, field_name):
+#         if self.write_only:
+#             return None
+#         if obj is None:
+#             return self.empty
+#         ct = getattr(obj, field_name)
+#         return '.'.join(ct.natural_key())
+
+
+class InteractionSerializer(serializers.HyperlinkedModelSerializer):
+
+    clicker_class = serializers.HyperlinkedRelatedField(view_name='class-detail', read_only=True)
+    bubblesort = BubbleSortSerializer(read_only=True)
+    gameoflife = GameOfLifeSerializer(read_only=True)
+    creator = CreatorNameSerializer(read_only=True)
+
+    class Meta:
+        # exclude = ('creator',)
+        model = models.Interaction
+        # use_natural_foreign_keys = True

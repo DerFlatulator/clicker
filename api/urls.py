@@ -20,7 +20,8 @@ view_sets = [
     views.GameOfLifeViewSet,
     views.GameOfLifeCellViewSet,
     views.BubbleSortViewSet,
-    views.BubbleSortSwapViewSet
+    views.BubbleSortSwapViewSet,
+    views.InteractionViewSet
 ]
 
 
