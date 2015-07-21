@@ -19,6 +19,7 @@ from .permissions import DeviceIsRegisteredPermission
 import math
 import random
 
+
 def generic_serializer_view_set_factory(_model, _serializer=HyperlinkedModelSerializer):
     class GenericSerializerViewSet(viewsets.ModelViewSet):
         queryset = _model.objects.all()
@@ -30,6 +31,7 @@ def generic_serializer_view_set_factory(_model, _serializer=HyperlinkedModelSeri
 
             self.serializer_class = GenericSerializer
             return self.serializer_class
+
     try:
         GenericSerializerViewSet.__name__ = _model.__name__
     finally:
@@ -74,6 +76,8 @@ class GenerateMetadata(SimpleMetadata):
 
 
 class GameOfLifeViewSet(viewsets.ModelViewSet):
+    DEFAULT_PATTERN = 'glider'
+    DEFAULT_ACTIVATE = True
 
     def get_serializer_class(self, *args, **kwargs):
         if 'post' in self.action_map and self.action_map['post'] == 'generate':
@@ -111,8 +115,15 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         if 'interaction_slug' not in request.data:
             return Response({'detail': 'please specify an interaction type'}, status=status.HTTP_400_BAD_REQUEST)
 
+        activate = request.data.get('activate', GameOfLifeViewSet.DEFAULT_ACTIVATE)
+
         interaction_slug = request.data['interaction_slug']
         interaction_type = models.InteractionType.objects.get(slug_name=interaction_slug)
+
+        for m in models.Interaction.objects.all():
+            if activate:
+                m.state = models.Interaction.COMPLETE
+                m.save()
 
         # create game of life instance and corresponding interaction
         interaction = models.Interaction.objects.create(clicker_class=clicker_class,
@@ -127,6 +138,8 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         game.save()
 
         interaction.gameoflife = game
+        if activate:
+            interaction.state = models.Interaction.ACTIVE
         interaction.save()
 
         # allocate clients to cells
@@ -143,7 +156,7 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
 
         interaction_data = {'assignments': {}}
 
-        PATTERNS = {
+        patterns = {
             'glider': (
                 (0, 0, 1, 0),
                 (1, 0, 1, 0),
@@ -152,9 +165,9 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
             )
         }
 
-        pattern_name = request.POST.get('pattern', None)
-        if pattern_name in PATTERNS:
-            pattern = PATTERNS[pattern_name]
+        pattern_name = request.POST.get('pattern', GameOfLifeViewSet.DEFAULT_PATTERN)
+        if pattern_name in patterns:
+            pattern = patterns[pattern_name]
         else:
             pattern = None
 
@@ -280,9 +293,30 @@ class InteractionTypeViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.InteractionTypeSerializer
 
 
-class InteractionViewSet(viewsets.ReadOnlyModelViewSet):
+class InteractionViewSet(viewsets.ModelViewSet):
     queryset = models.Interaction.objects.all()
     serializer_class = serializers.InteractionSerializer
+
+    def filter_queryset(self, queryset):
+        creator = self.request.query_params.get('creator', None)
+        if creator:
+            queryset = queryset.filter(creator__user__username=creator)
+
+        clicker_class = self.request.query_params.get('class', None)
+        if clicker_class:
+            queryset = queryset.filter(clicker_class__class_name=clicker_class)
+
+        state_name = self.request.query_params.get('state', None)
+        if state_name:
+            states = [state for state, _state_name in models.Interaction.INTERACTION_STATES
+                      if state_name == _state_name.lower()]
+            if not len(states):
+                return queryset.none()
+
+            state = states[0]
+            queryset = queryset.filter(state=state)
+
+        return queryset
 
 
 # Admin

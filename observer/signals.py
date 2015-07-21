@@ -7,7 +7,6 @@ import json
 from api.models import BubbleSortSwap, GameOfLifeCell, Interaction
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
-live_sessions = {}  # TODO these need to be removed at some point.
 
 @receiver(post_save, sender=BubbleSortSwap,
           dispatch_uid="observer:BubbleSortSwap#post_save")
@@ -25,25 +24,27 @@ def save_game_of_life_cell(sender, instance, **kwargs):
     if not instance.changed:
         return
 
-    gol_id = instance.game_of_life_id
+    if hasattr(instance, 'gameoflife'):
+        if instance.game_of_life.interaction.state != Interaction.ACTIVE:
+            return
 
-    if not ('gameoflife#{}'.format(gol_id)) in live_sessions:
-        return
-
-    print "Publishing to redis:gameoflife.observer"
-    r.publish('gameoflife.observer', json.dumps({
-        'row': instance.row,
-        'col': instance.col,
-        'alive': instance.alive,
-        'game_of_life': instance.game_of_life_id,
-        'event_type': 'toggle_cell'
-    }))
+        print "Publishing to redis:gameoflife.observer"
+        r.publish('gameoflife.observer', json.dumps({
+            'row': instance.row,
+            'col': instance.col,
+            'alive': instance.alive,
+            'game_of_life': instance.game_of_life_id,
+            'event_type': 'toggle_cell'
+        }))
 
 @receiver(post_save, sender=Interaction,
           dispatch_uid="observer:Interaction#post_save")
 def save_interaction(sender, instance, created, **kwargs):
     # the first save is ignored
     if created:
+        return
+
+    if instance.state != Interaction.ACTIVE:
         return
 
     if hasattr(instance, 'gameoflife'):
@@ -55,4 +56,3 @@ def save_interaction(sender, instance, created, **kwargs):
 
         print "Publishing to redis:gameoflife.observer"
         r.publish('gameoflife.observer', json.dumps(data))
-        live_sessions['gameoflife#{}'.format(data['game_of_life'])] = data

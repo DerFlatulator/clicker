@@ -40,6 +40,7 @@ class BubbleSortSerializer(serializers.HyperlinkedModelSerializer):
                                                      slug_field='lower_index',
                                                      source='swaps',
                                                      read_only=True)
+    description = serializers.CharField(source='get_info', read_only=True)
 
     class Meta:
         model = models.BubbleSort
@@ -58,6 +59,7 @@ class GameOfLifeSerializer(serializers.HyperlinkedModelSerializer):
     cells = serializers.HyperlinkedRelatedField(view_name='gameoflifecell-detail',
                                                 read_only=True,
                                                 many=True)
+    description = serializers.CharField(source='get_info', read_only=True)
 
     class Meta:
         model = models.GameOfLife

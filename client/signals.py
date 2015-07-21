@@ -9,7 +9,6 @@ import json
 from api.models import BubbleSortSwap, GameOfLifeCell, Interaction
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
-live_sessions = {}  # TODO these need to be removed at some point.
 
 # TODO make the client publishing more intelligent
 
@@ -24,11 +23,10 @@ def new_bubble_sort_swap(sender, **kwargs):
 
 @receiver(post_save, sender=GameOfLifeCell, dispatch_uid="client:GameOfLifeCell#post_save")
 def save_game_of_life_cell(sender, instance, **kwargs):
-    if not instance.changed:
+    if instance.game_of_life.interaction.state != Interaction.ACTIVE:
         return
 
-    gol_id = instance.game_of_life_id
-    if not ('gameoflife#{}'.format(gol_id)) in live_sessions:
+    if not instance.changed:
         return
 
     print "Publishing to redis:gameoflife.client"
@@ -43,6 +41,9 @@ def save_game_of_life_cell(sender, instance, **kwargs):
 def save_interaction(sender, instance, created, **kwargs):
     # the first save is ignored
     if created:
+        return
+
+    if instance.state != Interaction.ACTIVE:
         return
 
     if hasattr(instance, 'gameoflife'):
@@ -60,4 +61,3 @@ def save_interaction(sender, instance, created, **kwargs):
 
         print "Publishing to redis:gameoflife.client"
         r.publish('gameoflife.client', json.dumps(data))
-        live_sessions['gameoflife#{}'.format(data['game_of_life'])] = data

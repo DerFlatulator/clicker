@@ -4,7 +4,8 @@
     "pk": 1,
     "fields": {
       "class_name": "data-science",
-      "long_name": "Data Science"
+      "long_name": "Data Science",
+      "creator": 1
     }
   },
   {
@@ -12,7 +13,8 @@
     "pk": 2,
     "fields": {
       "class_name": "gameoflife",
-      "long_name": "Cellular Automata"
+      "long_name": "Cellular Automata",
+      "creator": 1
     }
   },
   {
@@ -20,7 +22,8 @@
     "pk": 3,
     "fields": {
       "class_name": "bubblesort",
-      "long_name": "Algorithms and Data Structures"
+      "long_name": "Algorithms and Data Structures",
+      "creator": 1
     }
   }
 ]

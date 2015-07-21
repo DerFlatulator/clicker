@@ -49,18 +49,27 @@ def class_detail(request, class_name):
         'connected_devices': cls_model.get_connected_devices()
     }
 
-    interactions = [
-        {
-            'interaction_type': {
-                'long_name': x.interaction_type.long_name,
-                'slug_name': x.interaction_type.slug_name,
-                'gameoflife': x.gameoflife.get_info() if hasattr(x, 'gameoflife') else None,
-                'bubblesort': x.bubblesort.get_info() if hasattr(x, 'bubblesort') else None
-            },
-            'state_name': x.state_name,
+    interactions = serializers.InteractionSerializer(interactions_model,
+                                                     many=True,
+                                                     context={'request': request}).data
+    for interaction in interactions:
+        obj = interaction.pop('bubblesort', None)
+        obj = interaction.pop('gameoflife', obj)
+        if obj:
+            interaction['description'] = obj['description']
 
-        } for x in interactions_model
-    ]
+    # interactions = [
+    #     {
+    #         'interaction_type': {
+    #             'long_name': x.interaction_type.long_name,
+    #             'slug_name': x.interaction_type.slug_name,
+    #             'gameoflife': x.gameoflife.get_info() if hasattr(x, 'gameoflife') else None,
+    #             'bubblesort': x.bubblesort.get_info() if hasattr(x, 'bubblesort') else None
+    #         },
+    #         'state_name': x.state_name,
+    #
+    #     } for x in interactions_model
+    # ]
 
     types = serializers.InteractionTypeSerializer(types_model, many=True,
                                                   context={'request': request}).data

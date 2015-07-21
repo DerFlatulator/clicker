@@ -33,7 +33,7 @@ class GameOfLife extends React.Component {
             }
         });
 
-        window.onbeforeunload = function () {
+        window.onbeforeunload = () => {
             this.props.socket.disconnect();
         };
 
@@ -168,6 +168,14 @@ class App extends React.Component {
 
         this.setState({ socket });
 
+        $.getJSON(`/api/interaction/?state=active&class=${this.state.class_name}`,
+            data => {
+                if (data.count > 0) {
+                    this.setCurrentInteraction(data.results[0]);
+                }
+            }
+        );
+
         socket.on('connect', function () {
             console.log('socket connected');
         });
@@ -180,10 +188,19 @@ class App extends React.Component {
                 this.setState({
                     interaction_url: `/api/interaction/${data.interaction}/`,
                     assignments: data.assignments,
-                    instance: data.game_of_life,
                     instance_url: `/api/gameoflife/${data.game_of_life}/`
                 });
             }
+        });
+    }
+
+    setCurrentInteraction(interaction) {
+        let data = JSON.parse(interaction.data_json);
+
+        this.setState({
+            interaction_url: interaction.url,
+            assignments: data.assignments,
+            instance_url: interaction.gameoflife.url
         });
     }
 
@@ -199,6 +216,7 @@ class App extends React.Component {
         } else {
             return (
                 <div className="card-panel">
+                    <h4>Observer</h4>
                     <p className={'flow-text'}>Waiting for interactions to open</p>
                     <div className="progress">
                         <div className="indeterminate"></div>

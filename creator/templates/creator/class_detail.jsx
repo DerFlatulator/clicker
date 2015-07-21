@@ -9,17 +9,22 @@ import $ from 'jquery';
 import 'jquery.cookie';
 import classNames from 'classnames';
 
+
 class CreatorDetail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             waiting: false,
             selectedItem: '*',
-            selectedItemName: ''
+            selectedItemName: '',
+            interactions: this.props.interactions
         };
         this.createInteraction = this.createInteraction.bind(this);
         this.onInteractionCreated = this.onInteractionCreated.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.deleteInteraction = this.deleteInteraction.bind(this);
+        this.onInteractionDeleted = this.onInteractionDeleted.bind(this);
+        this.reload = this.reload.bind(this);
     }
 
     createInteraction(interaction_type) {
@@ -41,12 +46,31 @@ class CreatorDetail extends React.Component {
         });
     }
 
+    deleteInteraction(url, event) {
+        $.ajax({
+            url,
+            method: 'DELETE',
+            dataType: 'json',
+            success: this.onInteractionDeleted,
+            error: console.error.bind(console)
+        });
+    }
+
+    reload() {
+        $.getJSON(`/api/interaction/?creator=${this.props.user}`, (data) => {
+            this.setState({
+                interactions: data.results
+            });
+        })
+    }
+
 
     componentDidMount() {
         $('select').material_select();
     }
 
     componentDidUpdate() {
+        $('.tooltip').tooltip();
     }
 
     handleChange(event) {
@@ -67,7 +91,13 @@ class CreatorDetail extends React.Component {
         console.log(data);
         this.setState({waiting: false});
 
-        window.location.reload(); // TODO replace with update state XHR
+        this.reload();
+    }
+
+    onInteractionDeleted(data) {
+        console.log(data);
+
+        this.reload();
     }
 
     render() {
@@ -85,17 +115,32 @@ class CreatorDetail extends React.Component {
                     <li className="collection-header">
                         <h4>Available Interactions</h4>
                     </li>
-                    {this.props.interactions.map(interaction => {
+                    {this.state.interactions.map(interaction => {
                         return (
-                            <li className="collection-item">
+                            <li className="collection-item"
+                                key={interaction.url}>
                                 <div>
                                     State: {interaction.state_name}&nbsp;&mdash;&nbsp;
-                                    {interaction.interaction_type.long_name}&nbsp;&mdash;&nbsp;
-                                    {interaction.interaction_type.bubblesort}
-                                    {interaction.interaction_type.gameoflife}
-                                    <a href="#!" className="secondary-content">
-                                        Start <i className="material-icons right">send</i>
-                                    </a>
+                                    {interaction.long_name}&nbsp;&mdash;&nbsp;
+                                    {interaction.description}
+                                    <div  className='secondary-content'>
+                                        <a href="#!" onClick={this.deleteInteraction.bind(this, interaction.url)}
+                                           className="red-text ">
+                                            <i data-tooltip="Delete Interaction" data-position='left'
+                                               className="material-icons right tooltip">delete</i>
+                                        </a>
+                                        {interaction.state_name !== "Active" ?
+                                            <a href="#!">
+                                                <i data-tooltip="Activate Interaction" data-position='left'
+                                                   className="teal-text tooltip material-icons right">send</i>
+                                            </a>
+                                                :
+                                            <a href="#!">
+                                                <i data-tooltip="De-activate Interaction" data-position='left'
+                                                   className="orange-text tooltip material-icons right">cancel</i>
+                                            </a>
+                                        }
+                                    </div>
                                 </div>
                             </li>
                         );
@@ -117,7 +162,11 @@ class CreatorDetail extends React.Component {
 
                                 {this.props.types.map(type => {
                                    return (
-                                    <option value={type.slug_name}>{type.long_name}</option>
+                                    <option
+                                        key={type.slug_name}
+                                        value={type.slug_name}>
+                                        {type.long_name}
+                                    </option>
                                    );
                                 })}
                             </select>
@@ -125,6 +174,7 @@ class CreatorDetail extends React.Component {
                         <div className="col s12 m4">
                             <a onClick={this.createInteraction} className={buttonClasses}>
                                 Create
+                                <i className="material-icons right">add_circle</i>
                             </a>
                         </div>
                     </div>

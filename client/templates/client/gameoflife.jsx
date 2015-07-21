@@ -167,7 +167,6 @@ class App extends BaseComponent {
             'isRegisteredToClass', 'componentDidMount', 'ignoreMessage');
         this.state = {
             device_id: this.getDeviceID(),
-            interaction_id: null,
             connect_state: 'disconnected',
             socketConnected: false
         };
@@ -194,6 +193,13 @@ class App extends BaseComponent {
             connected: this.isRegisteredToClass(this.props.clickerClass)
         });
 
+        $.getJSON(`/api/interaction/?state=active&class=${this.props.clickerClass}`,
+                data => {
+                if (data.count > 0) {
+                    this.setCurrentInteraction(data.results[0]);
+                }
+            }
+        );
 
         console.log('creating socket');
         var socket = io(this.props.channel, {
@@ -205,7 +211,7 @@ class App extends BaseComponent {
 
         console.log(socket);
 
-        window.onbeforeunload = function () {
+        window.onbeforeunload = () => {
             socket.disconnect();
         };
 
@@ -235,9 +241,7 @@ class App extends BaseComponent {
 
                     this.setState({
                         interaction_url: `/api/interaction/${data.interaction}/`,
-                        interaction_id: data.interaction,
                         assignments: data.assignments,
-                        instance_id: data.game_of_life,
                         instance_url: `/api/gameoflife/${data.game_of_life}/`,
                         cell_name: data.assignments[this.state.device_id]
                     });
@@ -245,8 +249,23 @@ class App extends BaseComponent {
                         cell_url: `/api/gameoflifecell/${data.cell_pks[this.state.cell_name]}/`,
                         connect_state: 'connected'
                     });
+
+                    if ('vibrate' in window.navigator && typeof window.navigator.vibrate === 'function') {
+                        window.navigator.vibrate([100, 100, 100]);
+                    }
                 }
             }
+        });
+    }
+
+    setCurrentInteraction(interaction) {
+        let data = JSON.parse(interaction.data_json);
+
+        this.setState({
+            interaction_url: interaction.url,
+            assignments: data.assignments,
+            instance_url: interaction.gameoflife.url,
+            connect_state: 'connected'
         });
     }
 
