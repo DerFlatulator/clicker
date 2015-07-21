@@ -3,6 +3,7 @@ from django.dispatch import receiver
 
 import redis
 import json
+from rest_framework.reverse import reverse_lazy
 
 from api.models import BubbleSortSwap, GameOfLifeCell, Interaction
 
@@ -24,18 +25,18 @@ def save_game_of_life_cell(sender, instance, **kwargs):
     if not instance.changed:
         return
 
-    if hasattr(instance, 'gameoflife'):
-        if instance.game_of_life.interaction.state != Interaction.ACTIVE:
-            return
+    if instance.game_of_life.interaction.state != Interaction.ACTIVE:
+        return
+    url = reverse_lazy('gameoflife-detail', args=[instance.game_of_life_id])
 
-        print "Publishing to redis:gameoflife.observer"
-        r.publish('gameoflife.observer', json.dumps({
-            'row': instance.row,
-            'col': instance.col,
-            'alive': instance.alive,
-            'game_of_life': instance.game_of_life_id,
-            'event_type': 'toggle_cell'
-        }))
+    print "Publishing to redis:gameoflife.observer"
+    r.publish('gameoflife.observer', json.dumps({
+        'row': instance.row,
+        'col': instance.col,
+        'alive': instance.alive,
+        'game_of_life': str(url),
+        'event_type': 'toggle_cell'
+    }))
 
 @receiver(post_save, sender=Interaction,
           dispatch_uid="observer:Interaction#post_save")

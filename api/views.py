@@ -174,7 +174,6 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         for col in range(cols):
             for row in range(rows):
                 cell = game.cells.filter(game_of_life=game, row=row, col=col)[0]
-
                 if pattern:
                     if row < len(pattern) and col < len(pattern[0]):
                         cell.alive = bool(pattern[row][col])
@@ -183,12 +182,14 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
                 else:
                     cell.alive = rand_bool()
 
-                cell.save()
-
                 something = everything.pop()
                 if isinstance(something, unicode):
                     device_id = something
                     interaction_data['assignments'][device_id] = cell.cell_name
+                else:
+                    cell.is_ai = True
+
+                cell.save()
 
         interaction_data['game_of_life'] = game.id
         interaction_data['interaction'] = interaction.id

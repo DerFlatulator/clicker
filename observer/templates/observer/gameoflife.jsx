@@ -40,7 +40,9 @@ class GameOfLife extends React.Component {
 
         this.props.socket.on('message', message => {
             let data = JSON.parse(message);
-            if (this.props.id == data.game_of_life && data.event_type === 'toggle_cell') {
+            let url = this.props.url.substring(this.props.url.indexOf('/api/'));
+            console.log(data.game_of_life, url);
+            if (url == data.game_of_life && data.event_type === 'toggle_cell') {
                 this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
             }
         });
@@ -209,7 +211,7 @@ class App extends React.Component {
             return (
                 <GameOfLife {...this.props}
                     assignments={this.state.assignments}
-                    id={this.state.instance}
+                    //id={this.state.instance}
                     url={this.state.instance_url}
                     socket={this.state.socket} />
             );

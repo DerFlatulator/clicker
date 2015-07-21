@@ -194,7 +194,7 @@ class App extends BaseComponent {
         });
 
         $.getJSON(`/api/interaction/?state=active&class=${this.props.clickerClass}`,
-                data => {
+            data => {
                 if (data.count > 0) {
                     this.setCurrentInteraction(data.results[0]);
                 }

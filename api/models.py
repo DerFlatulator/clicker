@@ -125,6 +125,7 @@ class GameOfLifeCell(models.Model):
     cell_name = models.CharField(max_length=10, editable=False)
     changed = models.NullBooleanField(null=True)
     game_of_life = models.ForeignKey(GameOfLife, related_name='cells')
+    is_ai = models.BooleanField(default=False, blank=True)
 
     def get_cell_name(self):
         cell_name = ""
