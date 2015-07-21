@@ -26,6 +26,7 @@
                 <li class="collection-item avatar">
                     <i class="material-icons circle green mdi-action-assessment"></i>
                     <span class="title">{{ class.long_name }}</span>
+                    <p>Creator: {{ class.creator.user.username }}</p>
                     <p>Class is open.</p>
                     <a href="/client/{{ class.class_name }}/" class="secondary-content waves-effect waves-light btn">
                         <i class="mdi-action-game left"></i>

@@ -27,7 +27,7 @@
             class_name: "{{ class_name |escapejs }}",
             user: "{{ username }}",
             clicker_class: {{ class_json |safe }},
-            interactions: {{ interactions |safe }},
+            interactions: {{ interactions_json |safe }},
             types: {{ interaction_types_json |safe }}
         };
     </script>

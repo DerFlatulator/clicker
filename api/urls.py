@@ -22,7 +22,8 @@ view_sets = [
     views.BubbleSortViewSet,
     views.BubbleSortSwapViewSet,
     views.InteractionViewSet,
-    (views.InteractionTypeViewSet, "type")
+    (views.InteractionTypeViewSet, "type"),
+    views.CreatorViewSet
 ]
 
 

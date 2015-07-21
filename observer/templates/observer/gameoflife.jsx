@@ -33,6 +33,11 @@ class GameOfLife extends React.Component {
             }
         });
 
+        window.onbeforeunload = function () {
+            this.props.socket.disconnect();
+        };
+
+
         this.props.socket.on('message', message => {
             let data = JSON.parse(message);
             if (this.props.id == data.game_of_life && data.event_type === 'toggle_cell') {
@@ -194,7 +199,10 @@ class App extends React.Component {
         } else {
             return (
                 <div className="card-panel">
-                    <p className="flow-text">Waiting for interactions to open...</p>
+                    <p className={'flow-text'}>Waiting for interactions to open</p>
+                    <div className="progress">
+                        <div className="indeterminate"></div>
+                    </div>
                 </div>
             );
         }

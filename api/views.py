@@ -287,6 +287,10 @@ class InteractionViewSet(viewsets.ReadOnlyModelViewSet):
 
 # Admin
 
+class CreatorViewSet(viewsets.ModelViewSet):
+    queryset = models.Creator.objects.all()
+    serializer_class = serializers.CreatorSerializer
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

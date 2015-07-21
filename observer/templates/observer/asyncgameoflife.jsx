@@ -14,11 +14,13 @@ class GameOfLife extends React.Component {
             cells: [[true,  false],
                     [false, true ]]
         };
+        this.isAI = this.isAI.bind(this);
     }
 
     componentDidMount() {
         $.ajax({
             url: this.props.url,
+            method: 'GET',
             dataType: 'json',
             cache: false,
             success: data => {
@@ -31,21 +33,12 @@ class GameOfLife extends React.Component {
             }
         });
 
-        $(function () {
-            var socket = io(this.props.channel);
-
-            socket.on('connect', function () {
-                console.log('socket connected');
-            });
-
-            socket.on('message', message => {
-                console.log(message);
-                let data = JSON.parse(message);
-                if (this.props.id == data.game_of_life) {
-                    this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
-                }
-            });
-        }.bind(this));
+        this.props.socket.on('message', message => {
+            let data = JSON.parse(message);
+            if (this.props.id == data.game_of_life && data.event_type === 'toggle_cell') {
+                this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
+            }
+        });
     }
 
     /**
@@ -86,11 +79,23 @@ class GameOfLife extends React.Component {
         return newCells;
     }
 
+    isAI(x, y) {
+
+        var colLetter = GameOfLife.indexToColumnLetter(y),
+            rowNum = x,
+            str = `${colLetter}${rowNum + 1}`;
+
+        return Object.keys(this.props.assignments)
+            .map(key => this.props.assignments[key])
+            .filter(val => val == str)
+            .length == 0;
+    }
+
     render() {
 
         return (
             <div>
-                <h3>Asynchronous Game of Life</h3>
+                <h3>Game of Life</h3>
                 <div className="gameOfLife">
                     <div className="golCornerSpacer">&nbsp;</div>
 
@@ -109,12 +114,12 @@ class GameOfLife extends React.Component {
                                     {x + 1}
                                 </div>
 
-                                {row.map((value) => {
+                                {row.map((value, y) => {
                                     return (
                                         <span className={classNames("gol", {
                                             "red lighten-2": !value,
                                             "green darken-2": value
-                                        })}></span>
+                                        })}>{this.isAI(x,y) ? "Auto" : ""}</span>
                                     );
                                 })}
 
@@ -143,20 +148,75 @@ class GameOfLife extends React.Component {
 
 }
 
+class App extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            class_name: "gameoflife",
+            interaction_url: null
+        };
+    }
+
+    componentDidMount() {
+        var socket = io(this.props.channel);
+
+        this.setState({ socket });
+
+        socket.on('connect', function () {
+            console.log('socket connected');
+        });
+
+        socket.on('message', message => {
+            console.log(message);
+
+            let data = JSON.parse(message);
+            if (data.event_type === 'new_interaction') {
+                this.setState({
+                    interaction_url: `/api/interaction/${data.interaction}/`,
+                    assignments: data.assignments,
+                    instance: data.game_of_life,
+                    instance_url: `/api/gameoflife/${data.game_of_life}/`
+                });
+            }
+        });
+    }
+
+    render() {
+        if (this.state.class_name !== null && this.state.interaction_url !== null) {
+            return (
+                <GameOfLife {...this.props}
+                    assignments={this.state.assignments}
+                    id={this.state.instance}
+                    url={this.state.instance_url}
+                    socket={this.state.socket} />
+            );
+        } else {
+            return (
+                <div className="card-panel">
+                    <p className="flow-text">Waiting for interactions to open...</p>
+                </div>
+            );
+        }
+    }
+}
+
 let run = function () {
     var qs = querystring.parse(window.location.search.substring(1)),
         socketBase = `//${window.location.hostname}:4000/`,
         socketURL = socketBase + 'socket.io/socket.io.js',
-        instance = parseInt(qs.instance) || 1,
-        url = `/api/gameoflife/${instance}/`,
+        //instance = parseInt(qs.instance) || 1,
+        //url = `/api/gameoflife/${instance}/`,
         channel = socketBase + "gameoflife.observer";
 
     // Wait for socket code to load before activating React
     $.getScript(socketURL, function () {
-        React.render(
-            <GameOfLife url={url} channel={channel} id={instance} date={new Date()}/>,
-            document.getElementById('react-main')
-        );
+        $(() => {
+            React.render(
+                <App channel={channel} date={new Date()}/>,
+                document.getElementById('react-main')
+            );
+        });
     });
 
 };

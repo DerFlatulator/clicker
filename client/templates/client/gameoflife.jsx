@@ -217,6 +217,8 @@ class App extends BaseComponent {
             //}
         });
 
+        // socket.on('disconnect', ...
+
         socket.on('message', message => {
             console.log(message);
 

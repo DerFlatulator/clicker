@@ -19,25 +19,23 @@ class GameOfLife extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props.cellURL);
+
         $.ajax({
             url: this.props.cellURL,
             dataType: 'json',
+            method: 'GET',
             cache: false,
-            success: data => {
+            success: (data) => {
                 console.log(data);
                 this.setState({
                     clientCell: data.alive
                 });
             },
             error: (xhr, status, err) => {
-                console.error(this.props.cellURL, status, err.toString());
+                console.error(xhr, status, err.toString());
             }
         });
-
-        $(function () {
-            $('.modal-trigger').leanModal();
-            $('.tooltip').tooltip({delay: 50});
-        }.bind(this));
     }
 
     /**
@@ -99,7 +97,7 @@ class GameOfLife extends React.Component {
 
         return (
             <div className="sortPanel">
-                <p className="flow-text">You are responsible for <strong>cell {this.props.cellName}</strong>.</p>
+                <h5>You are responsible for <strong>cell {this.props.cellName}</strong>.</h5>
 
                 <a onClick={this.swap.bind(this)} className={classes}>
                     <i className="mdi-action-invert-colors left"></i>
@@ -107,18 +105,18 @@ class GameOfLife extends React.Component {
                 </a>
 
                 {this.isAlive() ? (
-                    <p className="flow-text">Click <span className="red-text">DIE</span> when the number of
+                    <h5>Click <span className="red-text">DIE</span> when the number of
                         <span className="green-text"> alive </span>
                         <a href="#neighbours" className="modal-trigger tooltip"
                            data-tooltip="Click for info"> neighbours</a>
                         &nbsp;is <strong> more than 3 </strong>
-                        or <strong> less than 2</strong>.</p>
+                        or <strong> less than 2</strong>.</h5>
                 ) : (
-                    <p className="flow-text">Click <span className="green-text">LIVE</span> when the number of
+                    <h5>Click <span className="green-text">LIVE</span> when the number of
                         <span className="green-text"> alive </span>
                         <a href="#neighbours" className="modal-trigger tooltip"
                            data-tooltip="Click for info"> neighbours</a>
-                           &nbsp;is <strong> exactly 3</strong>.</p>
+                           &nbsp;is <strong> exactly 3</strong>.</h5>
                 )}
 
                 <div id="neighbours" className="modal modal-fixed-footer textLeft">
@@ -156,20 +154,261 @@ class GameOfLife extends React.Component {
     }
 }
 
+class BaseComponent extends React.Component {
+    _bind(...methods) {
+        methods.forEach(method => this[method] = this[method].bind(this));
+    }
+}
+
+class App extends BaseComponent {
+    constructor(props) {
+        super (props);
+        this._bind('register', 'connect', 'onRegistered', 'getDeviceID',
+            'isRegisteredToClass', 'componentDidMount', 'ignoreMessage');
+        this.state = {
+            device_id: this.getDeviceID(),
+            interaction_id: null,
+            connect_state: 'disconnected',
+            socketConnected: false
+        };
+
+        console.log('App#constructor');
+    }
+
+    ignoreMessage(message) {
+        if (!('localStorage' in window))
+            return false;
+        var ctr = window.localStorage.getItem('socket.io:gameoflife.client-counter');
+        if (ctr && parseInt(ctr) >= message._counter) {
+            return true;
+        } else {
+            window.localStorage.setItem('socket.io:gameoflife.client-counter', message._counter);
+            return false;
+        }
+    }
+
+    componentDidMount() {
+        console.log('App#didMount');
+
+        this.setState({
+            connected: this.isRegisteredToClass(this.props.clickerClass)
+        });
+
+
+        console.log('creating socket');
+        var socket = io(this.props.channel, {
+            'multiplex': false,
+            'sync disconnect on unload': true
+        });
+
+        this.setState({ socket });
+
+        console.log(socket);
+
+        window.onbeforeunload = function () {
+            socket.disconnect();
+        };
+
+        socket.on('connect', () => {
+            this.setState({ socketConnected: true });
+            console.log('socket connected');
+            //if ('localStorage' in window) {
+            //    window.localStorage.setItem('socket.io:gameoflife.client-counter', '0');
+            //}
+        });
+
+        // socket.on('disconnect', ...
+
+        socket.on('message', message => {
+            console.log(message);
+
+            if (!this.state.socketConnected)
+                return;
+
+            //if (this.ignoreMessage(message))
+            //    return;
+
+            var data = JSON.parse(message);
+
+            if (data.event_type === 'new_interaction') {
+                if (this.state.device_id in data.assignments) {
+
+                    this.setState({
+                        interaction_url: `/api/interaction/${data.interaction}/`,
+                        interaction_id: data.interaction,
+                        assignments: data.assignments,
+                        instance_id: data.game_of_life,
+                        instance_url: `/api/gameoflife/${data.game_of_life}/`,
+                        cell_name: data.assignments[this.state.device_id]
+                    });
+                    this.setState({
+                        cell_url: `/api/gameoflifecell/${data.cell_pks[this.state.cell_name]}/`,
+                        connect_state: 'connected'
+                    });
+                }
+            }
+        });
+    }
+
+    componentDidUpdate() {
+        $('.modal-trigger').leanModal();
+        $('.tooltip').tooltip({delay: 50});
+    }
+
+    /**
+     * :return: the device_id or null
+     */
+    getDeviceID() {
+        if ('localStorage' in window) {
+            var device_id = window.localStorage.getItem('device_id');
+            if (device_id != null)
+                return device_id;
+        }
+        return null;
+    }
+
+    isRegisteredToClass(clickerClass) {
+        if ('localStorage' in window) {
+            return window.localStorage.getItem(`registered:${clickerClass}`) === "true";
+        }
+        return false;
+    }
+
+    connect() {
+        this.setState({ connect_state: 'connecting' });
+        console.log('connecting');
+
+        var device_id = this.getDeviceID();
+        if (device_id) {
+            this.setState({ device_id });
+            console.log('registering (already had device_id)');
+
+            this.register({ device_id, classes: [] }).then(this.onRegistered);
+        } else {
+            $.post('/api/connect/', (data) => {
+                console.log('registering (retrieved device_id)');
+                this.register(data).then(this.onRegistered);
+            }).fail(console.error.bind(console));
+        }
+    }
+
+    register(data) {
+        console.log(data);
+        this.setState({
+            device_id: data.device_id,
+            connect_state: 'registering'
+        });
+        if ('localStorage' in window)
+            window.localStorage.setItem('device_id', data.device_id);
+
+        var isRegistered = data.classes.map(url => url.split("/").pop())
+                                       .indexOf(this.props.clickerClass) > -1;
+
+        return new Promise((resolve, reject) => {
+            if (!isRegistered) {
+                $.ajax({
+                    url: `/api/connect/${data.device_id}/classes/`,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "add": [this.props.clickerClass]
+                    }),
+                    success: resolve,
+                    error: reject
+                });
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    onRegistered() {
+        this.setState({
+            connected: true,
+            connect_state: 'registered'
+        });
+        if ('localStorage' in window) {
+            window.localStorage.setItem(`registered:${this.props.clickerClass}`, "true");
+        }
+    }
+
+    render() {
+        if (this.state.connected) {
+            if (this.state.connect_state === 'connected') {
+                //return <i/>;
+                return (
+                    <GameOfLife {...this.props}
+                        socket={this.state.socket}
+                        cellName={this.state.cell_name}
+                        cellURL={this.state.cell_url}
+                        />
+                );
+            } else {
+                return (
+                    <div className={'card-panel'}>
+                        <p className={'flow-text'}>Waiting for interactions to open</p>
+                        <div className="progress">
+                            <div className="indeterminate"></div>
+                        </div>
+
+                    </div>
+                );
+            }
+
+
+            //<div className="preloader-wrapper active">
+            //    <div className="spinner-layer spinner-blue-only">
+            //        <div className="circle-clipper left">
+            //            <div className="circle"></div>
+            //        </div><div className="gap-patch">
+            //        <div className="circle"></div>
+            //    </div><div className="circle-clipper right">
+            //        <div className="circle"></div>
+            //    </div>
+            //    </div>
+            //</div>
+
+
+        }
+        else {
+            var buttonClasses = classNames('waves-effect waves-light btn-large', {
+               'disabled': this.state.connect_state === 'connecting'
+            });
+
+            return (
+                <div className={'card-panel'}>
+                    <p className={'flow-text'}>
+                        You are not connected to this class.
+                    </p>
+
+                    <a onClick={this.connect} className={buttonClasses}>
+                        Connect
+                    </a>
+                </div>
+            );
+        }
+    }
+}
+
 let run = function () {
     $.ajaxSetup({
         beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
     });
 
     var qs = querystring.parse(window.location.search.substring(1)),
-        instance = parseInt(qs.instance) || 1,
-        cellName = qs.cell || "A1",
-        url = `/api/gameoflife/${instance}/`,
-        cellURL = url + `cell/${cellName}/`;
+        socketBase = `//${window.location.hostname}:4000/`,
+        socketURL = socketBase + 'socket.io/socket.io.js',
+        channel = socketBase + "gameoflife.client";
 
-    React.render(
-        <GameOfLife url={url} cellURL={cellURL} cellName={cellName} date={new Date()}/>,
-        document.getElementById('react-main')
-    );
+    $.getScript(socketURL, function () {
+        $(() => {
+            React.render(
+                <App channel={channel}
+                     clickerClass={'gameoflife'}
+                     date={new Date()}/>,
+                document.getElementById('react-main')
+            );
+        });
+    });
 };
 run();

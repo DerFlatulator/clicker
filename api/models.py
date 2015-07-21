@@ -47,6 +47,9 @@ class BubbleSort(models.Model):
         self._current = current
         return current
 
+    def get_info(self):
+        return "({})".format(",".join(self.get_list_current))
+
     def __unicode__(self):
         return ','.join(self._current) if hasattr(self, '_current') else self.shuffled
 
@@ -107,6 +110,9 @@ class GameOfLife(models.Model):
 
         return gol
 
+    def get_info(self):
+        return "({} x {})".format(self.num_cols, self.num_rows)
+
     def __unicode__(self):
         str_list = [''.join(map(lambda v: "1" if v else "0", row)) for row in self.get_current_state]
         return '\n'.join(str_list)
@@ -157,6 +163,7 @@ class GameOfLifeCell(models.Model):
 class ClickerClass(models.Model):
     class_name = models.CharField(max_length=50, null=False, unique=True)
     long_name = models.CharField(max_length=255, null=False)
+    creator = models.ForeignKey('Creator', related_name='classes')
     # # Compute this instead
     # connected_students = models.IntegerField(default=0, null=False)
 
@@ -169,7 +176,6 @@ class ClickerClass(models.Model):
 
 class Creator(models.Model):
     user = models.OneToOneField(User)
-    classes = models.ManyToManyField(ClickerClass)
 
 
 class InteractionType(models.Model):

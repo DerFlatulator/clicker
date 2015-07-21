@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * :file: creator/creator_index
  */
@@ -22,7 +24,6 @@ class CreatorIndex extends React.Component {
         $('.tooltip').tooltip({delay: 50});
     }
 
-
     render() {
         var buttonClasses = classNames('waves-effect waves-light btn-large modal-trigger', {
             'disabled': this.state.waiting
@@ -40,9 +41,11 @@ class CreatorIndex extends React.Component {
                         return (
                             <li className="collection-item avatar">
                                 <i className="material-icons circle green mdi-action-assessment"></i>
-                                <span className="title">{cls.fields.long_name}</span>
-                                <p>Class is open for observation.</p>
-                                <a href={`/creator/${cls.fields.class_name}/`}
+                                <span className="title">{cls.long_name}</span>
+                                <p>This class contains {
+                                    cls.num_interactions
+                                } interaction{cls.num_interactions!==1 ? 's':''}.</p>
+                                <a href={`/creator/${cls.class_name}/`}
                                    className="secondary-content waves-effect waves-light btn">
                                     View Class
                                 </a>

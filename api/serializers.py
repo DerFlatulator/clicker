@@ -63,10 +63,39 @@ class GameOfLifeSerializer(serializers.HyperlinkedModelSerializer):
         model = models.GameOfLife
 
 
+class CreatorSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer()
+
+    class Meta:
+        model = models.Creator
+
+
+# noinspection PyAbstractClass
+# class GenericRelatedFieldSerializer(serializers.RelatedField):
+#     def to_representation(self, value):
+#         if isinstance(value, models.GameOfLife):
+#             serializer = GameOfLifeSerializer(value)
+#         elif isinstance(value, models.BubbleSort):
+#             serializer = BubbleSortSerializer(value)
+#         else:
+#             raise Exception('Unexpected type of generic related object')
+#
+#         return serializer.data
+
+class CreatorNameSerializer(serializers.RelatedField):
+    def to_representation(self, value):
+        if isinstance(value, models.Creator):
+            return value.user.username
+        else:
+            raise Exception('Unexpected type of related field')
+
+
 # noinspection PyMethodMayBeStatic
 class ClickerClassSerializer(serializers.HyperlinkedModelSerializer):
 
     connected_devices = serializers.IntegerField(source='get_connected_devices', read_only=True)
+    creator = CreatorNameSerializer(read_only=True)
 
     def validate_class_name(self, class_name):
         if not re.match(r"^[a-z\-_0-9]+$", class_name):
@@ -97,25 +126,6 @@ class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
                 'view_name': 'connect-detail'
             }
         }
-
-# noinspection PyAbstractClass
-# class GenericRelatedFieldSerializer(serializers.RelatedField):
-#     def to_representation(self, value):
-#         if isinstance(value, models.GameOfLife):
-#             serializer = GameOfLifeSerializer(value)
-#         elif isinstance(value, models.BubbleSort):
-#             serializer = BubbleSortSerializer(value)
-#         else:
-#             raise Exception('Unexpected type of generic related object')
-#
-#         return serializer.data
-
-class CreatorNameSerializer(serializers.RelatedField):
-    def to_representation(self, value):
-        if isinstance(value, models.Creator):
-            return value.user.username
-        else:
-            raise Exception('Unexpected type of related field')
 
 
 #
