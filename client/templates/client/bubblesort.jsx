@@ -3,8 +3,6 @@
 import $ from 'jquery';
 import classNames from 'classnames';
 import React from 'react';
-import 'jquery.cookie'; // $.cookie
-import querystring from 'querystring';
 
 class BubbleSort extends React.Component {
 
@@ -12,21 +10,23 @@ class BubbleSort extends React.Component {
         super(props);
         this.state = {
             indices: [0, 1],
-            buttonEnabled: true
+            buttonEnabled: true,
+            assignment: this.props.assignments[this.props.deviceId]
         };
     }
 
     componentDidMount() {
+        console.log(this.state);
+
         this.setState({ indices: [
-            this.props.lower_index, this.props.lower_index + 1
+            this.state.assignment.lower_index, this.state.assignment.lower_index + 1
         ] });
     }
 
     swap() {
         this.setState({ buttonEnabled: false });
-        $.post(this.props.swapURL, {
+        $.post(this.state.assignment.swap_url, {
             lower_index: this.state.indices[0],
-            // bubble_sort: '//' + window.location.host + this.props.url
             bubble_sort: this.props.url
         }, this.swapDone.bind(this)).fail(this.swapDone.bind(this)).always(this.swapDone.bind(this));
     }
@@ -56,20 +56,5 @@ class BubbleSort extends React.Component {
     }
 }
 
-let run = function () {
-    $.ajaxSetup({
-        beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
-    });
-
-    var qs = querystring.parse(window.location.search.substring(1)),
-        instance = parseInt(qs.instance) || 1,
-        lower_index = parseInt(qs.lower_index) || 0,
-        url = `/api/bubblesort/${instance}/`,
-        swapURL = `/api/bubblesortswap/`;
-
-    React.render(
-        <BubbleSort instance={instance} url={url} swapURL={swapURL} lower_index={lower_index} date={new Date()}/>,
-        document.getElementById('react-main')
-    );
-};
-run();
+window.interactions = window.interactions || {};
+window.interactions['BubbleSort'] = BubbleSort;

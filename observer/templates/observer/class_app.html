@@ -21,5 +21,11 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static "js/observer/" %}{{ class_name }}.bundle.js"></script>
+    <script type="text/javascript">
+    window.$context = {
+        class_name: "{{ class_name |escapejs }}"
+    }
+    </script>
+
+    <script type="text/javascript" src="{% static "js/observer/interaction.bundle.js" %}"></script>
 {% endblock %}

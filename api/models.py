@@ -7,6 +7,7 @@ from django.contrib.contenttypes import fields
 import string
 import random
 import hashlib
+from rest_framework.reverse import reverse_lazy
 
 
 class BubbleSort(models.Model):
@@ -183,6 +184,9 @@ class InteractionType(models.Model):
     slug_name = models.SlugField()
     long_name = models.CharField(max_length=100, default='')
 
+    def __unicode__(self):
+        return self.long_name
+
 
 class Interaction(models.Model):
     READY = 'R'
@@ -199,6 +203,13 @@ class Interaction(models.Model):
     data_json = models.TextField(default='{}', null=False, blank=True)
     state = models.CharField(max_length='2', choices=INTERACTION_STATES, default=READY)
     creator = models.ForeignKey(Creator, related_name='interactions', editable=False)
+
+    @property
+    def instance_url(self):
+        if hasattr(self, 'gameoflife'):
+            return str(reverse_lazy('gameoflife-detail', args=[self.gameoflife.id]))
+        if hasattr(self, 'bubblesort'):
+            return str(reverse_lazy('bubblesort-detail', args=[self.bubblesort.id]))
 
     @property
     def state_name(self):

@@ -20,70 +20,101 @@ var querystring = require('querystring');
 var redis = require('redis');
 var redisClient = redis.createClient();
 
+
+/**
+ * Redis channels are:
+ *     <interaction_name>.<class_name>.(client|observer)
+ *     OR:
+ *     <class_name>.(client|observer)
+ *
+ * Socket.IO namespaces are:
+ *     /(client|observer)
+ *
+ * Socket.IO rooms are:
+ *     <class_name>.<interaction_name>
+ */
+
 // Subscribe to Redis observer channels
 
-var redisChannels = [
-    'gameoflife.observer',
-    'bubblesort.observer',
-    'gameoflife.client',
-    'bubblesort.client'
-];
+//var redisChannels = [
+//    'gameoflife.observer',
+//    'bubblesort.observer',
+//    'gameoflife.client',
+//    'bubblesort.client'
+//];
 
-var activeSockets = {};
 
-redisChannels.forEach(function (channel) {
+var namespaces = {
+    client: makeNamespace('/client'),
+    observer: makeNamespace('/observer')
+};
 
-    redisClient.subscribe(channel);
-    activeSockets[channel] = {};
+var redisChannelGlob = '*.*'; // '*.*.*' is also valid
+redisClient.psubscribe(redisChannelGlob);
 
-    var msgCounter = 1;
+/**
+ * Attach a callback from redis,
+ * forward it to the observer iff they are subscribed to the redisChannel
+ * [redis message ---> observer]
+ */
+redisClient.on('pmessage', function (pattern, _channel, message) {
 
-    var namespace = io.of('/' + channel);
+    var parts = _channel.split('.');
+    if (parts.length < 2 || parts.length > 3)
+        throw new RangeError("Redis channels MUST be in the form *.*.* or *.*");
+
+    var is_to_room = parts.length === 3;
+
+    var interaction_name = is_to_room ? parts[0] : null,
+        class_name = is_to_room ? parts[1] : parts[0],
+        type = is_to_room ? parts[2] : parts[1];
+
+    if (!(type in namespaces)) {
+        throw new RangeError('Redis channel type must be "client" or "observer"');
+    }
+
+    var nsp = namespaces[type];
+
+    if (is_to_room) {
+        var room = interaction_name + "." + class_name;
+
+        console.log('Forwarding from', _channel, 'to', '/'+type, 'room:', room);
+        nsp.emit(room, message);
+    } else {
+        console.log('Forwarding from', _channel, 'to', '/'+type, 'global');
+        nsp.emit('message', message);
+    }
+    console.log('', message);
+});
+
+/**
+ * Create a Socket.IO namespace
+ * @param namespace in the form /name
+ * @returns {Namespace}
+ */
+function makeNamespace(namespace) {
+
+    var nsp = io.of(namespace);
+    console.log('listening on', namespace);
 
     /**
      * Listen for connections from clients
      */
-    namespace.on('connection', function (socket) {
+    nsp.on('connection', function (socket) {
 
-        console.log("* " + (channel.indexOf('observer') > -1 ? "Observer" : "Client") +
-            " connection [" + socket.client.id + ", " + socket.conn.remoteAddress +
-            "] - Time: " + socket.handshake.time);
-
-        activeSockets[channel][socket.client.id] = socket;
+        console.log("* New connection:", socket.client.id, socket.conn.remoteAddress,socket.handshake.time);
 
         /**
          * Called when an observer disconnects
          */
         socket.on('disconnect', function () {
-            console.log('* ' + (channel.indexOf('observer') > -1 ? "Observer" : "Client") +
-                ' disconnection');
-
-            delete activeSockets[channel][socket.client.id];
+            console.log("* Disconnection");
         });
     });
 
+    return nsp;
+}
 
-    /**
-     * Attach a callback from redis,
-     * forward it to the observer iff they are subscribed to the redisChannel
-     * [redis message ---> observer]
-     */
-    redisClient.on('message', function (_channel, message) {
-        if (_channel === channel) {
-
-            for (var clientId in activeSockets[channel]) {
-                if (activeSockets[channel].hasOwnProperty(clientId)) {
-                    var socket = activeSockets[channel][clientId];
-                    console.log("* Forwarding message from <" + _channel + ">: " + message +
-                        " [to: " + socket.client.id + "]");
-                    //message = JSON.parse(message);
-                    //message._counter = msgCounter++;
-                    socket.emit('message', message);
-                }
-            }
-        }
-    });
-});
 
 // Configure socket.io to handle Django cookies
 //io.configure(function () {

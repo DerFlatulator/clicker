@@ -32,17 +32,20 @@ def cell_post_save(sender, instance, created, **kwargs):
             cell_2d[cell.row] = {}
         cell_2d[cell.row][cell.col] = cell
 
+    cells_to_make_live = []
+    cells_to_make_die = []
+
     # for cell in generate_all_cells(cell_2d, row, col, gol.num_rows, gol.num_cols):
     for cell in gol.cells.filter(is_ai=True):
-        num_neighbours = len(filter(lambda n: n.alive, [
-            neighbour
-            for neighbour
-            in generate_neighbours(cell_2d, cell.row, cell.col, gol.num_rows, gol.num_cols)]))
+        num_neighbours = len(filter(lambda n: n.alive,
+                                    generate_neighbours(cell_2d, cell.row, cell.col, gol.num_rows, gol.num_cols)))
 
         if cell.alive and (num_neighbours < 2 or num_neighbours > 3):
+            # cells_to_make_die.append(cell)
             cell.alive = False
             cell.save()
         elif num_neighbours == 3:
+            # cells_to_make_live.append(cell)
             cell.alive = True
             cell.save()
 

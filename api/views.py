@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework.decorators import detail_route, list_route, renderer_classes
 from rest_framework.metadata import SimpleMetadata
+from rest_framework.reverse import reverse_lazy
 from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework.response import Response
 
@@ -55,6 +56,86 @@ class ClickerClassViewSet(viewsets.ModelViewSet):
 class BubbleSortViewSet(viewsets.ModelViewSet):
     queryset = models.BubbleSort.objects.all()
     serializer_class = serializers.BubbleSortSerializer
+
+    def get_serializer_class(self, *args, **kwargs):
+        if 'post' in self.action_map and self.action_map['post'] == 'generate':
+            if self.request.accepted_renderer.format == 'api':
+                return serializers.InteractionGeneratorSerializer
+
+        return serializers.BubbleSortSerializer
+
+    @list_route(methods=['post', 'get'])
+    def generate(self, request, **kwargs):
+        """
+        :param class_name: the class this interaction will be associated with
+
+        """
+        if request.method == 'GET':
+            return Response({}, status=status.HTTP_200_OK)
+
+        if not hasattr(request.user, 'creator'):
+            return Response({'detail': 'you are not a creator'}, status=status.HTTP_403_FORBIDDEN)
+
+        creator = request.user.creator
+
+        class_name = request.data['class_name']
+        clicker_class = models.ClickerClass.objects.get(class_name=class_name)
+        class_size = clicker_class.get_connected_devices()
+
+        if class_size == 0:
+            return Response({'detail': 'class size is zero'}, status=status.HTTP_403_FORBIDDEN)
+
+        # if 'interaction_slug' not in request.data:
+        #     return Response({'detail': 'please specify an interaction type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # interaction_slug = request.data['interaction_slug']
+        interaction_type = models.InteractionType.objects.get(slug_name='bubblesort')
+
+        for m in models.Interaction.objects.all():
+            m.state = models.Interaction.COMPLETE
+            m.save()
+
+        # create game of life instance and corresponding interaction
+        interaction = models.Interaction.objects.create(clicker_class=clicker_class,
+                                                        state=models.Interaction.READY,
+                                                        creator=creator,
+                                                        interaction_type=interaction_type)
+        interaction.save()
+
+        list_len = class_size + 1
+        items = range(1, list_len + 1)
+        for _ in range(class_size * 2):
+            i = random.randrange(0, list_len-1)
+            items[i], items[i+1] = items[i+1], items[i]
+
+        csv = ",".join(map(str, items))
+        bubblesort = models.BubbleSort(shuffled=csv)
+        bubblesort.interaction = interaction
+        bubblesort.save()
+
+        interaction.state = models.Interaction.ACTIVE
+        interaction.save()
+
+        interaction_data = {'assignments': {}}
+        clients = map(lambda d: d.device_id, clicker_class.registereddevice_set.all())
+        i = 0
+        for client in clients:
+            interaction_data['assignments'][client] = {
+                'lower_index': i,
+                'swap_url': '/api/bubblesortswap/'
+            }
+            i += 1
+
+        interaction_data['bubble_sort'] = bubblesort.id
+        interaction_data['interaction'] = interaction.id
+        interaction_data['instance_script'] = '/static/js/:type:/bubblesort.bundle.js'
+        interaction_data['instance_component_name'] = 'BubbleSort'
+
+        interaction.data_json = json.dumps(interaction_data)
+        interaction.save()
+
+        return Response(serializers.BubbleSortSerializer(bubblesort, context={'request': request}).data,
+                        status=status.HTTP_201_CREATED)
 
 
 class GenerateMetadata(SimpleMetadata):
@@ -117,8 +198,8 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
 
         activate = request.data.get('activate', GameOfLifeViewSet.DEFAULT_ACTIVATE)
 
-        interaction_slug = request.data['interaction_slug']
-        interaction_type = models.InteractionType.objects.get(slug_name=interaction_slug)
+        # interaction_slug = request.data['interaction_slug']
+        interaction_type = models.InteractionType.objects.get(slug_name='gameoflife')
 
         for m in models.Interaction.objects.all():
             if activate:
@@ -185,14 +266,18 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
                 something = everything.pop()
                 if isinstance(something, unicode):
                     device_id = something
-                    interaction_data['assignments'][device_id] = cell.cell_name
+                    cell.save()
+                    cell_data = serializers.GameOfLifeCellSerializer(cell,
+                                                                     context={'request': request}).data
+                    interaction_data['assignments'][device_id] = cell_data
                 else:
                     cell.is_ai = True
-
-                cell.save()
+                    cell.save()
 
         interaction_data['game_of_life'] = game.id
         interaction_data['interaction'] = interaction.id
+        interaction_data['instance_script'] = '/static/js/:type:/gameoflife.bundle.js'
+        interaction_data['instance_component_name'] = 'GameOfLife'
 
         interaction.data_json = json.dumps(interaction_data)
         interaction.save()

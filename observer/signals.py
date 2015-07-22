@@ -1,6 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from api import serializers
+
 import redis
 import json
 from rest_framework.reverse import reverse_lazy
@@ -11,12 +13,16 @@ r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 @receiver(post_save, sender=BubbleSortSwap,
           dispatch_uid="observer:BubbleSortSwap#post_save")
-def new_bubble_sort_swap(sender, **kwargs):
-    instance = kwargs['instance']
-    print "Publishing to redis:bubblesort.observer"
-    r.publish('bubblesort.observer', json.dumps({
+def new_bubble_sort_swap(sender, instance, **kwargs):
+    class_name = instance.bubble_sort.interaction.clicker_class.class_name
+    channel = 'bubblesort.{}.observer'.format(class_name)
+    url = reverse_lazy('bubblesort-detail', args=[instance.bubble_sort_id])
+
+    print "Publishing to redis:{}".format(channel)
+    r.publish(channel, json.dumps({
         'lower_index': instance.lower_index,
-        'bubble_sort': instance.bubble_sort_id
+        'bubble_sort': str(url),
+        'event_type': 'swap'
     }))
 
 @receiver(post_save, sender=GameOfLifeCell,
@@ -29,8 +35,12 @@ def save_game_of_life_cell(sender, instance, **kwargs):
         return
     url = reverse_lazy('gameoflife-detail', args=[instance.game_of_life_id])
 
-    print "Publishing to redis:gameoflife.observer"
-    r.publish('gameoflife.observer', json.dumps({
+    class_name = instance.game_of_life.interaction.clicker_class.class_name
+    channel = 'gameoflife.{}.observer'.format(class_name)
+    # serial = serializers.GameOfLifeSerializer()
+
+    print "Publishing to redis:{}".format(channel)
+    r.publish(channel, json.dumps({
         'row': instance.row,
         'col': instance.col,
         'alive': instance.alive,
@@ -48,12 +58,21 @@ def save_interaction(sender, instance, created, **kwargs):
     if instance.state != Interaction.ACTIVE:
         return
 
+    class_name = instance.clicker_class.class_name
+
+    data = {'event_type': 'new_interaction'}
     if hasattr(instance, 'gameoflife'):
-        data = json.loads(instance.data_json)
+        data.update(json.loads(instance.data_json))
         if 'assignments' not in data:
             return
 
-        data['event_type'] = 'new_interaction'
+    if hasattr(instance, 'bubblesort'):
+        data.update(json.loads(instance.data_json))
+        if 'assignments' not in data:
+            return
 
-        print "Publishing to redis:gameoflife.observer"
-        r.publish('gameoflife.observer', json.dumps(data))
+    data['instance_url'] = instance.instance_url
+
+    channel = '{}.observer'.format(class_name)
+    print "Publishing to redis:{}".format(channel)
+    r.publish(channel, json.dumps(data))

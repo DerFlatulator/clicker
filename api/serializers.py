@@ -175,6 +175,7 @@ class InteractionSerializer(serializers.HyperlinkedModelSerializer):
                                              queryset=models.Interaction.objects.all())
 
     state_name = serializers.CharField(read_only=True)
+    instance_url = serializers.URLField(read_only=True)
 
     class Meta:
         model = models.Interaction

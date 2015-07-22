@@ -16,6 +16,8 @@ class BubbleSort extends React.Component {
     }
 
     componentDidMount() {
+        //console.log(this.props.url);
+
         $.ajax({
             url: this.props.url,
             dataType: 'json',
@@ -31,19 +33,18 @@ class BubbleSort extends React.Component {
             }
         });
 
-        $(() => {
-            var socket = io(this.props.channel);
+        this.props.socket.on(`bubblesort.${this.props.clickerClass}`, message => {
+            let data = JSON.parse(message);
 
-            socket.on('connect', function () {
-                console.log('socket connected');
-            });
+            console.log(data);
+            let url = this.props.url.substring(this.props.url.indexOf('/api/'));
 
-            socket.on('message', message => {
-                let data = JSON.parse(message);
-                if (this.props.id == data.bubble_sort) {
+            if (data.event_type === 'swap') {
+                if (url == data.bubble_sort) {
                     this.swapListIndex(data.lower_index);
                 }
-            });
+            }
+
         });
     }
 
@@ -142,27 +143,5 @@ class BubbleSortCaption extends React.Component {
     }
 }
 
-let run = function () {
-
-    var qs = querystring.parse(window.location.search.substring(1)),
-        socketBase = `//${window.location.hostname}:4000/`,
-        socketURL = socketBase + "socket.io/socket.io.js",
-        instance = parseInt(qs.instance) || 1,
-        url = `/api/bubblesort/${instance}/`,
-        channel = socketBase + "bubblesort.observer";
-
-    /*
-     * Wait for socket code to load before activating React.
-     * React will briefly render the default state, then
-     * update when the first GET request completes.
-     */
-    $.getScript(socketURL, function () {
-        React.render(
-            <BubbleSort url={url} channel={channel} id={instance} date={new Date()}/>,
-            document.getElementById('react-main')
-        );
-    });
-
-};
-run();
-
+window.interactions = window.interactions || {};
+window.interactions['BubbleSort'] = BubbleSort;
