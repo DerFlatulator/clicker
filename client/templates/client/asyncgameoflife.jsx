@@ -67,9 +67,10 @@ class AsyncGameOfLife extends React.Component {
             return;
 
         this.setState({ buttonEnabled: false });
+
         $.ajax({
             url: this.state.assignment.url,
-            method: 'PATCH',
+            method: 'PUT',
             data: JSON.stringify({
                 alive: !this.isAlive()
             }),
