@@ -70,9 +70,10 @@ class AsyncGameOfLife extends React.Component {
         $.ajax({
             url: this.state.assignment.url,
             method: 'PATCH',
-            data: {
+            data: JSON.stringify({
                 alive: !this.isAlive()
-            },
+            }),
+            contentType: 'application/json',
             dataType: 'json',
             success: this.swapDone.bind(this),
             error: (xhr, status, err) => {
