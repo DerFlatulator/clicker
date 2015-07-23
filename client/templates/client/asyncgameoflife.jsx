@@ -4,7 +4,7 @@ import $ from 'jquery';
 import classNames from 'classnames';
 import React from 'react';
 
-class GameOfLife extends React.Component {
+class AsyncGameOfLife extends React.Component {
 
     constructor(props) {
         super (props);
@@ -63,6 +63,9 @@ class GameOfLife extends React.Component {
     }
 
     swap() {
+        if (!this.state.buttonEnabled)
+            return;
+
         this.setState({ buttonEnabled: false });
         $.ajax({
             url: this.state.assignment.url,
@@ -154,4 +157,4 @@ class GameOfLife extends React.Component {
 }
 
 window.interactions = window.interactions || {};
-window.interactions['GameOfLife'] = GameOfLife;
+window.interactions['AsyncGameOfLife'] = AsyncGameOfLife;

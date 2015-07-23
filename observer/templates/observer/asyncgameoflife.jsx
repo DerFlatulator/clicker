@@ -4,7 +4,7 @@ import $ from 'jquery';
 import classNames from 'classnames';
 import React from 'react';
 
-class GameOfLife extends React.Component {
+class AsyncGameOfLife extends React.Component {
 
     constructor(props) {
         super (props);
@@ -23,7 +23,7 @@ class GameOfLife extends React.Component {
             cache: false,
             success: data => {
                 this.setState({
-                    cells: GameOfLife.deserialize(data.serialized)
+                    cells: AsyncGameOfLife.deserialize(data.serialized)
                 });
             },
             error: (xhr, status, err) => {
@@ -35,20 +35,20 @@ class GameOfLife extends React.Component {
             this.props.socket.disconnect();
         };
 
-        var m_type = `gameoflife.${this.props.clickerClass}`;
+        var m_type = `asyncgameoflife.${this.props.clickerClass}`;
         this.props.socket.on(m_type, message => {
             let data = JSON.parse(message);
             let url = this.props.url.substring(this.props.url.indexOf('/api/'));
             console.log(data.game_of_life, url);
             if (url == data.game_of_life && data.event_type === 'toggle_cell') {
-                this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
+                this.setState({ cells: AsyncGameOfLife.updateCells(this.state.cells, data) });
             }
         });
     }
 
     componentWillUnmount() {
         console.log('unmount');
-        this.props.socket.on(`gameoflife.${this.props.clickerClass}`, $.noop);
+        this.props.socket.on(`asyncgameoflife.${this.props.clickerClass}`, $.noop);
     }
 
     /**
@@ -91,7 +91,7 @@ class GameOfLife extends React.Component {
 
     isAI(x, y) {
 
-        var colLetter = GameOfLife.indexToColumnLetter(y),
+        var colLetter = AsyncGameOfLife.indexToColumnLetter(y),
             rowNum = x,
             str = `${colLetter}${rowNum + 1}`;
 
@@ -105,14 +105,14 @@ class GameOfLife extends React.Component {
 
         return (
             <div>
-                <h3>Game of Life</h3>
+                <h3>Async. Game of Life</h3>
                 <div className="gameOfLife">
                     <div className="golCornerSpacer">&nbsp;</div>
 
                     {this.state.cells[0].map((_, y) => {
                         return (
                             <div className="golColumnCaption">
-                                {GameOfLife.indexToColumnLetter(y)}
+                                {AsyncGameOfLife.indexToColumnLetter(y)}
                             </div>
                         );
                     })}
@@ -145,7 +145,7 @@ class GameOfLife extends React.Component {
                     {this.state.cells[0].map((_, y) => {
                         return (
                             <div className="golColumnCaption">
-                                {GameOfLife.indexToColumnLetter(y)}
+                                {AsyncGameOfLife.indexToColumnLetter(y)}
                             </div>
                         );
                     })}
@@ -159,4 +159,4 @@ class GameOfLife extends React.Component {
 }
 
 window.interactions = window.interactions || {};
-window.interactions['GameOfLife'] = GameOfLife;
+window.interactions['AsyncGameOfLife'] = AsyncGameOfLife;

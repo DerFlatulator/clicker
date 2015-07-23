@@ -67,6 +67,9 @@ class GameOfLife(models.Model):
     num_rows = models.IntegerField(null=False, default=3)
     num_cols = models.IntegerField(null=False, default=4)
     interaction = models.OneToOneField('Interaction', related_name='gameoflife')
+    is_async = models.BooleanField(default=True)
+    is_buffer = models.BooleanField(default=False)
+    buffer = models.OneToOneField('GameOfLife', null=True, related_name='source')
 
     def save(self, *args, **kwargs):
         is_new = not self.pk  # new if instance hasn't been assigned a p.k.

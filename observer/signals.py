@@ -31,12 +31,15 @@ def save_game_of_life_cell(sender, instance, **kwargs):
     if not instance.changed:
         return
 
+    if instance.game_of_life.is_buffer:
+        return
+
     if instance.game_of_life.interaction.state != Interaction.ACTIVE:
         return
     url = reverse_lazy('gameoflife-detail', args=[instance.game_of_life_id])
 
     class_name = instance.game_of_life.interaction.clicker_class.class_name
-    channel = 'gameoflife.{}.observer'.format(class_name)
+    channel = '{}gameoflife.{}.observer'.format('async' if instance.game_of_life.is_async else '', class_name)
     # serial = serializers.GameOfLifeSerializer()
 
     print "Publishing to redis:{}".format(channel)
@@ -62,6 +65,9 @@ def save_interaction(sender, instance, created, **kwargs):
 
     data = {'event_type': 'new_interaction'}
     if hasattr(instance, 'gameoflife'):
+        if instance.gameoflife.is_buffer:
+            return
+
         data.update(json.loads(instance.data_json))
         if 'assignments' not in data:
             return

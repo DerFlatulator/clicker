@@ -28,6 +28,9 @@ class CreatorDetail extends React.Component {
     }
 
     createInteraction(interaction_type) {
+        if (this.state.waiting)
+            return;
+
         this.setState({waiting: true});
 
         if (this.state.selectedItem === '*')

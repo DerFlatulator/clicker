@@ -1,22 +1,20 @@
 from collections import OrderedDict
-import json
 from django.contrib.auth.models import User, Group
 from django.core import exceptions
+from django.shortcuts import redirect
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import permissions
-from rest_framework.decorators import detail_route, list_route, renderer_classes
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.metadata import SimpleMetadata
-from rest_framework.reverse import reverse_lazy
 from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework.response import Response
 
 from . import serializers
 from . import models
-from rest_framework_xml.renderers import XMLRenderer
-from rest_framework import renderers
 from .permissions import DeviceIsRegisteredPermission
 
+import json
 import math
 import random
 
@@ -105,8 +103,8 @@ class BubbleSortViewSet(viewsets.ModelViewSet):
         list_len = class_size + 1
         items = range(1, list_len + 1)
         for _ in range(class_size * 2):
-            i = random.randrange(0, list_len-1)
-            items[i], items[i+1] = items[i+1], items[i]
+            i = random.randrange(0, list_len - 1)
+            items[i], items[i + 1] = items[i + 1], items[i]
 
         csv = ",".join(map(str, items))
         bubblesort = models.BubbleSort(shuffled=csv)
@@ -178,6 +176,16 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         :param class_name: the class this interaction will be associated with
 
         """
+        try:
+            if request.DATA:
+                data = request.DATA
+            else:
+                data = request.stream.DATA
+        except Exception:
+            data = request.stream.DATA
+
+        async = data.get('async', True) is True  # TODO change to False when sync is implemented
+
         if request.method == 'GET':
             return Response({}, status=status.HTTP_200_OK)
 
@@ -186,17 +194,17 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
 
         creator = request.user.creator
 
-        class_name = request.data['class_name']
+        class_name = data['class_name']
         clicker_class = models.ClickerClass.objects.get(class_name=class_name)
         class_size = clicker_class.get_connected_devices()
 
         if class_size == 0:
             return Response({'detail': 'class size is zero'}, status=status.HTTP_403_FORBIDDEN)
 
-        if 'interaction_slug' not in request.data:
-            return Response({'detail': 'please specify an interaction type'}, status=status.HTTP_400_BAD_REQUEST)
+        # if 'interaction_slug' not in request.data:
+        #     return Response({'detail': 'please specify an interaction type'}, status=status.HTTP_400_BAD_REQUEST)
 
-        activate = request.data.get('activate', GameOfLifeViewSet.DEFAULT_ACTIVATE)
+        activate = data.get('activate', GameOfLifeViewSet.DEFAULT_ACTIVATE)
 
         # interaction_slug = request.data['interaction_slug']
         interaction_type = models.InteractionType.objects.get(slug_name='gameoflife')
@@ -215,7 +223,7 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
 
         rows = max(4, int(math.ceil(math.sqrt(class_size))))
         cols = max(4, int(math.ceil(float(class_size) / rows)))  # more-or-less square
-        game = models.GameOfLife(num_rows=rows, num_cols=cols, interaction=interaction)
+        game = models.GameOfLife(num_rows=rows, num_cols=cols, interaction=interaction, is_async=async)
         game.save()
 
         interaction.gameoflife = game
@@ -246,7 +254,7 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
             )
         }
 
-        pattern_name = request.POST.get('pattern', GameOfLifeViewSet.DEFAULT_PATTERN)
+        pattern_name = data.get('pattern', GameOfLifeViewSet.DEFAULT_PATTERN)
         if pattern_name in patterns:
             pattern = patterns[pattern_name]
         else:
@@ -274,10 +282,15 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
                     cell.is_ai = True
                     cell.save()
 
-        interaction_data['game_of_life'] = game.id
         interaction_data['interaction'] = interaction.id
-        interaction_data['instance_script'] = '/static/js/:type:/gameoflife.bundle.js'
-        interaction_data['instance_component_name'] = 'GameOfLife'
+        interaction_data['game_of_life'] = game.id
+        if async:
+            interaction_data['instance_script'] = '/static/js/:type:/asyncgameoflife.bundle.js'
+            interaction_data['instance_component_name'] = 'AsyncGameOfLife'
+        else:
+            # interaction_data['game_of_life_buffer'] = game_buffer.id
+            interaction_data['instance_script'] = '/static/js/:type:/gameoflife.bundle.js'
+            interaction_data['instance_component_name'] = 'GameOfLife'
 
         interaction.data_json = json.dumps(interaction_data)
         interaction.save()
@@ -422,3 +435,16 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = (permissions.IsAdminUser,)
+
+
+class AsyncGameOfLifeViewSet(viewsets.GenericViewSet):
+    serializer_class = serializers.GameOfLifeSerializer
+
+    def list(self, request):
+        return redirect('gameoflife-list')
+
+    @list_route(methods=['post'])
+    def generate(self, request, *args, **kwargs):
+        request.data[u'async'] = True
+        vs = GameOfLifeViewSet.as_view({'post': 'generate'})
+        return vs(request, *args, **kwargs)

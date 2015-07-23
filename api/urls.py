@@ -17,6 +17,7 @@ view_sets = [
     views.GroupViewSet,
     (views.ClickerClassViewSet, "class"),
     (views.ConnectionViewSet, "connect"),
+    views.AsyncGameOfLifeViewSet,
     views.GameOfLifeViewSet,
     views.GameOfLifeCellViewSet,
     views.BubbleSortViewSet,
