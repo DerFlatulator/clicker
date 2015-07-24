@@ -10,19 +10,10 @@
   },
   {
     "model": "api.clickerclass",
-    "pk": 2,
-    "fields": {
-      "class_name": "gameoflife",
-      "long_name": "Cellular Automata",
-      "creator": 1
-    }
-  },
-  {
-    "model": "api.clickerclass",
     "pk": 3,
     "fields": {
-      "class_name": "bubblesort",
-      "long_name": "Algorithms and Data Structures",
+      "class_name": "compsci",
+      "long_name": "Computer Science",
       "creator": 1
     }
   }

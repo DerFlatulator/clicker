@@ -41,7 +41,9 @@ class GameOfLife extends React.Component {
             let url = this.props.url.substring(this.props.url.indexOf('/api/'));
             console.log(data.game_of_life, url);
             if (url == data.game_of_life && data.event_type === 'toggle_cell') {
-                this.setState({ cells: GameOfLife.updateCells(this.state.cells, data) });
+                this.setState({
+                    cells: GameOfLife.updateCells(this.state.cells, data)
+                });
             }
         });
     }
@@ -96,61 +98,84 @@ class GameOfLife extends React.Component {
             str = `${colLetter}${rowNum + 1}`;
 
         return Object.keys(this.props.assignments)
-            .map(key => this.props.assignments[key].cell_name)
+            .map(key => this.props.assignments[key].source.cell_name)
             .filter(val => val == str)
             .length == 0;
     }
 
+    nextIteration = () => {
+        $.post(this.props.urls.next_state, data => {
+            $.get(this.props.url, data => {
+                this.setState({
+                    cells: GameOfLife.deserialize(data.serialized)
+                });
+            })
+        });
+    };
+
     render() {
+        var classes = classNames([
+            'waves-effect', 'waves-light', 'btn', 'blue'
+        ]);
 
         return (
             <div>
                 <h3>Game of Life</h3>
-                <div className="gameOfLife">
-                    <div className="golCornerSpacer">&nbsp;</div>
+                <div className="row">
+                    <div className="gameOfLife col m8">
+                        <div className="golCornerSpacer">&nbsp;</div>
 
-                    {this.state.cells[0].map((_, y) => {
-                        return (
-                            <div className="golColumnCaption">
-                                {GameOfLife.indexToColumnLetter(y)}
-                            </div>
-                        );
-                    })}
-
-                    {this.state.cells.map((row, x) => {
-                        return (
-                            <div className="golRow">
-                                <div className="golRowCaption">
-                                    {x + 1}
+                        {this.state.cells[0].map((_, y) => {
+                            return (
+                                <div className="golColumnCaption">
+                                    {GameOfLife.indexToColumnLetter(y)}
                                 </div>
+                            );
+                        })}
 
-                                {row.map((value, y) => {
-                                    return (
-                                        <span className={classNames("gol", {
-                                            "red lighten-2": !value,
-                                            "green darken-2": value
-                                        })}>{this.isAI(x,y) ? "Auto" : ""}</span>
-                                    );
-                                })}
+                        {this.state.cells.map((row, x) => {
+                            return (
+                                <div className="golRow">
+                                    <div className="golRowCaption">
+                                        {x + 1}
+                                    </div>
 
-                                <div className="golRowCaption">
-                                    {x + 1}
+                                    {row.map((value, y) => {
+                                        return (
+                                            <span className={classNames("gol", {
+                                                "red lighten-2": !value,
+                                                "green darken-2": value
+                                            })}>{this.isAI(x,y) ? "Auto" : ""}</span>
+                                        );
+                                    })}
+
+                                    <div className="golRowCaption">
+                                        {x + 1}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
 
-                    <div className="golCornerSpacer">&nbsp;</div>
+                        <div className="golCornerSpacer">&nbsp;</div>
 
-                    {this.state.cells[0].map((_, y) => {
-                        return (
-                            <div className="golColumnCaption">
-                                {GameOfLife.indexToColumnLetter(y)}
-                            </div>
-                        );
-                    })}
+                        {this.state.cells[0].map((_, y) => {
+                            return (
+                                <div className="golColumnCaption">
+                                    {GameOfLife.indexToColumnLetter(y)}
+                                </div>
+                            );
+                        })}
 
+                    </div>
+                    <div className="col m4">
+                        {/* Next iteration button */}
+                        <a onClick={this.nextIteration} className={classes}>
+                            <i className="material-icons right">navigate_next</i>
+                            Next State
+                        </a>
+                    </div>
                 </div>
+
                 <br/>
             </div>
         );

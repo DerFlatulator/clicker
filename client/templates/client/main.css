@@ -6,8 +6,8 @@
 }
 
 .sortPanel h5 {
-    padding-top: 5%;
-    padding-bottom: 5%;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 a.modal-trigger {
@@ -20,4 +20,17 @@ a.modal-trigger {
 
 .textRight {
     text-align: right;
+}
+
+.noMarginTop {
+    margin-top: 0;
+}
+
+.max300 {
+    max-width: 300px;
+}
+
+.waiting {
+    vertical-align: top;
+    padding-left: 6px;
 }

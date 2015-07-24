@@ -7,7 +7,7 @@ import redis
 import json
 from rest_framework.reverse import reverse_lazy
 
-from api.models import BubbleSortSwap, GameOfLifeCell, Interaction
+from api.models import BubbleSortSwap, GameOfLifeCell, Interaction, GameOfLife
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -25,8 +25,27 @@ def new_bubble_sort_swap(sender, instance, **kwargs):
         'event_type': 'swap'
     }))
 
-@receiver(post_save, sender=GameOfLifeCell,
-          dispatch_uid="observer:GameOfLifeCell#post_save")
+# @receiver(post_save, sender=GameOfLife, dispatch_uid="observer:GameOfLife#post_save")
+# def save_game_of_life(sender, instance, **kwargs):
+#
+#     if instance.is_async:
+#         return
+#
+#     if instance.is_buffer:
+#         return
+#
+#     class_name = instance.interaction.clicker_class.class_name
+#     channel = 'gameoflife.{}.observer'.format(class_name)
+#     url = reverse_lazy('gameoflife-detail', args=[instance.id])
+#
+#     print "Publishing to redis:{}".format(channel)
+#     r.publish(channel, json.dumps({
+#         'game_of_life': str(url),
+#         'event_type': 'next_iteration',
+#         'serialized': unicode(instance)
+#     }))
+
+@receiver(post_save, sender=GameOfLifeCell, dispatch_uid="observer:GameOfLifeCell#post_save")
 def save_game_of_life_cell(sender, instance, **kwargs):
     if not instance.changed:
         return
@@ -51,8 +70,7 @@ def save_game_of_life_cell(sender, instance, **kwargs):
         'event_type': 'toggle_cell'
     }))
 
-@receiver(post_save, sender=Interaction,
-          dispatch_uid="observer:Interaction#post_save")
+@receiver(post_save, sender=Interaction, dispatch_uid="observer:Interaction#post_save")
 def save_interaction(sender, instance, created, **kwargs):
     # the first save is ignored
     if created:

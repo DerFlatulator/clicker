@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.metadata import SimpleMetadata
+from rest_framework.reverse import reverse_lazy
 from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework.response import Response
 
@@ -170,6 +171,23 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
     # lookup_field = 'game_of_life'
     metadata_class = GenerateMetadata
 
+    @detail_route(methods=['post'])
+    def swap_buffers(self, request, pk):
+        gol = models.GameOfLife.objects.get(pk=pk)
+        if gol.is_async:
+            return Response({'detail': 'this is an async. game of life'}, status=status.HTTP_400_BAD_REQUEST)
+        if gol.is_buffer:
+            return Response({'detail': 'this is an buffer game of life'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            buff = gol.buffer
+            for buff_cell, source_cell in zip(buff.cells.all(), gol.cells.all()):
+                source_cell.alive = buff_cell.alive
+                source_cell.save()
+
+        gol.save()
+
+        return Response({}, status=status.HTTP_202_ACCEPTED)
+
     @list_route(methods=['post', 'get'])
     def generate(self, request, **kwargs):
         """
@@ -184,7 +202,7 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         except Exception:
             data = request.stream.DATA
 
-        async = data.get('async', True) is True  # TODO change to False when sync is implemented
+        async = data.get('async', True) is False
 
         if request.method == 'GET':
             return Response({}, status=status.HTTP_200_OK)
@@ -225,6 +243,11 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         cols = max(4, int(math.ceil(float(class_size) / rows)))  # more-or-less square
         game = models.GameOfLife(num_rows=rows, num_cols=cols, interaction=interaction, is_async=async)
         game.save()
+        if not async:
+            gol_buffer = models.GameOfLife(num_rows=rows, num_cols=cols, is_async=False, is_buffer=True)
+            gol_buffer.save()
+            game.buffer = gol_buffer
+            game.save()
 
         interaction.gameoflife = game
         if activate:
@@ -271,17 +294,35 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
                 else:
                     cell.alive = rand_bool()
 
+                buff_cell = gol_buffer.cells.filter(game_of_life=gol_buffer, row=row, col=col)[0]
                 something = everything.pop()
                 if isinstance(something, unicode):
                     device_id = something
                     cell.save()
                     cell_data = serializers.GameOfLifeCellSerializer(cell,
                                                                      context={'request': request}).data
-                    interaction_data['assignments'][device_id] = cell_data
+                    buff_cell_data = serializers.GameOfLifeCellSerializer(buff_cell,
+                                                                          context={'request': request}).data
+                    if async:
+                        interaction_data['assignments'][device_id] = cell_data
+                    else:
+                        interaction_data['assignments'][device_id] = {
+                            'source': cell_data,
+                            'buffer': buff_cell_data
+                        }
                 else:
                     cell.is_ai = True
                     cell.save()
 
+                buff_cell.is_ai = cell.is_ai
+                buff_cell.alive = cell.alive
+                buff_cell.save()
+
+        interaction_data['urls'] = {
+            'buffer': str(reverse_lazy('gameoflife-detail', args=[gol_buffer.id])),
+            'source': str(reverse_lazy('gameoflife-detail', args=[game.id])),
+        }
+        interaction_data['urls']['next_state'] = "{}swap_buffers/".format(interaction_data['urls']['source'])
         interaction_data['interaction'] = interaction.id
         interaction_data['game_of_life'] = game.id
         if async:

@@ -5,13 +5,22 @@ from django.dispatch import receiver
 from api import models
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+@receiver(post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid="api:User#post_save")
 def user_post_save(sender, instance, created, **kwargs):
     if created:
         models.Creator(user=instance).save()
 
+@receiver(post_save, sender=models.GameOfLife, dispatch_uid="api:GameOfLife#post_save")
+def gol_post_save(sender, instance, created, **kwargs):
+    if created:
+        return
 
-@receiver(post_save, sender=models.GameOfLifeCell)
+    if instance.is_async  or instance.is_buffer:
+        return
+
+    perform_update(instance.buffer)
+
+@receiver(post_save, sender=models.GameOfLifeCell, dispatch_uid="api:GameOfLifeCell#post_save")
 def cell_post_save(sender, instance, created, **kwargs):
     if created:
         return
@@ -24,8 +33,14 @@ def cell_post_save(sender, instance, created, **kwargs):
     if not instance.changed:
         return
 
+    if not gol.is_async:
+        return
+
+    perform_update(gol)
+
+def perform_update(gol):
     # fetch adjacent cells
-    col, row = instance.col, instance.row
+    # col, row = instance.col, instance.row
     cell_2d = {}
     for cell in gol.cells.all():
         if cell.row not in cell_2d:

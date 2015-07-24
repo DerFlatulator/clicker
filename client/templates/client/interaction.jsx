@@ -112,6 +112,7 @@ class Interaction extends BaseComponent {
         this.setState({
             //interaction_url: interaction.url,
             assignments: data.assignments,
+            urls: data.urls || {},
             instance_url: interaction.instance_url || data.instance_url,
             connect_state: 'connected',
             instance_script_path: data.instance_script.replace(':type:', 'client'),
@@ -138,7 +139,7 @@ class Interaction extends BaseComponent {
     onGotInstance(component_name) {
         this.setState({
             instance_loaded: true,
-            instance_component_name: component_name,
+            instance_component_name: component_name
         });
 
         if ('vibrate' in window.navigator && typeof window.navigator.vibrate === 'function') {
@@ -241,6 +242,7 @@ class Interaction extends BaseComponent {
                         url={this.state.instance_url}
                         deviceId={this.state.device_id}
                         assignments={this.state.assignments}
+                        urls={this.state.urls}
                         />
                 );
             } else {

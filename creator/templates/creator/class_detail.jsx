@@ -15,6 +15,7 @@ class CreatorDetail extends React.Component {
         super(props);
         this.state = {
             waiting: false,
+            clickerClass: this.props.clicker_class,
             selectedItem: '*',
             selectedItemName: '',
             interactions: this.props.interactions
@@ -103,6 +104,23 @@ class CreatorDetail extends React.Component {
         this.reload();
     }
 
+    clearDevices = () => {
+        $.ajax({
+            url: this.props.clicker_class.url + "cleardevices",
+            method: 'POST',
+            data: {},
+            dataType: 'json',
+            success: this.onClearedDevices,
+            error: console.error.bind(console)
+        });
+    };
+
+    onClearedDevices = (data) => {
+        var clickerClass = this.state.clickerClass;
+        clickerClass.connected_devices = 0;
+        this.setState({ clickerClass: clickerClass });
+    };
+
     render() {
         var buttonClasses = classNames('waves-effect waves-light btn-large', {
             'disabled': this.state.waiting
@@ -114,10 +132,26 @@ class CreatorDetail extends React.Component {
 
                 <h4>Class: <strong>{this.props.clicker_class.long_name}</strong></h4>
 
+                <div className="row">
+                    <div className="col s8">
+                        <h5>Connected Devices: <strong>{this.state.clickerClass.connected_devices}</strong></h5>
+                    </div>
+                    <div className="col s4">
+                        <a onClick={this.clearDevices} className={'red darken-3 waves-effect waves-light btn'}>
+                            Clear All
+                            <i className="material-icons right">remove_circle</i>
+                        </a>
+                    </div>
+                </div>
+
+
                 <ul className="collection with-header">
                     <li className="collection-header">
                         <h4>Available Interactions</h4>
                     </li>
+                    {this.state.interactions.length == 0 ?
+                        <li className="collection-item" key="none">None</li> : ''
+                    }
                     {this.state.interactions.map(interaction => {
                         return (
                             <li className="collection-item"

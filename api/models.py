@@ -66,7 +66,7 @@ class BubbleSortSwap(models.Model):
 class GameOfLife(models.Model):
     num_rows = models.IntegerField(null=False, default=3)
     num_cols = models.IntegerField(null=False, default=4)
-    interaction = models.OneToOneField('Interaction', related_name='gameoflife')
+    interaction = models.OneToOneField('Interaction', related_name='gameoflife', null=True)  # null if is_buffer
     is_async = models.BooleanField(default=True)
     is_buffer = models.BooleanField(default=False)
     buffer = models.OneToOneField('GameOfLife', null=True, related_name='source')

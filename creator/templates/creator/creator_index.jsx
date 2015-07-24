@@ -35,7 +35,7 @@ class CreatorIndex extends React.Component {
         <span className="card-title activator grey-text text-darken-4">Clicker++ Creator</span>
         <p>Your classes:</p>
         <div className="row">
-            <div className="col s12 m12 l8">
+            <div className="col s12 m12 l10">
                 <ul className="collection">
                     {this.props.classes.map(cls => {
                         return (

@@ -73,6 +73,7 @@ class Interaction extends React.Component {
             //interaction_url: interaction.url,
             assignments: data.assignments,
             instance_url: interaction.instance_url || data.instance_url,
+            urls: data.urls || {},
             instance_script_path: data.instance_script.replace(':type:', 'observer'),
             instance_component_name: data.instance_component_name,
             instance_loaded: false
@@ -88,6 +89,7 @@ class Interaction extends React.Component {
             return (
                 <DynamicInteraction {...this.props}
                     assignments={this.state.assignments}
+                    urls={this.state.urls}
                     url={this.state.instance_url}
                     socket={this.state.socket} />
             );
@@ -106,6 +108,10 @@ class Interaction extends React.Component {
 }
 
 let run = function () {
+    $.ajaxSetup({
+        beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
+    });
+
     var qs = querystring.parse(window.location.search.substring(1)),
         socketBase = `//${window.location.hostname}:4000/`,
         socketURL = socketBase + 'socket.io/socket.io.js',
