@@ -45,13 +45,17 @@ def new_bubble_sort_swap(sender, instance, **kwargs):
 #         'serialized': unicode(instance)
 #     }))
 
+def handle_buffer_cell(instance):
+    pass  # TODO send updates to observer when students make a selection
+
+
 @receiver(post_save, sender=GameOfLifeCell, dispatch_uid="observer:GameOfLifeCell#post_save")
 def save_game_of_life_cell(sender, instance, **kwargs):
     if not instance.changed:
         return
 
     if instance.game_of_life.is_buffer:
-        return
+        return handle_buffer_cell(instance)
 
     if instance.game_of_life.interaction.state != Interaction.ACTIVE:
         return

@@ -12,10 +12,11 @@ def user_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=models.GameOfLife, dispatch_uid="api:GameOfLife#post_save")
 def gol_post_save(sender, instance, created, **kwargs):
-    if created:
+
+    if instance.is_async or instance.is_buffer:
         return
 
-    if instance.is_async  or instance.is_buffer:
+    if not hasattr(instance.buffer, 'cells'):
         return
 
     perform_update(instance.buffer)

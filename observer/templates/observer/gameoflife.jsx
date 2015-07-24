@@ -118,6 +118,15 @@ class GameOfLife extends React.Component {
             'waves-effect', 'waves-light', 'btn', 'blue'
         ]);
 
+        var personOrAI = (x, y, val) => {
+            return <i className={classNames({
+                                                dead: !val,
+                                                androidIcon: this.isAI(x,y),
+                                                personIcon: !this.isAI(x,y)
+                                            }, 'material-icons')
+                                }>{this.isAI(x,y) ? 'android' : 'person'}</i>;
+        };
+
         return (
             <div>
                 <h3>Game of Life</h3>
@@ -144,8 +153,11 @@ class GameOfLife extends React.Component {
                                         return (
                                             <span className={classNames("gol", {
                                                 "red lighten-2": !value,
-                                                "green darken-2": value
-                                            })}>{this.isAI(x,y) ? "Auto" : ""}</span>
+                                                "green darken-2": value,
+                                                "red-text text-darken-4": !value,
+                                                "green-text text-darken-4": value
+                                            })}>{personOrAI(x,y,value)}
+                                            </span>
                                         );
                                     })}
 

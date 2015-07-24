@@ -71,3 +71,19 @@
     text-align: center;
 /*    vertical-align: super; */
 }
+
+.personIcon, .androidIcon {
+    font-size: 30px;
+    margin-top: 7px;
+}
+
+.dead {
+    transform: rotate(90deg) scale(0.7,1);
+}
+
+.material-icons {
+    -moz-transition: all 1s ease;
+    -webkit-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+}
