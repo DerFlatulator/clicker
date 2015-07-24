@@ -7,6 +7,7 @@
     position: absolute;
     bottom: 0;
     padding-top: 5px;
+    transition: all 0.5s;
 }
 
 .sortCaption {
@@ -19,7 +20,7 @@
 }
 
 .sortList {
-    height: 250px;
+    height: 300px;
     position: relative;
     margin-bottom: 55px;
 }
@@ -69,7 +70,7 @@
     font-size: 2em;
     height: 40px;
     text-align: center;
-/*    vertical-align: super; */
+    /*vertical-align: super; */
 }
 
 .personIcon, .androidIcon {
