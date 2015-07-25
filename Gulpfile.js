@@ -143,7 +143,9 @@ gulp.task('build-jsx', ['bower'], function () {
             packageCache: {},
             fullPaths: true
         })
-            .transform(babelify)
+            .transform({
+                stage: 0
+            }, babelify)
             .transform({
                 global: true
             }, 'browserify-shim')
