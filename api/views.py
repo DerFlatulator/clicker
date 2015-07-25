@@ -202,7 +202,7 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
         except Exception:
             data = request.stream.DATA
 
-        async = data.get('async', True) is False
+        async = data.get('async', False) is True
 
         if request.method == 'GET':
             return Response({}, status=status.HTTP_200_OK)
@@ -294,18 +294,19 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
                 else:
                     cell.alive = rand_bool()
 
-                buff_cell = gol_buffer.cells.filter(game_of_life=gol_buffer, row=row, col=col)[0]
+                if not async:
+                    buff_cell = gol_buffer.cells.filter(game_of_life=gol_buffer, row=row, col=col)[0]
                 something = everything.pop()
                 if isinstance(something, unicode):
                     device_id = something
                     cell.save()
                     cell_data = serializers.GameOfLifeCellSerializer(cell,
                                                                      context={'request': request}).data
-                    buff_cell_data = serializers.GameOfLifeCellSerializer(buff_cell,
-                                                                          context={'request': request}).data
                     if async:
                         interaction_data['assignments'][device_id] = cell_data
                     else:
+                        buff_cell_data = serializers.GameOfLifeCellSerializer(buff_cell,
+                                                                              context={'request': request}).data
                         interaction_data['assignments'][device_id] = {
                             'source': cell_data,
                             'buffer': buff_cell_data
@@ -314,14 +315,17 @@ class GameOfLifeViewSet(viewsets.ModelViewSet):
                     cell.is_ai = True
                     cell.save()
 
-                buff_cell.is_ai = cell.is_ai
-                buff_cell.alive = cell.alive
-                buff_cell.save()
+                if not async:
+                    buff_cell.is_ai = cell.is_ai
+                    buff_cell.alive = cell.alive
+                    buff_cell.save()
 
         interaction_data['urls'] = {
-            'buffer': str(reverse_lazy('gameoflife-detail', args=[gol_buffer.id])),
             'source': str(reverse_lazy('gameoflife-detail', args=[game.id])),
         }
+        if not async:
+            interaction_data['urls']['buffer'] = str(reverse_lazy('gameoflife-detail', args=[gol_buffer.id]))
+
         interaction_data['urls']['next_state'] = "{}swap_buffers/".format(interaction_data['urls']['source'])
         interaction_data['interaction'] = interaction.id
         interaction_data['game_of_life'] = game.id
