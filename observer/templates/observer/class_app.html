@@ -15,6 +15,12 @@
     {% include "nav.html" with app="observer" %}
 {% endblock %}
 
+{% block react_outlet %}
+    <div class="progress">
+        <div class="indeterminate"></div>
+    </div>
+{% endblock %}
+
 {% block footer_class %}
     teal darken-2
 {% endblock %}

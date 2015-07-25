@@ -15,6 +15,12 @@
     {% include "nav.html" with app="client" %}
 {% endblock %}
 
+{% block react_outlet %}
+    <div class="progress">
+        <div class="indeterminate"></div>
+    </div>
+{% endblock %}
+
 {% block footer_class %}
     purple
 {% endblock %}
