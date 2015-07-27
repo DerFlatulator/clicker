@@ -35,6 +35,7 @@
     "gulp-watch": "^4.2.4",
     "minifyify": "^7.0.2",
     "tiny-lr": "^0.1.5",
+    "tsify": "^0.11.4",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.3"
   },

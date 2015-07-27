@@ -79,9 +79,17 @@
 }
 
 .dead {
-    transform: rotate(90deg) scale(0.7,1);
+    /*transform: rotate(90deg) scale(0.7,1);*/
 }
 
-.material-icons {
+.golDead {
+    border: 2px outset darkred;
+}
+
+.golAlive {
+    border: 2px outset green;
+}
+
+.golDead, .golAlive {
     transition: all 1s ease;
 }

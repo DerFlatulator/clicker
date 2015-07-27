@@ -23,7 +23,9 @@ a.modal-trigger {
 }
 
 .noMarginTop {
-    margin-top: 0;
+    margin: 0;
+    padding: 0;
+    padding-top: 1rem !important;
 }
 
 .max300 {
@@ -33,4 +35,74 @@ a.modal-trigger {
 .waiting {
     vertical-align: top;
     padding-left: 6px;
+}
+
+
+.gol {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: #222;
+    border: 1px ridge black;
+    text-align: center;
+    vertical-align: top;
+}
+
+.golDead {
+    background: #ddd;
+}
+
+.golRow {
+    height: 50px;
+}
+
+.golCornerSpacer {
+    width: 30px;
+    display: inline-block;
+}
+
+.golRowCaption {
+    width: 30px;
+    display: inline-block;
+    font-size: 2em;
+    height: 40px;
+    text-align: center;
+    vertical-align: super;
+}
+
+.golColumnCaption {
+    width: 50px;
+    display: inline-block;
+    font-size: 2em;
+    height: 40px;
+    text-align: center;
+    /*vertical-align: super; */
+}
+
+.personIcon, .androidIcon {
+    font-size: 30px;
+    margin-top: 7px;
+}
+
+.dead {
+    /*transform: rotate(90deg) scale(0.7,1);*/
+}
+
+.golDead {
+    border: 2px outset darkred;
+}
+
+.golAlive {
+    border: 2px outset green;
+}
+
+.golDead, .golAlive {
+    transition: all 1s ease;
+}
+
+.algorithm {
+}
+
+.marginTop {
+    margin-top: 10px;
 }

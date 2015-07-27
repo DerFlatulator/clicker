@@ -124,7 +124,7 @@ class GameOfLife extends React.Component {
                                                 androidIcon: this.isAI(x,y),
                                                 personIcon: !this.isAI(x,y)
                                             }, 'material-icons')
-                                }>{this.isAI(x,y) ? 'android' : 'person'}</i>;
+                                }>{this.isAI(x,y) ? '' : 'person'}</i>;
         };
 
         return (
@@ -151,11 +151,14 @@ class GameOfLife extends React.Component {
 
                                     {row.map((value, y) => {
                                         return (
-                                            <span className={classNames("gol", {
-                                                "red lighten-2": !value,
-                                                "green darken-2": value,
-                                                "red-text text-darken-4": !value,
-                                                "green-text text-darken-4": value
+                                            <span className={classNames("gol grey z-depth-1", {
+                                                // "red lighten-2": !value,
+                                                "darken-2": value,
+                                                "lighten-4": !value,
+                                                "golAlive": value,
+                                                "golDead": !value,
+                                                //"red-text text-darken-4": !value,
+                                                //"green-text text-darken-4": value
                                             })}>{personOrAI(x,y,value)}
                                             </span>
                                         );

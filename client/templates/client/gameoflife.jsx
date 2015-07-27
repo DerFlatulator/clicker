@@ -29,10 +29,13 @@ class GameOfLife extends React.Component {
             method: 'GET',
             cache: false,
             success: (data) => {
-                //console.log(data);
+                console.log(data);
                 this.setState({
                     clientCell: data.alive,
                     nextClientCell: data.alive
+                });
+                $.getJSON(data.game_of_life, {}, (gol_data) => {
+                    this.setState({ cells: GameOfLife.deserialize(gol_data.serialized) })
                 });
             },
             error: (xhr, status, err) => {
@@ -65,7 +68,8 @@ class GameOfLife extends React.Component {
                 this.setState({
                     buttonEnabled: true,
                     decisionChosen: null,
-                    clientCell: this.state.nextClientCell
+                    clientCell: this.state.nextClientCell,
+                    cells: GameOfLife.deserialize(data.serialized)
                 });
             }
         })
@@ -86,14 +90,6 @@ class GameOfLife extends React.Component {
 
     isAlive() {
         return this.state.clientCell;
-
-        // TODO validation
-        // var index = this.props.cellName.match(/[0-9]/).index,
-        //    columnLetter = this.props.cellName.substring(0, index),
-        //    row = parseInt(this.props.cellName.substring(index)) - 1,
-        //    column = columnLetter.toUpperCase().charCodeAt(0) - "A".charCodeAt(0);
-        //
-        // return this.state.cells[row][column];
     }
 
     swap(is_alive) {
@@ -146,67 +142,119 @@ class GameOfLife extends React.Component {
             'swapButton', 'waves-effect', 'waves-light', 'btn-large', 'left'
         ]);
 
+        var name = this.state.assignment.source.cell_name;
+
         return (
             <div className="sortPanel">
-                <h4>You are responsible for <strong>cell {this.state.assignment.source.cell_name}</strong>.</h4>
-                <p className="flow-text">
-                    Your cell is currently <strong className={this.isAlive() ? "green-text" : "red-text"}>
-                    {this.isAlive() ? "alive" : "dead"}</strong>.
-                </p>
-                <div className="row">
-                    <div className="col m6">
-                        <h4>If you're alive...</h4>
-                            <h5>You <span className="red-text">die</span> if the number of
-                                <span className="green-text"> alive </span>
-                                <a href="#neighbours" className="modal-trigger tooltip"
-                                   data-tooltip="Click for info"> neighbours</a>
-                                &nbsp;is <strong> more than 3 </strong> (overcrowding)
-                                or <strong> less than 2</strong> (loneliness). Otherwise, stay alive (stasis).</h5>
-                    </div>
-                    <div className="col m6">
-                        <h4>If you're dead...</h4>
-                            <h5>You <span className="green-text">live</span> if the number of
-                                <span className="green-text"> alive </span>
-                                <a href="#neighbours" className="modal-trigger tooltip"
-                                   data-tooltip="Click for info"> neighbours</a>
-                                   &nbsp;is <strong> exactly 3</strong> (reproduction). Otherwise, stay dead (stasis).</h5>
-
-                    </div>
-                </div>
-                <h4>Next state:</h4>
-                <div className="row">
-                    <div className="col s5">
-                        <a onClick={this.swap.bind(this, true)} className={classes}>
-                            <i className="material-icons left">check</i>
-                            { this.isAlive() ? 'Stay Alive' : 'Become Alive' }
-                        </a>
-                    </div>
-                    <div className="col s2">
-                        <p className="flow-text noMarginTop">OR</p>
-                    </div>
-                    <div className="col s5">
-                        <a onClick={this.swap.bind(this, false)} className={classes2}>
-                            <i className="material-icons left">close</i>
-                            { this.isAlive() ? 'Die' : 'Stay Dead' }
-                        </a>
-                    </div>
-                </div>
-                {this.state.decisionChosen !== null ?
-                    <div className="row">
-                        <div className="preloader-wrapper small active">
-                            <div className="spinner-layer spinner-blue-only">
-                                <div className="circle-clipper left">
-                                    <div className="circle"></div>
-                                </div><div className="gap-patch">
-                                <div className="circle"></div>
-                            </div><div className="circle-clipper right">
-                                <div className="circle"></div>
-                            </div>
+                <ul className="collapsible popout" data-collapsible="expandable">
+                    <li>
+                        <div className="collapsible-header active left-align"><i className="material-icons">grid_on</i>
+                            Game of Life
+                        </div>
+                        <div className="collapsible-body">
+                            <div className="row">
+                                <div className="col s12 l6">
+                                    <p className="flow-text left-align">
+                                        You're responsible for <strong>cell {name}</strong>,
+                                        which is currently <strong className={this.isAlive() ? "green-text" : "red-text"}>
+                                        {this.isAlive() ? "alive" : "dead"}</strong>.
+                                    </p>
+                                </div>
+                                <div className="col s12 l6">
+                                    <GameOfLifeRepr cell_name={name} cells={this.state.cells} />
+                                </div>
                             </div>
                         </div>
-                        <span className="flow-text waiting">Waiting for next state</span>
-                    </div>
-                : 'Select an option'}
+                    </li>
+                    {/*
+                    <li>
+                        <div className="collapsible-header active left-align"><i className="material-icons">grid_on</i>
+                            Game of Life
+                        </div>
+                        <div className="collapsible-body">
+                            <GameOfLifeRepr cell_name={name} cells={this.state.cells} />
+                        </div>
+                    </li>
+                    */}
+                    <li>
+                        <div className="collapsible-header active left-align"><i className="material-icons">code</i>
+                            Algorithm
+                        </div>
+                        <div className="row collapsible-body">
+                            <div className="col l6 left-align">
+                                <div className="algorithm">
+                                    {/*<h4>If you're alive...</h4>
+                                     <h5>You <span className="red-text">die</span> if the number of
+                                     <span className="green-text"> alive </span>
+                                     <a href="#neighbours" className="modal-trigger tooltip"
+                                     data-tooltip="Click for info"> neighbours</a>
+                                     &nbsp;is <strong> more than 3 </strong> (overcrowding)
+                                     or <strong> less than 2</strong> (loneliness). Otherwise, stay alive (stasis).</h5> */}
+                                    <pre> if cell({name}) is <span className="green-text">alive</span>:</pre>
+                                    <pre>   if <span className="green-text">alive_neighbours</span>({name}) &gt; 3:
+                                    <br/>     <span className="red-text">die</span>({name}). # Overcrowding</pre>
+                                    <pre>   else if <span className="green-text">alive_neighbours</span>({name}) &lt; 2:
+                                    <br/>     <span className="red-text">die</span>({name}). # Loneliness</pre>
+                                    <pre>   else: <span className="green-text">live</span>({name}). # Stasis </pre>
+                                </div>
+                            </div>
+                            <div className="col l6 left-align">
+                                <div className="algorithm">
+                                    <pre> if cell({name}) is <span className="red-text">dead</span>:</pre>
+                                    <pre>   if <span className="green-text">alive_neighbours</span>({name}) == 3:
+                                    <br/>     <span className="green-text">live</span>({name}). # Reproduction</pre>
+                                    <pre>   else: <span className="red-text">die</span>({name}). # Stasis </pre>
+                                    {/*<h4>If you're dead...</h4>
+                                     <h5>You <span className="green-text">live</span> if the number of
+                                     <span className="green-text"> alive </span>
+                                     <a href="#neighbours" className="modal-trigger tooltip"
+                                     data-tooltip="Click for info"> neighbours</a>
+                                     &nbsp;is <strong> exactly 3</strong> (reproduction). Otherwise, stay dead (stasis).</h5>*/}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div className="collapsible-header active left-align"><i className="material-icons">input</i>
+                            Respond
+                        </div>
+                        <div className="collapsible-body">
+                            <div className="row marginTop">
+                                <div className="col s5">
+                                    <a onClick={this.swap.bind(this, true)} className={classes}>
+                                        <i className="material-icons left">check</i>
+                                        { this.isAlive() ? 'Stay Alive' : 'Become Alive' }
+                                    </a>
+                                </div>
+                                <div className="col s2">
+                                    <p className="flow-text noMarginTop">OR</p>
+                                </div>
+                                <div className="col s5">
+                                    <a onClick={this.swap.bind(this, false)} className={classes2}>
+                                        <i className="material-icons left">close</i>
+                                        { this.isAlive() ? 'Die' : 'Stay Dead' }
+                                    </a>
+                                </div>
+                            </div>
+                            {this.state.decisionChosen !== null ?
+                                <div className="row">
+                                    <div className="preloader-wrapper small active">
+                                        <div className="spinner-layer spinner-blue-only">
+                                            <div className="circle-clipper left">
+                                                <div className="circle"></div>
+                                            </div><div className="gap-patch">
+                                            <div className="circle"></div>
+                                        </div><div className="circle-clipper right">
+                                            <div className="circle"></div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <span className="flow-text waiting">Waiting for next state</span>
+                                </div>
+                                : 'Select an option'}
+                        </div>
+                    </li>
+                </ul>
 
                 <div id="neighbours" className="modal modal-fixed-footer textLeft">
                     <div className="modal-content">
@@ -238,6 +286,94 @@ class GameOfLife extends React.Component {
                         <a href="#!" className="modal-action modal-close waves-effect waves-green btn-flat">Got it!</a>
                     </div>
                 </div>
+            </div>
+        );
+    }
+}
+
+class GameOfLifeRepr extends React.Component {
+
+    /**
+     * @param {number} index the index (0-based) to convert from
+     * @returns {string} the column letter
+     */
+    static indexToColumnLetter(index) {
+        return String.fromCharCode("A".charCodeAt(0) + index);
+    }
+
+    render() {
+        var person = (x, y, val) => {
+            var colLetter = GameOfLifeRepr.indexToColumnLetter(y),
+                rowNum = x,
+                str = `${colLetter}${rowNum + 1}`;
+
+            if (this.props.cell_name === str) {
+                return <i className={classNames({
+                            dead: !val,
+                            "grey-text text-lighten-4": val,
+                        }, 'personIcon material-icons')
+                }>person</i>;
+            } else {
+                return <span></span>;
+            }
+        };
+
+        $(document).ready(function(){
+            $('.collapsible').collapsible({
+                //accordion : true // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+            });
+        });
+
+        return (
+            <div className="gameOfLife col m12">
+                <div className="golCornerSpacer">&nbsp;</div>
+
+                {this.props.cells[0].map((_, y) => {
+                    return (
+                        <div className="golColumnCaption">
+                            {GameOfLifeRepr.indexToColumnLetter(y)}
+                        </div>
+                    );
+                })}
+
+                {this.props.cells.map((row, x) => {
+                    return (
+                        <div className="golRow">
+                            <div className="golRowCaption">
+                                {x + 1}
+                            </div>
+
+                            {row.map((value, y) => {
+                                return (
+                                    <span className={classNames("gol grey z-depth-1", {
+                                        // "red lighten-2": !value,
+                                        "darken-2": value,
+                                        "lighten-4": !value,
+                                        "golAlive": value,
+                                        "golDead": !value,
+                                        //"red-text text-darken-4": !value,
+                                        //"green-text text-darken-4": value
+                                    })}>{person(x, y, value)}
+                                    </span>
+                                );
+                            })}
+
+                            <div className="golRowCaption">
+                                {x + 1}
+                            </div>
+                        </div>
+                    );
+                })}
+
+                <div className="golCornerSpacer">&nbsp;</div>
+
+                {this.props.cells[0].map((_, y) => {
+                    return (
+                        <div className="golColumnCaption">
+                            {GameOfLifeRepr.indexToColumnLetter(y)}
+                        </div>
+                    );
+                })}
             </div>
         );
     }

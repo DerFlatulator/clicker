@@ -43,7 +43,7 @@ def save_game_of_life(sender, instance, **kwargs):
     r.publish(channel, json.dumps({
         'game_of_life': str(url),
         'event_type': 'next_state',
-        # 'serialized': unicode(instance)
+        'serialized': unicode(instance)
     }))
 
 @receiver(post_save, sender=GameOfLifeCell, dispatch_uid="client:GameOfLifeCell#post_save")
