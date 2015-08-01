@@ -164,6 +164,8 @@ class GameOfLife extends React.Component {
                                     <GameOfLifeRepr cell_name={name} cells={this.state.cells} />
                                 </div>
                             </div>
+                            <a href="#neighbours" className="modal-trigger tooltip"
+                               data-tooltip="Click for info">&quot;Neighbour&quot; information</a>
                         </div>
                     </li>
                     {/*

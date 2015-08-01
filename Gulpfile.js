@@ -151,7 +151,7 @@ gulp.task('build-jsx', ['bower'], function () {
             }, 'browserify-shim')
             .plugin('minifyify', {
                 map: app.entry + '.map',
-                output: app.entry + '.map'
+                output: app.output_dir + app.entry + '.map'
             })
             .bundle()
             .pipe(source(app.entry))
