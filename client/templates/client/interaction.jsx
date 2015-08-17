@@ -12,6 +12,46 @@ class BaseComponent extends React.Component {
     }
 }
 
+class Storage {
+    static _handleError (ex) {
+        if (ex instanceof DOMException) {
+            if ('__proto__' in ex && SECURITY_ERR in ex.__proto__) {
+                if (ex.code === ex.__proto__.SECURITY_ERR) {
+                    alert("Your browser doesn't support cookies.\n" +
+                          "Enable cookies from your device settings, and " +
+                          "ensure you aren't in Private browsing");
+
+                    return;
+                }
+            }
+            alert('An error occurred when trying to store data on your device:\n' +
+                  ex.message);
+        }
+    }
+    static getItem(key) {
+        if (window.hasOwnProperty('localStorage')) {
+            try {
+                return window.localStorage.getItem(key);
+            } catch (ex) {
+                Storage._handleError(ex);
+            }
+        }
+        return null;
+    }
+    static setItem(key, value) {
+        if (window.hasOwnProperty('localStorage')) {
+            try {
+                window.localStorage.setItem(key, value);
+                return true;
+            } catch (ex) {
+                Storage._handleError(ex);
+            }
+        }
+        return false;
+    }
+}
+
+
 class Interaction extends BaseComponent {
     constructor(props) {
         super (props);
@@ -33,13 +73,11 @@ class Interaction extends BaseComponent {
     }
 
     ignoreMessage(message) {
-        if (!('localStorage' in window))
-            return false;
-        var ctr = window.localStorage.getItem('socket.io:gameoflife.client-counter');
+        var ctr = Storage.getItem('socket.io:gameoflife.client-counter');
         if (ctr && parseInt(ctr) >= message._counter) {
             return true;
         } else {
-            window.localStorage.setItem('socket.io:gameoflife.client-counter', message._counter);
+            Storage.setItem('socket.io:gameoflife.client-counter', message._counter);
             return false;
         }
     }
@@ -156,19 +194,15 @@ class Interaction extends BaseComponent {
      * :return: the device_id or null
      */
     getDeviceID() {
-        if ('localStorage' in window) {
-            var device_id = window.localStorage.getItem('device_id');
-            if (device_id != null)
-                return device_id;
-        }
+        var device_id = Storage.getItem('device_id');
+        if (device_id != null)
+            return device_id;
+
         return null;
     }
 
     isRegisteredToClass(clickerClass) {
-        if ('localStorage' in window) {
-            return window.localStorage.getItem(`registered:${clickerClass}`) === "true";
-        }
-        return false;
+        return Storage.getItem(`registered:${clickerClass}`) === "true";
     }
 
     connect() {
@@ -195,8 +229,7 @@ class Interaction extends BaseComponent {
             device_id: data.device_id,
             connect_state: 'registering'
         });
-        if ('localStorage' in window)
-            window.localStorage.setItem('device_id', data.device_id);
+        Storage.setItem('device_id', data.device_id);
 
         var isRegistered = data.classes.map(url => url.split("/").pop())
                 .indexOf(this.props.clickerClass) > -1;
@@ -224,9 +257,7 @@ class Interaction extends BaseComponent {
             connected: true,
             connect_state: 'registered'
         });
-        if ('localStorage' in window) {
-            window.localStorage.setItem(`registered:${this.props.clickerClass}`, "true");
-        }
+        Storage.setItem(`registered:${this.props.clickerClass}`, "true");
     }
 
     render() {
