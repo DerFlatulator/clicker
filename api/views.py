@@ -51,6 +51,11 @@ class ClickerClassViewSet(viewsets.ModelViewSet):
     queryset = models.ClickerClass.objects.all()
     serializer_class = serializers.ClickerClassSerializer
 
+    @detail_route(methods=['post'])
+    def cleardevices(self, request, pk):
+        clk = models.ClickerClass.objects.get(class_name=pk)
+        clk.registereddevice_set.clear()
+        return Response({}, status=status.HTTP_202_ACCEPTED)
 
 class BubbleSortViewSet(viewsets.ModelViewSet):
     queryset = models.BubbleSort.objects.all()

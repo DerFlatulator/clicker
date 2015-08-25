@@ -106,7 +106,7 @@ class CreatorDetail extends React.Component {
 
     clearDevices = () => {
         $.ajax({
-            url: this.props.clicker_class.url + "cleardevices",
+            url: `/api/class/${this.props.class_name}/cleardevices/`,
             method: 'POST',
             data: {},
             dataType: 'json',

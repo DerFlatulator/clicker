@@ -56,7 +56,8 @@ class Interaction extends BaseComponent {
     constructor(props) {
         super (props);
         this._bind('register', 'connect', 'onRegistered', 'getDeviceID',
-            'isRegisteredToClass', 'componentDidMount', 'ignoreMessage');
+            'isRegisteredToClass', 'componentDidMount', 'ignoreMessage',
+            'ensureRegisteredToClass');
         this.state = {
             device_id: this.getDeviceID(),
             connect_state: 'disconnected',
@@ -83,11 +84,12 @@ class Interaction extends BaseComponent {
     }
 
     componentDidMount() {
-        console.log('App#didMount');
+        //console.log('App#didMount');
 
-        this.setState({
-            connected: this.isRegisteredToClass(this.props.clickerClass)
-        });
+        if (this.isRegisteredToClass(this.props.clickerClass)) {
+            this.ensureRegisteredToClass(this.props.clickerClass);
+        }
+
 
         //console.log(`/api/interaction/?state=active&class=${this.props.clickerClass}`);
 
@@ -99,7 +101,7 @@ class Interaction extends BaseComponent {
             }
         );
 
-        console.log('creating socket');
+        //console.log('creating socket');
         var socket = io(this.props.channel, {
             'multiplex': false,
             'sync disconnect on unload': true
@@ -107,7 +109,7 @@ class Interaction extends BaseComponent {
 
         this.setState({ socket });
 
-        console.log(socket);
+        //console.log(socket);
 
         window.onbeforeunload = () => {
             socket.disconnect();
@@ -115,7 +117,7 @@ class Interaction extends BaseComponent {
 
         socket.on('connect', () => {
             this.setState({ socketConnected: true });
-            console.log('socket connected');
+            //console.log('socket connected');
             //if ('localStorage' in window) {
             //    window.localStorage.setItem('socket.io:gameoflife.client-counter', '0');
             //}
@@ -203,6 +205,24 @@ class Interaction extends BaseComponent {
 
     isRegisteredToClass(clickerClass) {
         return Storage.getItem(`registered:${clickerClass}`) === "true";
+    }
+
+    ensureRegisteredToClass(clickerClass) {
+        console.log('validating cache');
+
+        $.get(`/api/connect/${this.getDeviceID()}`, ({ classes }) => {
+            var filtered = classes.filter((item) => item.class_name === clickerClass);
+
+            if (filtered.length > 0) {
+                // Storage is valid
+                Storage.setItem(`registered:${clickerClass}`, 'true');
+                this.setState({ connected: true });
+            } else {
+                // Invalidate storage
+                Storage.setItem(`registered:${clickerClass}`, 'false');
+                this.setState({ connected: false });
+            }
+        });
     }
 
     connect() {
