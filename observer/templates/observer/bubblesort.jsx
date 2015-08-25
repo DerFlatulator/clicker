@@ -11,7 +11,8 @@ class BubbleSort extends React.Component {
     constructor(props) {
         super (props);
         this.state = {
-            list: [1,2,3]
+            list: [1,2,3],
+            bs: -1
         };
     }
 
@@ -22,10 +23,11 @@ class BubbleSort extends React.Component {
             url: this.props.url,
             dataType: 'json',
             cache: false,
-            success: ({ current_list }) => {
-                console.log(current_list);
+            success: (data) => {
+                console.log(data);
                 this.setState({
-                    list: current_list
+                    list: data.current_list,
+                    bs: data.url
                 });
             },
             error: (xhr, status, err) => {
@@ -87,7 +89,7 @@ class BubbleSort extends React.Component {
                             return;
 
                         return (
-                            <BubbleSortCaption key={index} index={index}></BubbleSortCaption>
+                            <BubbleSortCaption bs={this.state.bs} key={index} index={index}></BubbleSortCaption>
                         );
                     })}
                     <div className="sortFooter" style={bottomStyles}>Invervals</div>
@@ -102,8 +104,8 @@ class BubbleSortItem extends React.Component {
     constructor(props) {
         super (props);
         this.state = {
-            height_multiplier: 30,
-            width_multiplier: 66
+            height_multiplier: 15,
+            width_multiplier: 33
         };
     }
 
@@ -112,7 +114,7 @@ class BubbleSortItem extends React.Component {
             <div className="sortItem"
                  style={{
                     background: this.props.colour,
-                    height: (this.state.height_multiplier * this.props.item) + 'px',
+                    height: (this.state.height_multiplier * this.props.item) + 10 + 'px',
                     left: (this.state.width_multiplier * this.props.index) + 'px'
                  }}>
                 {this.props.item}
@@ -126,13 +128,22 @@ class BubbleSortCaption extends React.Component {
     constructor(props) {
         super (props);
         this.state = {
-            width_multiplier: 66
+            width_multiplier: 33
         };
     }
 
+    handleClick = (e) => {
+        var interval = $(e.target).text();
+        $.post('/api/bubblesortswap/', {
+            lower_index: interval - 1,
+            bubble_sort: this.props.bs
+        });
+    };
+
     render() {
         return (
-            <div className="sortCaption"
+            <div onClick={this.handleClick}
+                 className="sortCaption"
                  style={{
                     height: (this.state.height_multiplier) + 'px',
                     left: (this.state.width_multiplier * (this.props.index - 0.5)) + 'px'

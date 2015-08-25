@@ -1,6 +1,6 @@
 .sortItem {
     background: #000;
-    width: 55px;
+    width: 28px;
     color: white;
     text-align: center;
     margin: 2px;
@@ -11,25 +11,30 @@
 }
 
 .sortCaption {
-    width: 55px;
+    width: 28px;
     text-align: center;
     margin: 2px;
     font-size: 1.5em;
     position: absolute;
     bottom: -30px;
+    cursor: pointer;
 }
 
 .sortList {
-    height: 300px;
+/*    height: 300px;
     position: relative;
+    */
     margin-bottom: 55px;
+
+    position: absolute;
+    bottom: 88px;
 }
 
 .sortFooter {
     position: absolute;
     bottom: -50px;
     font-size: 1.5em;
-    text-align: center;
+    text-align: left;
 }
 
 .gol {
