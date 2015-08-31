@@ -1,3 +1,4 @@
+
 .sortItem {
     background: #000;
     width: 28px;
@@ -24,10 +25,11 @@
 /*    height: 300px;
     position: relative;
     */
-    margin-bottom: 55px;
+    margin-bottom: 59px;
 
     position: absolute;
-    bottom: 88px;
+    bottom: 0px;
+    z-index: 1000;
 }
 
 .sortFooter {

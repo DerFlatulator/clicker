@@ -423,6 +423,26 @@ class RegressionPlotItemViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.RegressionPlotPointSerializer
 
 
+class GraphViewSet(viewsets.ModelViewSet):
+    queryset = models.Graph.objects.all()
+    serializer_class = serializers.GraphSerializer
+
+
+class GraphVertexViewSet(viewsets.ModelViewSet):
+    queryset = models.GraphVertex.objects.all()
+    serializer_class = serializers.GraphVertexSerializer
+
+
+class GraphEdgeViewSet(viewsets.ModelViewSet):
+    queryset = models.GraphEdge.objects.all()
+    serializer_class = serializers.GraphEdgeSerializer
+
+
+class GraphParticipationRulesViewSet(viewsets.ModelViewSet):
+    queryset = models.GraphParticipationRules.objects.all()
+    serializer_class = serializers.GraphParticipationRulesSerializer
+
+
 class ConnectionViewSet(viewsets.ModelViewSet):
     """
     TODO find a way to bind serializer / document the `@detail_route`s

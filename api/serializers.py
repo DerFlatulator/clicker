@@ -87,6 +87,33 @@ class RegressionSerializer(serializers.HyperlinkedModelSerializer):
         model = models.Regression
 
 
+class GraphSerializer(serializers.HyperlinkedModelSerializer):
+    # rules = serializers.HyperlinkedRelatedField(view_name='graphrules-detail',
+    #                                             read_only=True,
+    #                                             many=False)
+    class Meta:
+        model = models.Graph
+
+
+class GraphVertexSerializer(serializers.HyperlinkedModelSerializer):
+    assigned_to = serializers.HyperlinkedRelatedField(
+        view_name='connect-detail',
+        queryset=models.RegisteredDevice.objects.all())
+
+    class Meta:
+        model = models.GraphVertex
+
+
+class GraphEdgeSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.GraphEdge
+
+
+class GraphParticipationRulesSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.GraphParticipationRules
+
+
 class CreatorSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()
@@ -138,7 +165,9 @@ class ClickerClassSerializer(serializers.HyperlinkedModelSerializer):
 class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
 
     classes = ClickerClassSerializer(many=True, read_only=True)
-    classes_url = serializers.HyperlinkedRelatedField(source='pk', view_name='connect-classes', read_only=True)
+    classes_url = serializers.HyperlinkedRelatedField(source='pk',
+                                                      view_name='connect-classes',
+                                                      read_only=True)
     device_id = serializers.CharField(source='pk', read_only=True)
 
     class Meta:
@@ -147,7 +176,7 @@ class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
         model = models.RegisteredDevice
         extra_kwargs = {
             'url': {
-                'view_name': 'connect-detail'
+                'view_name': 'connect-detail',
             }
         }
 

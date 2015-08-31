@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.core.serializers import serialize
+from braces import views
 
 from api import serializers
 
 from api import models
+import forms
 
 import json
 
@@ -83,3 +85,16 @@ def class_detail(request, class_name):
         'interactions_json': json.dumps(interactions),
         'username': request.user.username
     })
+
+from django.core.urlresolvers import reverse_lazy
+from django.views import generic
+from django.conf import settings
+
+class NewGraphRules(generic.CreateView, views.LoginRequiredMixin, views.FormValidMessageMixin):
+    form_class = forms.GraphRulesForm
+    model = models.GraphParticipationRules
+    template_name = 'creator/new_graph_rules.html'
+    form_valid_message = 'All information is valid.'
+
+    def get_success_url(self):
+        self.messages.success("Rule set created.")

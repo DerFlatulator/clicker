@@ -3,5 +3,9 @@ Django
 djangorestframework
 redis
 drf-nested-routers
-django[bcrypt]
+# django[bcrypt]
 drf-extensions
+pygraphviz
+pyparsing==1.5.7
+pydot
+django-extensions

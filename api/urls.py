@@ -15,16 +15,26 @@ urlpatterns = [
 view_sets = [
     views.UserViewSet,
     views.GroupViewSet,
+
     (views.ClickerClassViewSet, "class"),
     (views.ConnectionViewSet, "connect"),
+
     views.AsyncGameOfLifeViewSet,
     views.GameOfLifeViewSet,
     views.GameOfLifeCellViewSet,
+
     views.BubbleSortViewSet,
     views.BubbleSortSwapViewSet,
+
     views.RegressionViewSet,
     views.RegressionEstimateViewSet,
     views.RegressionPlotItemViewSet,
+
+    views.GraphViewSet,
+    views.GraphVertexViewSet,
+    views.GraphEdgeViewSet,
+    (views.GraphParticipationRulesViewSet, 'graphrules'),
+
     views.InteractionViewSet,
     (views.InteractionTypeViewSet, "type"),
     views.CreatorViewSet

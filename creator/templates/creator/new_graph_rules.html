@@ -1,0 +1,263 @@
+{% extends "react_app.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Graph Rules | Creator{% endblock %}
+
+{% block footer_class %}light-blue darken-3{% endblock %}
+
+{% block react_outlet %}
+<div class="row">
+    <h3>Create Graph Rule Set</h3>
+</div>
+<form method="post">
+
+
+    {% csrf_token %}
+    <div class="row">
+        <h4 class="center">Graph Structure</h4>
+
+        <div class="input-field col s12 l6 switch">
+            <div class="hint grey-text text-darken-1">Should the graph be directed?</div>
+
+            <label class="row" >
+                <div class="col s4">Undirected</div>
+                <input requiredid="id_is_directed" name="is_directed" type="checkbox" />
+                <div class="lever col s2"></div>
+                <div class="col s5">Directed</div>
+            </label>
+        </div>
+        <div class="input-field col s12 l6 switch">
+            <div class="hint grey-text text-darken-1">Should the graph allow repeated edges and loops?</div>
+
+            <label class="row">
+                <div class="col s4">Simple graph</div>
+                <input required class="checkboxinput" id="id_is_multi_graph" name="is_multi_graph" type="checkbox" />
+                <div class="lever col s2"></div>
+                <div class="col s5">Multigraph</div>
+            </label>
+        </div>
+
+        <div class="input-field col s12 l6 switch">
+            <div class="hint grey-text text-darken-1">Should the graph's vertices be weighted?</div>
+
+            <label class="row">
+                <div class="col s4">No vertex weights</div>
+                <input required class="checkboxinput" id="id_is_vertex_weighted" name="is_vertex_weighted" type="checkbox" />
+                <div class="lever col s2"></div>
+                <div class="col s5">Weighted vertices</div>
+            </label>
+        </div>
+
+        <div class="input-field col s12 l6 switch">
+            <div class="hint grey-text text-darken-1">Should the graph's edges be weighted?</div>
+
+            <label class="row">
+                <div class="col s4">No edge weights</div>
+                <input required name="is_edge_weighted" type="checkbox" />
+                <div class="lever col s2"></div>
+                <div class="col s5">Weighted edges</div>
+            </label>
+        </div>
+
+
+    </div>
+    <div class="row">
+        <h4 class="center">Client Permissions (Structural)</h4>
+
+        <div class="input-field col s12 m3 offset-m3 switch">
+            <div class="hint grey-text text-darken-1">Can add new vertices?</div>
+
+            <label for="id_client_can_add_vertex">
+                No
+                <input required id="id_client_can_add_vertex" name="client_can_add_vertex" type="checkbox" />
+                <span class="lever"></span>
+                Yes
+            </label>
+        </div>
+        <div class="input-field col s12 m6">
+            <label for="id_client_can_remove_vertex" class="required">
+                Can remove vertices
+            </label>
+            <select class="not-browser-default" id="id_client_can_remove_vertex" name="client_can_remove_vertex">
+                <option value="none" selected="selected">None</option>
+                <option value="any">Any</option>
+                <option value="own">Their vertices only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6 l3">
+            <label for="id_client_can_add_edge_from" class="required">
+                Can add edge from
+            </label>
+            <select class="not-browser-default" id="id_client_can_add_edge_from" name="client_can_add_edge_from">
+                <option value="none">No vertex</option>
+                <option value="any">Any vertex</option>
+                <option value="own" selected="selected">Their vertex only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6 l3">
+            <label for="id_client_can_add_edge_to" class="required">
+                Can add edge to
+            </label>
+            <select class="not-browser-default" id="id_client_can_add_edge_to" name="client_can_add_edge_to">
+                <option value="none">No vertex</option>
+                <option value="any" selected="selected">Any vertex</option>
+                <option value="own">Their vertex only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6 l3">
+            <label for="id_client_can_remove_edge_from" class="required">
+                Can remove edge from
+            </label>
+            <select class="not-browser-default" id="id_client_can_remove_edge_from" name="client_can_remove_edge_from">
+                <option value="none" selected="selected">No vertex</option>
+                <option value="any">Any vertex</option>
+                <option value="own">Their vertex only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6 l3">
+            <label for="id_client_can_remove_edge_to" class="required">
+                Can remove edge to
+            </label>
+            <select class="not-browser-default" id="id_client_can_remove_edge_to" name="client_can_remove_edge_to">
+                <option value="none" selected="selected">No vertex</option>
+                <option value="any">Any vertex</option>
+                <option value="own">Their vertex only</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <h4 class="center">Client Permissions (Presentational)</h4>
+
+        <div class="input-field col s12 m6">
+            <label class="required">
+                Can label vertex
+            </label>
+            <select class="not-browser-default">
+                <option value="none">None</option>
+                <option value="any">Any</option>
+                <option value="own" selected="selected">Their vertices only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6">
+            <label for="id_client_can_label_edge" class="required">
+                Can label edge
+            </label>
+            <select class="not-browser-default" id="id_client_can_label_edge" name="client_can_label_edge">
+                <option value="none" selected="selected">None</option>
+                <option value="any">Any</option>
+                <option value="own">Their edges only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6">
+            <label for="id_client_can_color_vertex" class="required">
+                Can color vertex
+            </label>
+            <select class="not-browser-default" id="id_client_can_color_vertex" name="client_can_color_vertex">
+                <option value="none" selected="selected">None</option>
+                <option value="any">Any</option>
+                <option value="own">Their vertices only</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6">
+            <label for="id_client_can_color_edge" class="required">
+                Can color edge
+            </label>
+            <select class="not-browser-default" id="id_client_can_color_edge" name="client_can_color_edge">
+                <option value="none" selected="selected">None</option>
+                <option value="any">Any</option>
+                <option value="own">Their edges only</option>
+            </select>
+        </div>
+
+    </div>
+    <div class="row">
+        <h4 class="center">Presentation Options</h4>
+
+        <div class="input-field col s12 m6">
+            <label class="required">
+                Graph layout type
+            </label>
+            <select id="id_client_can_color_vertex" name="layout_type">
+                <option value="const">Fixed edge length layout</option>
+                <option value="force">D3.js force layout</option>
+                <option value="cola" selected="selected">Monash cola.js layout</option>
+                <option value="cluster">Clustered layout</option>
+            </select>
+        </div>
+
+        <div class="input-field col s12 m6">
+            <label for="id_vertex_label_format_string" class="required">
+                Vertex label format string
+            </label>
+            <input required maxlength="20" name="vertex_label_format_string" type="text" value="{1}_{2}" />
+            <div class="hint grey-text lighten-1">Use {1} for vertex label and {2} for vertex ID.</div>
+        </div>
+
+
+        <div class="input-field col s12 m6">
+            <label for="id_edge_thickness_func" class="required">
+                Edge thickness
+            </label>
+            <select class="not-browser-default" id="id_edge_thickness_func" name="edge_thickness_func">
+                <option value="const" selected="selected">Constant Thickness</option>
+                <option value="weight">Scale by Weight</option>
+                <option value="inv_weight">Scale by (1/Weight)</option>
+            </select>
+        </div>
+        <div class="input-field col s12 m6">
+            <label for="id_vertex_radius_func" class="required">
+                Vertex radius
+            </label>
+            <select class="not-browser-default" id="id_vertex_radius_func" name="vertex_radius_func">
+                <option value="const" selected="selected">Constant Weight</option>
+                <option value="degree">Scale by Degree</option>
+                <option value="weight">Scale by Weight</option>
+                <option value="inv_weight">Scale by (1/Weight)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <h4 class="center">Pre-filled and Generated Data</h4>
+
+        <div class="input-field col s12 m6 l4">
+            <label for="id_begin_with_vertices" class="required">
+                Begin with fixed vertices (optional)
+            </label>
+            <textarea class="materialize-textarea" name="begin_with_vertices" ></textarea>
+            <div class="hint grey-text lighten-1">One vertex lable per line.</div>
+        </div>
+        <div class="input-field col s12 m6 l4">
+            <label for="id_begin_with_edges" class="required">
+                Begin with fixed edges (optional)
+            </label>
+            <textarea class="materialize-textarea" cols="40" name="begin_with_edges"></textarea>
+            <div id="hint_id_begin_with_edges" class="hint grey-text lighten-1">
+                Comma separated vertex pairs, one per line. E.g. "a,b [newline] b,c"</div>
+        </div>
+
+        <div class="input-field col s12 m6 l4">
+            <label for="id_client_num_vertices_each" class="required">
+                Generate X vertices for each client
+            </label>
+            <input required name="client_num_vertices_each" class="validate" type="number" value="1" min="0" max="12" />
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col m6 offset-m6 offset-s4">
+            <br />
+            <button class="btn-large waves-effect waves-light" type="submit" name="action">
+                Create
+
+                <i class="material-icons right">send</i>
+            </button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
+
+{% block react_js %}{# don't load React #}{% endblock %}
