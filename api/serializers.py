@@ -65,6 +65,28 @@ class GameOfLifeSerializer(serializers.HyperlinkedModelSerializer):
         model = models.GameOfLife
 
 
+class RegressionPlotPointSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.RegressionPlotItem
+
+class RegressionEstimateSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.RegressionEstimate
+
+class RegressionSerializer(serializers.HyperlinkedModelSerializer):
+    estimates = serializers.HyperlinkedRelatedField(view_name='regressionestimate-detail',
+                                                    read_only=True,
+                                                    many=True)
+    plot_items = serializers.HyperlinkedRelatedField(view_name='regressionplotitem-detail',
+                                                     read_only=True,
+                                                     many=True)
+
+    class Meta:
+        model = models.Regression
+
+
 class CreatorSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()

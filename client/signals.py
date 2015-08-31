@@ -70,6 +70,7 @@ def save_game_of_life_cell(sender, instance, **kwargs):
         'event_type': 'toggle_cell'
     }))
 
+
 @receiver(post_save, sender=Interaction, dispatch_uid="client:Interaction#post_save")
 def save_interaction(sender, instance, created, **kwargs):
     # the first save is ignored
@@ -86,22 +87,11 @@ def save_interaction(sender, instance, created, **kwargs):
     if hasattr(instance, 'gameoflife'):
         if instance.gameoflife.is_buffer:
             return
-
-        data.update(json.loads(instance.data_json))
-        if 'assignments' not in data:
-            return
-
-        # provide pks for the clients
-        # data['cell_pks'] = {}
         cells = models.GameOfLifeCell.objects.filter(game_of_life_id=data['game_of_life'])
-        # for device_id in data['assignments']:
-        #     cell = data['assignments'][device_id]
-        #     data['cell_pks'][cell_name] = cells.get(cell_name=cell_name).pk
 
-    if hasattr(instance, 'bubblesort'):
-        data.update(json.loads(instance.data_json))
-        if 'assignments' not in data:
-            return
+    data.update(json.loads(instance.data_json))
+    if 'assignments' not in data:
+        return
 
     data['instance_url'] = instance.instance_url
 

@@ -381,5 +381,4 @@ class GameOfLifeRepr extends React.Component {
     }
 }
 
-window.interactions = window.interactions || {};
-window.interactions['GameOfLife'] = GameOfLife;
+window.interactions = $.extend(window.interactions, { GameOfLife });

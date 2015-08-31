@@ -90,14 +90,9 @@ def save_interaction(sender, instance, created, **kwargs):
         if instance.gameoflife.is_buffer:
             return
 
-        data.update(json.loads(instance.data_json))
-        if 'assignments' not in data:
-            return
-
-    if hasattr(instance, 'bubblesort'):
-        data.update(json.loads(instance.data_json))
-        if 'assignments' not in data:
-            return
+    data.update(json.loads(instance.data_json))
+    if 'assignments' not in data:
+        return
 
     data['instance_url'] = instance.instance_url
 

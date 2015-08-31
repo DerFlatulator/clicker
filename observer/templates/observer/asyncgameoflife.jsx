@@ -158,5 +158,4 @@ class AsyncGameOfLife extends React.Component {
 
 }
 
-window.interactions = window.interactions || {};
-window.interactions['AsyncGameOfLife'] = AsyncGameOfLife;
+window.interactions = $.extend(window.interactions, { AsyncGameOfLife });

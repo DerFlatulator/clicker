@@ -22,6 +22,9 @@ view_sets = [
     views.GameOfLifeCellViewSet,
     views.BubbleSortViewSet,
     views.BubbleSortSwapViewSet,
+    views.RegressionViewSet,
+    views.RegressionEstimateViewSet,
+    views.RegressionPlotItemViewSet,
     views.InteractionViewSet,
     (views.InteractionTypeViewSet, "type"),
     views.CreatorViewSet

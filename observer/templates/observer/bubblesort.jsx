@@ -154,5 +154,4 @@ class BubbleSortCaption extends React.Component {
     }
 }
 
-window.interactions = window.interactions || {};
-window.interactions['BubbleSort'] = BubbleSort;
+window.interactions = $.extend(window.interactions, { BubbleSort });

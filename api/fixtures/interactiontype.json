@@ -22,5 +22,13 @@
       "slug_name": "asyncgameoflife",
       "long_name": "Asynchronous Game of Life"
     }
+  },
+  {
+    "model": "api.interactiontype",
+    "pk": 4,
+    "fields": {
+      "slug_name": "regression",
+      "long_name": "Linear Regression"
+    }
   }
 ]
