@@ -47,8 +47,6 @@
                 {% endblock %}
             </div>
         </div>
-        <div class="footer-copyright">
-        </div>
     </footer>
 {% endblock %}
 {% block scripts %}
@@ -71,6 +69,7 @@
             $('.modal-trigger').leanModal();
             $('.tooltip').tooltip({delay: 50});
             $('select').material_select();
+            $('input.late-counter, textarea.late-counter').characterCounter();
         });
 
     {% if messages %}

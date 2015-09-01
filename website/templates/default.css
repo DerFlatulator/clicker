@@ -33,6 +33,18 @@ span.caret {
     width: 40px !important;
 }
 
+.dropdown-content, .dropdown-content li {
+    z-index: 3 !important; /*Needs to be above .btn */
+}
+
+.btn, .btn-large {
+    z-index: 2 !important;
+}
+
+.tab a {
+    text-overflow: ellipsis;
+}
+
 .largeIcon {
     font-size: 6rem;
 }

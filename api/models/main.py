@@ -23,6 +23,9 @@ class ClickerClass(models.Model):
 class Creator(models.Model):
     user = models.OneToOneField(User)
 
+    def __unicode__(self):
+        return str('Creator: ' + self.user.username)
+
 
 class InteractionType(models.Model):
     slug_name = models.SlugField()

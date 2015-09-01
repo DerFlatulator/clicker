@@ -117,6 +117,15 @@ class GraphParticipationRules(models.Model):
         (WEIGHT_INV, 'Scale by (1/Weight)'),
     )
 
+    # relations
+
+    interaction_type = models.OneToOneField('InteractionType', related_name='graph_rulesets')
+    creator = models.ForeignKey('Creator', related_name='graph_rules')
+
+    # meta
+
+    description = models.TextField(default='', blank=True, max_length=500)
+
     # graph layout
 
     layout_type = models.CharField(default=COLA, choices=_LAYOUT_TYPES, max_length=10)
@@ -132,10 +141,12 @@ class GraphParticipationRules(models.Model):
     # initial graph
 
     begin_with_vertices = models.TextField(
+        blank=True,
         default='',
         help_text='Comma separated list of vertex labels. E.g. "a,b,c,d"')
 
     begin_with_edges = models.TextField(
+        blank=True,
         default='',
         help_text='Comma separated vertex pairs, one per line. E.g. "a,b [newline] b,c"')
 

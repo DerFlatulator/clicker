@@ -1,12 +1,17 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import render
+from django.contrib import auth, messages
 from django.core.serializers import serialize
+from django.core.urlresolvers import reverse_lazy
+from django.views import generic
+from django.conf import settings
+
 from braces import views
 
 from api import serializers
-
 from api import models
-import forms
 
+import forms
 import json
 
 
@@ -86,15 +91,71 @@ def class_detail(request, class_name):
         'username': request.user.username
     })
 
-from django.core.urlresolvers import reverse_lazy
-from django.views import generic
-from django.conf import settings
 
-class NewGraphRules(generic.CreateView, views.LoginRequiredMixin, views.FormValidMessageMixin):
+def simple(s):
+    import string, random
+    out = ""
+    for c in s:
+        if c == '_':
+            out += c
+        if c in string.ascii_lowercase or c in string.digits:
+            out += c
+    if out == '':
+        out = str(random.random())[2:]
+    return out
+
+def gen_slug(long_name):
+    return "graph"
+    # return simple(str(long_name).strip().replace(' ', '_').lower())[:100]
+
+class NewGraphRules(generic.CreateView,
+                    views.LoginRequiredMixin,
+                    views.FormValidMessageMixin):
     form_class = forms.GraphRulesForm
     model = models.GraphParticipationRules
     template_name = 'creator/new_graph_rules.html'
     form_valid_message = 'All information is valid.'
 
+    # def dispatch(self, request, **kwargs):
+    #     return super(NewGraphRules, self).dispatch(request, **kwargs)
+
+    def form_valid(self, form):
+        name = str(form.data['long_name'])
+        slug_name = gen_slug(name)
+
+        it = models.InteractionType(long_name=name, slug_name=slug_name)
+        try:
+            it.clean_fields()
+            it.save()
+            form.instance.interaction_type = it
+            self.object = form.save(commit=False)
+        except ValidationError:
+            self.messages.error("Failed to save interaction type")
+            return super(NewGraphRules, self).form_invalid(form)
+
+        try:
+            self.object.clean_fields()
+            self.object.save()
+            self.messages.success("Created graph ruleset")
+            return super(NewGraphRules, self).form_valid(form)
+        except ValidationError:
+            self.messages.error("Failed to save graph ruleset")
+            return super(NewGraphRules, self).form_valid(form)
+
+    def post(self, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+
+        if self.request.user is not None and hasattr(self.request.user, 'creator'):
+            form.instance.creator = self.request.user.creator
+        else:
+            self.messages.error("You are not logged in!")
+            return self.form_invalid(form)
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
     def get_success_url(self):
-        self.messages.success("Rule set created.")
+        return reverse_lazy('creator')
