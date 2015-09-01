@@ -119,11 +119,14 @@ class GraphParticipationRules(models.Model):
 
     # relations
 
-    interaction_type = models.OneToOneField('InteractionType', related_name='graph_rulesets')
-    creator = models.ForeignKey('Creator', related_name='graph_rules')
+    interaction_type = models.ForeignKey('InteractionType',
+                                         related_name='graph_rulesets')
+    creator = models.ForeignKey('Creator',
+                                related_name='graph_rules')
 
     # meta
 
+    title = models.TextField(max_length=100)
     description = models.TextField(default='', blank=True, max_length=500)
 
     # graph layout

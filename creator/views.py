@@ -116,22 +116,10 @@ class NewGraphRules(generic.CreateView,
     template_name = 'creator/new_graph_rules.html'
     form_valid_message = 'All information is valid.'
 
-    # def dispatch(self, request, **kwargs):
-    #     return super(NewGraphRules, self).dispatch(request, **kwargs)
-
     def form_valid(self, form):
-        name = str(form.data['long_name'])
-        slug_name = gen_slug(name)
-
-        it = models.InteractionType(long_name=name, slug_name=slug_name)
-        try:
-            it.clean_fields()
-            it.save()
-            form.instance.interaction_type = it
-            self.object = form.save(commit=False)
-        except ValidationError:
-            self.messages.error("Failed to save interaction type")
-            return super(NewGraphRules, self).form_invalid(form)
+        it = models.InteractionType.objects.get(slug_name='graph')
+        form.instance.interaction_type = it
+        self.object = form.save(commit=False)
 
         try:
             self.object.clean_fields()

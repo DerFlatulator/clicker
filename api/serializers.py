@@ -90,10 +90,19 @@ class RegressionSerializer(serializers.HyperlinkedModelSerializer):
         model = models.Regression
 
 
+class GraphParticipationRulesSerializer(serializers.HyperlinkedModelSerializer):
+    interaction_type = InteractionTypeSerializer(read_only=True)
+    creator = serializers.SlugRelatedField(slug_field='username',
+                                           read_only=True,
+                                           source='creator.user')
+
+    class Meta:
+        model = models.GraphParticipationRules
+        extra_kwargs = {'url': {'view_name': 'graphrules-detail'}}
+
+
 class GraphSerializer(serializers.HyperlinkedModelSerializer):
-    # rules = serializers.HyperlinkedRelatedField(view_name='graphrules-detail',
-    #                                             read_only=True,
-    #                                             many=False)
+    rules = GraphParticipationRulesSerializer(read_only=True)
     class Meta:
         model = models.Graph
 
@@ -127,17 +136,6 @@ class InteractionGeneratorSerializer(serializers.HyperlinkedModelSerializer):
         model = models.Interaction
 
 
-class GraphParticipationRulesSerializer(serializers.HyperlinkedModelSerializer):
-    interaction_type = InteractionTypeSerializer(read_only=True)
-    creator = serializers.SlugRelatedField(slug_field='username',
-                                           read_only=True,
-                                           source='creator.user')
-
-    class Meta:
-        model = models.GraphParticipationRules
-        extra_kwargs = {'url': {'view_name': 'graphrules-detail'}}
-
-
 class CreatorSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
@@ -146,17 +144,6 @@ class CreatorSerializer(serializers.ModelSerializer):
 
 
 # noinspection PyAbstractClass
-# class GenericRelatedFieldSerializer(serializers.RelatedField):
-#     def to_representation(self, value):
-#         if isinstance(value, models.GameOfLife):
-#             serializer = GameOfLifeSerializer(value)
-#         elif isinstance(value, models.BubbleSort):
-#             serializer = BubbleSortSerializer(value)
-#         else:
-#             raise Exception('Unexpected type of generic related object')
-#
-#         return serializer.data
-
 class CreatorNameSerializer(serializers.RelatedField):
     def to_representation(self, value):
         if isinstance(value, models.Creator):
@@ -216,22 +203,3 @@ class ConnectionSerializer(serializers.HyperlinkedModelSerializer):
         read_only = ('device_id',)
         model = models.RegisteredDevice
         extra_kwargs = {'url': {'view_name': 'connect-detail', }}
-
-#
-# class ContentTypeField(serializers.WritableField):
-#     def field_from_native(self, data, files, field_name, into):
-#         into[field_name] = self.from_native(data[field_name])
-#
-#     def from_native(self, data):
-#         app_label, model = data.split('.')
-#         return ContentType.objects.get(app_label=app_label, model=model)
-#
-#     # If content_type is write_only, there is no need to have
-# field_to_native here.
-#     def field_to_native(self, obj, field_name):
-#         if self.write_only:
-#             return None
-#         if obj is None:
-#             return self.empty
-#         ct = getattr(obj, field_name)
-#         return '.'.join(ct.natural_key())

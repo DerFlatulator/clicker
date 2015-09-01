@@ -32,8 +32,7 @@ class InteractionType(models.Model):
     long_name = models.CharField(max_length=100, default='')
 
     def __unicode__(self):
-        return self.long_name
-
+        return '[{}] {}'.format(self.slug_name, self.long_name)
 
 class Interaction(models.Model):
     READY = 'R'

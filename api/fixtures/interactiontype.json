@@ -30,5 +30,13 @@
       "slug_name": "regression",
       "long_name": "Linear Regression"
     }
+  },
+  {
+    "model": "api.interactiontype",
+    "pk": 5,
+    "fields": {
+      "slug_name": "graph",
+      "long_name": "Graph"
+    }
   }
 ]
