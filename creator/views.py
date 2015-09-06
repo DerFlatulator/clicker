@@ -48,6 +48,7 @@ def class_detail(request, class_name):
     cls_model = models.ClickerClass.objects.get(class_name=class_name)
     interactions_model = cls_model.interactions.all()
     types_model = models.InteractionType.objects.all()
+    all_rules = models.GraphParticipationRules.objects.all()
 
     cls = {
         'class_name': cls_model.class_name,
@@ -59,6 +60,11 @@ def class_detail(request, class_name):
     interactions = serializers.InteractionSerializer(interactions_model,
                                                      many=True,
                                                      context={'request': request}).data
+
+    rules = serializers.GraphParticipationRulesSerializer(all_rules,
+                                                          many=True,
+                                                          context={'request': request}).data
+
     for interaction in interactions:
         obj = interaction.pop('bubblesort', None)
         obj = interaction.pop('gameoflife', obj)
@@ -86,6 +92,7 @@ def class_detail(request, class_name):
         'class': cls,
         'class_json': json.dumps(cls),
         'interactions': interactions,
+        'graph_rulesets_json': json.dumps(rules),
         'interaction_types_json': json.dumps(types),
         'interactions_json': json.dumps(interactions),
         'username': request.user.username

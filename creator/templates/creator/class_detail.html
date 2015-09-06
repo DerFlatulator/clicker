@@ -28,7 +28,8 @@
             user: "{{ username }}",
             clicker_class: {{ class_json |safe }},
             interactions: {{ interactions_json |safe }},
-            types: {{ interaction_types_json |safe }}
+            types: {{ interaction_types_json |safe }},
+            graph_rulesets: {{ graph_rulesets_json |safe}}
         };
     </script>
     <script type="text/javascript" src="{% static "js/creator/class_detail.bundle.js" %}"></script>

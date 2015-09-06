@@ -17,18 +17,13 @@ class CreatorDetail extends React.Component {
             waiting: false,
             clickerClass: this.props.clicker_class,
             selectedItem: '*',
+            graphRulesItem: '*',
             selectedItemName: '',
             interactions: this.props.interactions
         };
-        this.createInteraction = this.createInteraction.bind(this);
-        this.onInteractionCreated = this.onInteractionCreated.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.deleteInteraction = this.deleteInteraction.bind(this);
-        this.onInteractionDeleted = this.onInteractionDeleted.bind(this);
-        this.reload = this.reload.bind(this);
     }
 
-    createInteraction(interaction_type) {
+    createInteraction = (interaction_type) => {
         if (this.state.waiting)
             return;
 
@@ -37,20 +32,28 @@ class CreatorDetail extends React.Component {
         if (this.state.selectedItem === '*')
             return;
 
+        var item = this.state.selectedItem;
+
+        var data = {
+            class_name: this.props.class_name,
+            interaction_slug: item
+        };
+
+        if (item === 'graph') {
+            data.rules_url = this.state.graphRulesItem;
+        }
+
         $.ajax({
             url: `/api/${this.state.selectedItem}/generate/`,
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                class_name: this.props.class_name,
-                interaction_slug: this.state.selectedItem
-            }),
+            data: JSON.stringify(data),
             success: this.onInteractionCreated,
             error: console.error.bind(console)
         });
-    }
+    };
 
-    deleteInteraction(url, event) {
+    deleteInteraction = (url, event) => {
         $.ajax({
             url,
             method: 'DELETE',
@@ -58,16 +61,15 @@ class CreatorDetail extends React.Component {
             success: this.onInteractionDeleted,
             error: console.error.bind(console)
         });
-    }
+    };
 
-    reload() {
+    reload = () => {
         $.getJSON(`/api/interaction/?creator=${this.props.user}`, (data) => {
             this.setState({
                 interactions: data.results
             });
         })
-    }
-
+    };
 
     componentDidMount() {
         $('select').material_select();
@@ -77,7 +79,7 @@ class CreatorDetail extends React.Component {
         $('.tooltip').tooltip();
     }
 
-    handleChange(event) {
+    handleChange = (event) => {
 
         var name = this.props.types.map(type => {
             if (type.slug_name === event.target.value)
@@ -89,20 +91,26 @@ class CreatorDetail extends React.Component {
             selectedItemName: name
         });
 
-    }
+    };
 
-    onInteractionCreated(data) {
+    handleRulesChange = (event) => {
+        this.setState({
+            graphRulesItem: event.target.value
+        });
+    };
+
+    onInteractionCreated = (data) => {
         console.log(data);
         this.setState({waiting: false});
 
         this.reload();
-    }
+    };
 
-    onInteractionDeleted(data) {
+    onInteractionDeleted = (data) => {
         console.log(data);
 
         this.reload();
-    }
+    };
 
     clearDevices = () => {
         $.ajax({
@@ -125,6 +133,26 @@ class CreatorDetail extends React.Component {
         var buttonClasses = classNames('waves-effect waves-light btn-large', {
             'disabled': this.state.waiting
         });
+
+        var graphTypes = <span></span>;
+
+        if (this.state.selectedItem === 'graph') {
+            graphTypes = <select defaultValue='*'
+                                 className="browser-default"
+                                 onChange={this.handleRulesChange}>
+                <option value="*" disabled>Choose graph rule set</option>
+
+                {this.props.graph_rulesets.map(rules => {
+                    return (
+                        <option
+                            key={rules.url}
+                            value={rules.url}>
+                            {rules.title}
+                        </option>
+                    );
+                })}
+            </select>
+        }
 
         return (
             <div className={'card-panel'}>
@@ -206,7 +234,10 @@ class CreatorDetail extends React.Component {
                                     </option>
                                    );
                                 })}
+
                             </select>
+
+                            {graphTypes}
                         </div>
                         <div className="col s12 m4">
                             <a onClick={this.createInteraction} className={buttonClasses}>
@@ -234,6 +265,7 @@ let run = function () {
                        clicker_class={$context.clicker_class}
                        types={$context.types}
                        interactions={$context.interactions}
+                       graph_rulesets={$context.graph_rulesets}
                        date={new Date()}/>,
         document.getElementById('react-main')
     );

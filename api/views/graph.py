@@ -1,4 +1,6 @@
 import json
+from django.core.urlresolvers import resolve
+from django.utils.six.moves.urllib.parse import urlparse
 
 from rest_framework import status
 from rest_framework import viewsets
@@ -32,14 +34,16 @@ class GraphViewSet(InteractionGeneratorViewSet):
 
         interaction_type = self.get_interaction_type()
 
-        title = data.get('rules_title', None)
+        rules = data.get('rules_url', None)
 
-        if not title:
-            return Response({'detail': 'rules_title not provided'},
+        if not rules:
+            return Response({'detail': 'rules_url not provided'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        rules = get_object_or_404(interaction_type.graph_rulesets,
-                                  title=title)
+        path = urlparse(rules).path
+        pk = resolve(path).kwargs['pk']
+        rules = get_object_or_404(models.GraphParticipationRules.objects,
+                                  pk=pk)
 
         graph = models.Graph(interaction=interaction,
                              rules=rules)
