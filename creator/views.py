@@ -154,3 +154,7 @@ class NewGraphRules(generic.CreateView,
 
     def get_success_url(self):
         return reverse_lazy('creator')
+
+
+def create_graph_rules(request):
+    return render(request, 'creator/create_graph.html', {})

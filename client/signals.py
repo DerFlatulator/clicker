@@ -87,7 +87,7 @@ def save_interaction(sender, instance, created, **kwargs):
     if hasattr(instance, 'gameoflife'):
         if instance.gameoflife.is_buffer:
             return
-        cells = models.GameOfLifeCell.objects.filter(game_of_life_id=data['game_of_life'])
+        # cells = models.GameOfLifeCell.objects.filter(game_of_life_id=data['game_of_life'])
 
     data.update(json.loads(instance.data_json))
     if 'assignments' not in data:

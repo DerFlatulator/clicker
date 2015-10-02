@@ -21,7 +21,6 @@ var rename = require('gulp-rename');
 var bower = require('gulp-bower');
 var livereload = require('gulp-livereload');
 
-
 var apps_glob =  '+(creator|observer|client|website)';
 
 var globs = {

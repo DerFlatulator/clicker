@@ -101,12 +101,6 @@ class GraphParticipationRulesSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {'url': {'view_name': 'graphrules-detail'}}
 
 
-class GraphSerializer(serializers.HyperlinkedModelSerializer):
-    rules = GraphParticipationRulesSerializer(read_only=True)
-    class Meta:
-        model = models.Graph
-
-
 class GraphVertexSerializer(serializers.HyperlinkedModelSerializer):
     assigned_to = serializers.HyperlinkedRelatedField(
         view_name='connect-detail',
@@ -119,6 +113,16 @@ class GraphVertexSerializer(serializers.HyperlinkedModelSerializer):
 class GraphEdgeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.GraphEdge
+
+
+class GraphSerializer(serializers.HyperlinkedModelSerializer):
+    rules = GraphParticipationRulesSerializer(read_only=True)
+    vertices = GraphVertexSerializer(read_only=True, many=True)
+    edges = GraphEdgeSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = models.Graph
+
 
 
 class InteractionGeneratorSerializer(serializers.HyperlinkedModelSerializer):

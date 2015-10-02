@@ -1,3 +1,26 @@
 .creator {
     /* test */
 }
+
+.no-margin {
+    margin: 0;
+}
+
+.modal {
+    /*
+    position: static !important;
+    left: 0 !important;
+    width: 90% !important;
+    height: 100vh !important;
+    max-height: 50vh !important;
+    z-index: 100000 !important;
+    */
+}
+
+.button-row {
+    padding: 5px;
+    text-align: right;
+}
+
+.modal.modal-fixed-footer .modal-content {
+}

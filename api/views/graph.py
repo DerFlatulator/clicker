@@ -49,8 +49,28 @@ class GraphViewSet(InteractionGeneratorViewSet):
                              rules=rules)
         graph.save()
 
+        class_name = data['class_name']
+        clicker_class = models.ClickerClass.objects.get(class_name=class_name)
+        clients = clicker_class.registereddevice_set.all()
+
+        vertices = {}
+        index = 0
+        for client in clients:
+            v = models.GraphVertex(
+                is_assigned=True,
+                label="vertex #" + str(index),
+                graph=graph,
+                assigned_to=client,
+                index=index
+            )
+            index += 1
+            v.save()
+            vertices[client.device_id] = str(reverse_lazy('graphvertex-detail', args=[v.id]))
+
         interaction_data = {
-            'assignments': {},
+            'assignments': {
+                'vertices': vertices
+            },
             'urls': {
                 'source': str(reverse_lazy('graph-detail', args=[graph.id])),
             },

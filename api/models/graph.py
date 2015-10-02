@@ -25,11 +25,13 @@ class GraphVertex(models.Model):
     """
 
     is_assigned = models.BooleanField(default=False)
+    index = models.IntegerField(null=False, default=0)
     weight = models.IntegerField(default=1)
     border_color = models.CharField(default='black', max_length=50)
     background_color = models.CharField(default='grey', max_length=50)
     label = models.CharField(null=True, max_length=20)
     graph = models.ForeignKey(Graph, related_name='vertices')
+    deleted = models.BooleanField(default=False)
 
     assigned_to = models.ForeignKey('RegisteredDevice',
                                     null=True,

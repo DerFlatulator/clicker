@@ -7,7 +7,8 @@ import redis
 import json
 from rest_framework.reverse import reverse_lazy
 
-from api.models import BubbleSortSwap, GameOfLifeCell, Interaction, GameOfLife
+from api.models import BubbleSortSwap, GameOfLifeCell, Interaction, \
+    GameOfLife, GraphVertex, GraphEdge
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -98,4 +99,36 @@ def save_interaction(sender, instance, created, **kwargs):
 
     channel = '{}.observer'.format(class_name)
     print "Publishing to redis:{}".format(channel)
+    r.publish(channel, json.dumps(data))
+
+
+@receiver(post_save, sender=GraphVertex, dispatch_uid="observer:GraphVertex#post_save")
+def save_graph_vertex(sender, instance, created, **kwargs):
+
+    class_name = instance.graph.interaction.clicker_class.class_name
+    data = {'event_type': 'label_vertex',
+            'label': instance.label,
+            'graph': instance.graph_id,
+            'index': instance.index}
+
+    channel = 'graph.{}.observer'.format(class_name)
+    print "Publising to redis:{}".format(channel)
+    r.publish(channel, json.dumps(data))
+
+
+@receiver(post_save, sender=GraphEdge, dispatch_uid="observer:GraphEdge#post_save")
+def save_graph_edge(sender, instance, created, **kwargs):
+    if not created:
+        pass
+
+    # only continue if we're dealing with a fresh instance
+    class_name = instance.graph.interaction.clicker_class.class_name
+    data = {'event_type': 'add_edge',
+            'source': instance.source.index,
+            'target': instance.target.index,
+            'graph': instance.graph_id,
+            'label': instance.label}
+
+    channel = 'graph.{}.observer'.format(class_name)
+    print "Publising to redis:{}".format(channel)
     r.publish(channel, json.dumps(data))
