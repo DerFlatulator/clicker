@@ -42,18 +42,7 @@ class Graph extends React.Component {
                 console.error(xhr, status, err.toString());
             }
         });
-
-        // get all vertices, edges
-        $.getJSON(this.props.urls.source, ({ vertices, edges }) => {
-            this.setState({
-                vertices: vertices,
-                edges: edges,
-                loadedAllVertices: true
-            });
-            if (this.state.loadedVertex)
-                this.setState({ loaded: true });
-
-        });
+        this.syncEdges();
     }
 
     vertexFromLabel(label) {
@@ -100,7 +89,18 @@ class Graph extends React.Component {
             dataType: 'json',
             success: this.submitEdgeDone,
             error: (xhr, status, err) => {
-                console.error(this.state.vertex_url, status, err.toString());
+                if (xhr.status === 400) {
+                    var resp = xhr.responseJSON;
+                    console.log(resp);
+                    resp.non_field_errors.forEach((err) =>
+                        Materialize.toast(err, 2000, 'red'));
+
+                    this.setState({
+                        buttonEnabled: true
+                    });
+                } else {
+                    console.error(this.state.vertex_url, status, err.toString());
+                }
             }
         });
 
@@ -125,10 +125,47 @@ class Graph extends React.Component {
             dataType: 'json',
             success: this.submitLabelDone,
             error: (xhr, status, err) => {
-                console.error(this.state.vertex_url, status, err.toString());
+
+                if (xhr.status === 400) {
+                    var resp = xhr.responseJSON;
+                    for (var key in resp) {
+                        switch (key) {
+                            case 'label':
+                                Materialize.toast(resp[key], 3000, 'red');
+                                this.state.vertex.label = this.state.vertex._label;
+                                field.value = this.state.vertex.label;
+                                break;
+                        }
+                    }
+                    this.setState({
+                        buttonEnabled: true
+                    });
+
+                } else {
+                    console.error(this.state.vertex_url, status, err.toString());
+                }
             }
         });
 
+    };
+
+    syncEdges = (e) => {
+        // get all vertices, edges
+        this.setState({
+            buttonEnabled: false
+        });
+
+        $.getJSON(this.props.urls.source, ({ vertices, edges }) => {
+            this.setState({
+                vertices: vertices,
+                edges: edges,
+                loadedAllVertices: true,
+                buttonEnabled: true
+            });
+            if (!this.state.loaded && this.state.loadedVertex)
+                this.setState({ loaded: true });
+
+        });
     };
 
     submitLabelDone = () => {
@@ -154,8 +191,11 @@ class Graph extends React.Component {
     }
 
     componentDidUpdate() {
-        if (!$('#select_edge_to').hasClass("initialized"))
-            $('#select_edge_to').material_select();
+        if ($('#select_edge_to').hasClass("initialized"))
+            $('#select_edge_to').material_select('destroy');
+
+        $('#select_edge_to').material_select();
+        $('.select-wrapper').siblings('.caret').remove();
     }
 
     renderForm() {
@@ -182,15 +222,23 @@ class Graph extends React.Component {
             <div className='input-field col s12 m6'>
                 <label>Add Edge From '{vertexLabel}' To...</label>
                 {/*<input type="text" ref="edge_to" />*/}
-                <select id="select_edge_to" ref="select_edge_to"
-                    value={this.state.vertices[0].index}>
-                    {this.state.vertices.map((v) =>{
-                        if (v.index !== vertexIndex)
-                            return <option key={v.index} value={v.index}>{v.label}</option>;
-                        }
-                    )}
-                </select>
-
+                <div className="">
+                    <div className="col m10 s9">
+                        <select id="select_edge_to" ref="select_edge_to"
+                            value={this.state.vertices.length ? this.state.vertices[0].index : -1}>
+                            {this.state.vertices.map((v) =>{
+                                if (v.index !== vertexIndex)
+                                    return <option key={v.index} value={v.index}>{v.label}</option>;
+                                }
+                            )}
+                        </select>
+                    </div>
+                    <div className="col m2 s3">
+                        <button onClick={this.syncEdges} className={btnClasses}>
+                            <i className="material-icons">sync</i>
+                        </button>
+                    </div>
+                </div>
                 <button onClick={this.submitEdge} className={btnClasses}>
                     <i className="material-icons right">send</i>
                     Create Edge

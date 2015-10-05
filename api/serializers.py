@@ -106,11 +106,47 @@ class GraphVertexSerializer(serializers.HyperlinkedModelSerializer):
         view_name='connect-detail',
         queryset=models.RegisteredDevice.objects.all())
 
+    def validate_label(self, label):
+        matches = self.instance.graph.vertices.filter(label=label)
+
+        actual = models.GraphVertex.objects.get(id=self.instance.id)
+
+        if actual.label == label:
+            raise serializers.ValidationError('No change')
+
+        if len(matches) and matches[0].id != self.instance.id:
+            raise serializers.ValidationError('This label already exists')
+        return label
+
     class Meta:
         model = models.GraphVertex
 
 
 class GraphEdgeSerializer(serializers.HyperlinkedModelSerializer):
+    def validate(self, data):
+        source = data['source']
+        target = data['target']
+        graph = data['graph']
+        rules = graph.rules
+
+        if rules.is_multi_graph:
+            return
+
+        matches = models.GraphEdge.objects.filter(graph=graph,
+                                                  source=source,
+                                                  target=target)
+
+        rev_matches = models.GraphEdge.objects.filter(graph=graph,
+                                                      source=target,
+                                                      target=source)
+
+        if len(matches) or (not rules.is_directed and len(rev_matches)):
+            raise serializers.ValidationError('This edge already exists')
+
+        #    raise serializers.ValidationError(
+        #        {'target': 'Must be a valid index'})
+        return data
+
     class Meta:
         model = models.GraphEdge
 
