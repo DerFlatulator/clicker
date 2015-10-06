@@ -15,7 +15,7 @@ class BaseComponent extends React.Component {
 class Storage {
     static _handleError (ex) {
         if (ex instanceof DOMException) {
-            if ('__proto__' in ex && SECURITY_ERR in ex.__proto__) {
+            if ('__proto__' in ex && 'SECURITY_ERR' in ex.__proto__) {
                 if (ex.code === ex.__proto__.SECURITY_ERR) {
                     alert("Your browser doesn't support cookies.\n" +
                           "Enable cookies from your device settings, and " +

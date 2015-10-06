@@ -1,6 +1,6 @@
 digraph model_graph {
   // Dotfile by Django-Extensions graph_models
-  // Created: 2015-08-31 12:02
+  // Created: 2015-10-06 04:07
   // Cli Options: api
 
   fontname = "Helvetica"
@@ -535,6 +535,12 @@ digraph model_graph {
     </TD></TR>
   
     <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica Bold">assigned_to</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica Bold">ForeignKey (device_id)</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Helvetica Bold">graph</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Helvetica Bold">ForeignKey (id)</FONT>
@@ -550,6 +556,18 @@ digraph model_graph {
     <FONT FACE="Helvetica ">border_color</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Helvetica ">CharField</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">deleted</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">BooleanField</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT FACE="Helvetica ">index</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT FACE="Helvetica ">IntegerField</FONT>
     </TD></TR>
   
     <TR><TD ALIGN="LEFT" BORDER="0">
@@ -639,6 +657,30 @@ digraph model_graph {
     </TD></TR>
   
     <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT FACE="Helvetica Bold">creator</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT FACE="Helvetica Bold">ForeignKey (id)</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT FACE="Helvetica Bold">interaction_type</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT FACE="Helvetica Bold">ForeignKey (id)</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">begin_with_edges</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">TextField</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">begin_with_vertices</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">TextField</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Helvetica ">client_can_add_edge_from</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Helvetica ">CharField</FONT>
@@ -705,6 +747,12 @@ digraph model_graph {
     </TD></TR>
   
     <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">description</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT COLOR="#7B7B7B" FACE="Helvetica ">TextField</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Helvetica ">edge_thickness_func</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Helvetica ">CharField</FONT>
@@ -744,6 +792,12 @@ digraph model_graph {
     <FONT FACE="Helvetica ">layout_type</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Helvetica ">CharField</FONT>
+    </TD></TR>
+  
+    <TR><TD ALIGN="LEFT" BORDER="0">
+    <FONT FACE="Helvetica ">title</FONT>
+    </TD><TD ALIGN="LEFT">
+    <FONT FACE="Helvetica ">TextField</FONT>
     </TD></TR>
   
     <TR><TD ALIGN="LEFT" BORDER="0">
@@ -829,6 +883,9 @@ digraph model_graph {
   api_models_graph_GraphVertex -> api_models_graph_Graph
   [label="graph (vertices)"] [arrowhead=none, arrowtail=dot, dir=both];
 
+  api_models_graph_GraphVertex -> api_models_main_RegisteredDevice
+  [label="assigned_to (graph_vertices)"] [arrowhead=none, arrowtail=dot, dir=both];
+
   api_models_graph_GraphEdge -> api_models_graph_Graph
   [label="graph (edges)"] [arrowhead=none, arrowtail=dot, dir=both];
 
@@ -838,11 +895,11 @@ digraph model_graph {
   api_models_graph_GraphEdge -> api_models_graph_GraphVertex
   [label="target (target_edges)"] [arrowhead=none, arrowtail=dot, dir=both];
 
-  api_models_graph_GraphParticipationRules -> api_models_graph_GraphVertex
-  [label="begin_with_vertices (rules)"] [arrowhead=dot arrowtail=dot, dir=both];
+  api_models_graph_GraphParticipationRules -> api_models_main_InteractionType
+  [label="interaction_type (graph_rulesets)"] [arrowhead=none, arrowtail=dot, dir=both];
 
-  api_models_graph_GraphParticipationRules -> api_models_graph_GraphEdge
-  [label="begin_with_edges (rules)"] [arrowhead=dot arrowtail=dot, dir=both];
+  api_models_graph_GraphParticipationRules -> api_models_main_Creator
+  [label="creator (graph_rules)"] [arrowhead=none, arrowtail=dot, dir=both];
 
 }
 

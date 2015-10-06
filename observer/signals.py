@@ -86,7 +86,10 @@ def save_interaction(sender, instance, created, **kwargs):
 
     class_name = instance.clicker_class.class_name
 
-    data = {'event_type': 'new_interaction'}
+    data = {'event_type': 'new_interaction',
+            'class_name': class_name,
+            'interaction_id': instance.id}
+
     if hasattr(instance, 'gameoflife'):
         if instance.gameoflife.is_buffer:
             return

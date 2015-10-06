@@ -53,7 +53,18 @@ class GraphViewSet(InteractionGeneratorViewSet):
         clicker_class = models.ClickerClass.objects.get(class_name=class_name)
         clients = clicker_class.registereddevice_set.all()
 
-        vertices = {}
+        interaction_data = {
+            'assignments': {
+                #'vertices': vertices
+            },
+            'urls': {
+                'source': str(reverse_lazy('graph-detail', args=[graph.id])),
+            },
+            'interaction': interaction.id,
+            'instance_script': '/static/js/:type:/graph.bundle.js',
+            'instance_component_name': 'Graph'
+        }
+
         index = 0
         for client in clients:
             v = models.GraphVertex(
@@ -65,19 +76,11 @@ class GraphViewSet(InteractionGeneratorViewSet):
             )
             index += 1
             v.save()
-            vertices[client.device_id] = str(reverse_lazy('graphvertex-detail', args=[v.id]))
+            if client.device_id not in interaction_data['assignments']:
+                interaction_data['assignments'][client.device_id] = {}
 
-        interaction_data = {
-            'assignments': {
-                'vertices': vertices
-            },
-            'urls': {
-                'source': str(reverse_lazy('graph-detail', args=[graph.id])),
-            },
-            'interaction': interaction.id,
-            'instance_script': '/static/js/:type:/graph.bundle.js',
-            'instance_component_name': 'Graph'
-        }
+            interaction_data['assignments'][client.device_id]['vertices'] \
+                = [str(reverse_lazy('graphvertex-detail', args=[v.id]))]
 
         interaction.data_json = json.dumps(interaction_data)
         interaction.save()

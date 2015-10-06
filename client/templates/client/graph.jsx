@@ -17,7 +17,7 @@ class Graph extends React.Component {
             loaded: false,
             vertices: [],
             vertex: null,
-            vertex_url: props.assignments.vertices[props.deviceId]
+            vertex_url: props.assignments[props.deviceId].vertices[0]
         };
     }
 
@@ -226,7 +226,7 @@ class Graph extends React.Component {
                     <div className="col m10 s9">
                         <select id="select_edge_to" ref="select_edge_to"
                             value={this.state.vertices.length ? this.state.vertices[0].index : -1}>
-                            {this.state.vertices.map((v) =>{
+                            {this.state.vertices.map((v) => {
                                 if (v.index !== vertexIndex)
                                     return <option key={v.index} value={v.index}>{v.label}</option>;
                                 }

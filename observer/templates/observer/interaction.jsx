@@ -10,7 +10,7 @@ class Interaction extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            interaction_url: null,
+            interaction_id: -1,
             assignments: [],
             instance_url: null,
             instance_script_path: null,
@@ -40,7 +40,9 @@ class Interaction extends React.Component {
             //console.log(message);
 
             let data = JSON.parse(message);
-            if (data.event_type === 'new_interaction') {
+            if (data.event_type === 'new_interaction'
+             && data.class_name === $context.class_name
+             && data.interaction_id !== this.state.interaction_id) {
                 this.setCurrentInteraction({data_json: message});
             }
         });
@@ -70,7 +72,7 @@ class Interaction extends React.Component {
         let data = JSON.parse(interaction.data_json);
 
         this.setState({
-            //interaction_url: interaction.url,
+            interaction_id: interaction.interaction_id,
             assignments: data.assignments,
             instance_url: interaction.instance_url || data.instance_url,
             urls: data.urls || {},

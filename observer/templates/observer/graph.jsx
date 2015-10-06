@@ -44,10 +44,21 @@ class Vertex extends React.Component {
         super(props);
     }
 
+    static defaultProps = {
+        r: 45,
+        clickCallback: Vertex.handleClick
+    };
+
     componentDidMount() {
-        d3.select('g.id'+this.props.index)
+        d3.select('g.id'+this.props.d3Node.index)
             .datum(this.props.d3Node)
             .call(this.props.force.drag);
+    }
+
+    componentWillReceiveProps(newProps) {
+        // force vertex to render on screen.
+        newProps.x = Math.max(this.props.r, Math.min(getWidth() - this.props.r, newProps.x));
+        newProps.y = Math.max(this.props.r, Math.min(getHeight() - this.props.r, newProps.y));
     }
 
     textRows(txt, x) {
@@ -60,17 +71,6 @@ class Vertex extends React.Component {
 
             return <tspan key={i} x={0} dy={20}>{word}</tspan>;
         });
-    }
-
-    static defaultProps = {
-        r: 45,
-        clickCallback: Vertex.handleClick
-    };
-
-    componentWillReceiveProps(newProps) {
-        // force vertex to render on screen.
-        newProps.x = Math.max(this.props.r, Math.min(getWidth() - this.props.r, newProps.x));
-        newProps.y = Math.max(this.props.r, Math.min(getHeight() - this.props.r, newProps.y));
     }
 
     static handleClick = (e) => {
@@ -163,14 +163,16 @@ class InfoPanel extends React.Component {
         radius: NaN,
         diameter: NaN,
         eccentricity: NaN,
-        averageHarmonicCentrality: NaN
+        averageHarmonicCentrality: NaN,
+        maximumClusterSize: NaN
     };
 
     globalContent() {
         var avgPL = this.props.averagePathLength,
             rad = this.props.radius,
             diam = this.props.diameter,
-            avgHC = this.props.averageHarmonicCentrality;
+            avgHC = this.props.averageHarmonicCentrality,
+            cluster = this.props.maximumClusterSize;
         return (
             <div>
                 Average Harmonic Centrality: <strong>{avgHC.toFixed(3)}</strong>
@@ -179,6 +181,9 @@ class InfoPanel extends React.Component {
                 Average Path Length: <strong>{avgPL.toFixed(3)}</strong>
                 <br/>
                 <img width={210} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPEAAAAzCAMAAABxNR6EAAAAOVBMVEX///8JCQkYGBgtLS2KiooMDAxAQEAwMDDMzMx0dHS2trYiIiJiYmLm5uaenp4WFhYEBARQUFAAAAAULKwyAAAAAXRSTlMAQObYZgAABK9JREFUaAXtWelirCoM5p6jCAoqvP/D3gSIrDpOp3ZsT/nhAiEkkOWLMnZV0/wqzjflO/bTTSW7Riw9mOXf0hj2cfjV+BpruhHX3zO+0WFcJMrvGV+0sTdi+3vGNzqMi0R57YyttQu1foU3aONFkn4W22F5hZOyVqbzR9XbIe243bMZrB2M/rhck7Uin92tLXaqoMrn5G8yWIlZbT5wize92r4QZDRJR5C665K+h49D2DPzkv09XOaDBLO1Zb2ZaeekFs9ZOpEv6d59UL4Lphlr5wO2TurhyWg2eI6HjA/WvHposU3PDcs6qZ+1ztnZxGxbEeFqdU7wF5ChdslmDD6ytPtdchpwIUvtsyW6N907a5sONxqlnBtP3rOFQuuWZaRrdS9o1lOTK+MEAOD+ruKeN125gyMSbi8W78aGcTjsylZb3QNm+bu6MRpW33Bl4RK1k9r7+TyyHhUpbLXZbeB4R8rGUikpR4UL7TYP9z79SuvpMiGNdYpiDsw5N2YkunChCEQXmdZbN2M8ZDYFxhDceJzQwvV6lBBIsMvuui89zNTh2uKheAxBMdfrgOecBeHYvfWjxt6N9epdImb0O/gx032VcIVPS25r1gAxXW7uKrzZ6OawXcAANmcKcb5a4LLzPMV4yWCWm6LRjbWXmvZjRTLQRfFMa+pmUpHtDEBpxThC6PsUa34G1nuNCdy39Z/QgMvWg6jGaghMzEVeGEc6KVgnUCEwDLRvaKGbASl5PO6RMjDuI/tsdjKVZ/Dw+gysp580BO5bzDHn1E1wqZhBqTcEIgblt25Fcr2G+EXdms0U0bacrX0M8BGwXuRcD+H0M9TbT5qDSfIhDNCbAn5NGcJQOOMoCCYlbB1ZN0Rv9/jad4vzsD79SRPAvZcovc59FnhhKIpLdDx3xmn2ulbe7xIRTJoSP1ccs3G1OcT6zJ0s5wxt/EnjwX09R/SJdG7YGXJOqHMzUMrpKvJ9gCnBjcemm+Qsn3h7DtZHc6Kgki9V5aVxouybEs6t2FYd8RgOI+belMfxc6cG1knZijcB1h9QpKyjxg7cp0PueeEjtbmTivfwFakigo46C1dUnHFvu7J0k4q00SHZyjEt1C7FAqw/oEj5RY0pxaSjDD6TVa2y1WzG/sukWoawT5+NzEJbtJlWFguw/oAiZRU1pjiajjI63/SeEXzdi09gDs3gogn2J38sKJiILbGqqDFC3Ts3g9HRFyUoZoL9KbAUFGKILbGu76PxglI3v35usH6XAreIWtQYwf2dm/sXAsC1FpNg/T5FqlfU2GHhdKh8fm91EypxoWusEmLuAUWqSvxJQzuVjqa1PSFwKupzusvfPMyAL2v1SgGBHFDEOelPmgIbE9EW5UzAXlsHUbz9XsL6kwIl4L45QzRSf5PwDZ0FrD8pQQru45RY23N/trGoj0Rvfypg/Tl52uDe1faaQ/v7By5QwMei/hzfr6FqwvoHSzfBMsxxtT3cw3hS1D9g+LXDJ2B9IdAeuKfavttyQhOMFty+8yvW9poPw38I2BwMpaL+O2t1JHuo7WWslwi2H836AWPRy6mo/wFKHalgCGBuRf0R9U8Y25DdS0V9vhP/AwS/Ls1k0n5JAAAAAElFTkSuQmCC"/>
+                <br/>
+
+                Maximum Cluster Size: <strong>{cluster}</strong>
                 <br/>
 
                 Diameter: {diam.toFixed(3)}
@@ -288,24 +293,9 @@ class Graph extends React.Component {
     }
 
     setLayout = (e) => {
-        //if (this.state.layout === "cola") {
-        //    Storage.setItem('graph:layout-engine', 'd3');
-        //} else if (this.state.layout === "d3") {
-        //    Storage.setItem('graph:layout-engine', 'cola');
-        //}
     };
 
     componentDidUpdate() {
-        //$('.dropdown-button').dropdown({
-        //        inDuration: 300,
-        //        outDuration: 225,
-        //        constrain_width: true, // Does not change width of dropdown to that of the activator
-        //        hover: true, // Activate on hover
-        //        gutter: 0, // Spacing from edge
-        //        belowOrigin: false, // Displays dropdown below the button
-        //        alignment: 'left' // Displays dropdown with edge aligned to the left of button
-        //    }
-        //);
     }
 
     render() {
@@ -315,9 +305,9 @@ class Graph extends React.Component {
                 width={getWidth()}
                 height={getHeight()}
                 layout={this.state.layout}
-                //data={this.state.graph}
+                data={this.state.graph}
                 //data={graph}
-                data={empty}
+                //data={empty}
                 {...this.props} />
                 </div>;
 
@@ -347,8 +337,8 @@ class GraphApp extends React.Component {
             diameter: NaN,
             radius: NaN,
             harmonicCentrality: NaN,
-            eccentricity: NaN
-
+            eccentricity: NaN,
+            maximumClusterSize: NaN
         };
     }
 
@@ -390,45 +380,46 @@ class GraphApp extends React.Component {
     componentDidMount() {
         this.update();
 
+        // Bind a handler to d3's tick event to update React's representation of d3's state.
+        // d3 does not directly handle the DOM.
         this.state.force.on("tick", (tick, b, c) => {
             if (this.state.playing === false)
                 return;
 
             var q = d3.geom.quadtree(this.state.vertices);
             this.state.vertices.forEach((vertex) => q.visit(this.collide(vertex)));
-
+            // call forceUpdate since we are mutating a property of this.state.
             this.forceUpdate();
         });
 
-
-        window.onbeforeunload = () => {
-            this.props.socket.disconnect();
-        };
-
+        // Bind a resize event handler to resize the SVG element
         $(window).resize(this.resize);
 
+        // Handle messages received over SocketIO
         var m_type = `graph.${this.props.clickerClass}`;
         this.props.socket.on(m_type, message => {
             let data = JSON.parse(message);
             let url = this.props.urls.source;
             console.log(data.graph, url, data);
             if (url === `/api/graph/${data.graph}/`) {
-                if (data.event_type === 'add_vertex') {
+                switch (data.event_type) {
+                case 'add_vertex':
                     this.addVertex({ label: data.label });
-                }
-                if (data.event_type === 'add_edge') {
+                    break;
+                case 'add_edge':
                     this.addEdge({ source: data.source, target: data.target });
-                }
-                if (data.event_type === 'remove_edge') {
+                    break;
+                case 'remove_edge':
                     this.removeEdge({ source: data.source, target: data.target });
-                }
-                if (data.event_type === 'label_vertex') {
+                    break;
+                case 'label_vertex':
                     this.labelVertex({ index: data.index, label: data.label });
+                    break;
                 }
             }
         });
 
-         this.demo4(false);
+         //this.demo4(false);
     }
 
     componentWillUnmount() {
@@ -572,14 +563,10 @@ class GraphApp extends React.Component {
                 radius: this.calculateRadius(),
                 harmonicCentrality: this.calculateHarmonicCentrality(this.state.focussedVertex),
                 eccentricity: this.eccentricity(this.state.focussedVertex),
-                averageHarmonicCentrality: this.calculateAverageHarmonicCentrality()
+                averageHarmonicCentrality: this.calculateAverageHarmonicCentrality(),
+                maximumClusterSize: this.calculateMaximumClusterSize()
             });
         }
-
-        //if (this.state.playing === null)
-        //    this.state.force.start();
-        //else if (this.state.playing)
-        //    this.state.force.resume();
     }
 
     toggleUbiquitousVertex = () => {
@@ -644,20 +631,23 @@ class GraphApp extends React.Component {
         this.update();
     }
 
-    addVertex(vertex, quiet) {
+    getColaConstraints() {
         // https://github.com/tgdwyer/WebCola/blob/master/WebCola/examples/pageBoundsConstraints.html
-        //var constraints = [];
-        //var i = this.state.vertices.length,
-        //    nodeRadius = 45;
-        //constraints.push({ axis: 'x', type: 'separation',
-        //    left: tlIndex, right: i, gap: nodeRadius });
-        //constraints.push({ axis: 'y', type: 'separation',
-        //    left: tlIndex, right: i, gap: nodeRadius });
-        //constraints.push({ axis: 'x', type: 'separation',
-        //    left: i, right: brIndex, gap: nodeRadius });
-        //constraints.push({ axis: 'y', type: 'separation',
-        //    left: i, right: brIndex, gap: nodeRadius });
-        //vertex.constraints = constraints;
+        var constraints = [];
+        var i = this.state.vertices.length,
+            nodeRadius = 45;
+        constraints.push({ axis: 'x', type: 'separation',
+            left: tlIndex, right: i, gap: nodeRadius });
+        constraints.push({ axis: 'y', type: 'separation',
+            left: tlIndex, right: i, gap: nodeRadius });
+        constraints.push({ axis: 'x', type: 'separation',
+            left: i, right: brIndex, gap: nodeRadius });
+        constraints.push({ axis: 'y', type: 'separation',
+            left: i, right: brIndex, gap: nodeRadius });
+        return constraints;
+    }
+
+    addVertex(vertex, quiet) {
         this.state.vertices.push(vertex);
         if (!quiet)
             Materialize.toast(`Added vertex "${vertex.label}"`, 1000, 'green');
@@ -670,8 +660,7 @@ class GraphApp extends React.Component {
         // remove vertex
         Materialize.toast(`Removed vertex "${vertex.label}"`, 1000, 'red');
 
-        // reverse to access most recent element with a given label
-        vertex = this.state.vertices.reverse().filter((v) => {
+        vertex = this.state.vertices.filter((v) => {
             if (!v.deleted && v.label === vertex.label) {
                 return v;
             }
@@ -704,20 +693,28 @@ class GraphApp extends React.Component {
             eccentricity: this.eccentricity(vertex)
         });
 
-        // alert(this.calculateHarmonicCentrality(vertex));
-        //vertex.fixed = true;
         this.state.vertices.forEach(v => v.selected = false);
         vertex.selected = true;
     };
 
+    /**
+     * Performs a breadth-first search on non-deleted vertices.
+     * Applies a .distance and .parent attribute to all vertices in-place,
+     * which can be read after the call to bfs().
+     * @param x The input vertex
+     * @returns {Array} of vertices including {x} that are connected to {x}
+     */
     bfs(x) {
-        this.state.vertices.forEach((v) => {
+        this.nonDeleted().forEach((v) => {
             v.distance = Number.POSITIVE_INFINITY;
             v.parent = null;
         });
-        var queue = [];
+        var queue = [],
+            component = [];
+
         x.distance = 0;
         queue.unshift(x);
+        component.push(x);
 
         while (queue.length) {
             let u = queue.pop();
@@ -730,9 +727,35 @@ class GraphApp extends React.Component {
                     v.distance = u.distance + 1;
                     v.parent = u;
                     queue.unshift(v);
+                    component.push(v);
                 }
             })
         }
+        return component; // array of all connected vertices.
+    }
+
+    getConnectedComponents() {
+        var components = [];
+        var vertices = this.nonDeleted();
+        var indices = vertices.map(v => v.index);
+        var iters = 0;
+        while (indices.length) {
+            console.log(vertices.length, indices.length);
+            iters++; if (iters > 500) break; // avoid infinite recursion...
+
+            var component = this.bfs(vertices[indices[0]]);
+            components.push({
+                component,
+                length: component.length
+            });
+            component.forEach(v => indices.splice(indices.indexOf(v.index), 1));
+        }
+        return components;
+    }
+
+    calculateMaximumClusterSize() {
+        var components = this.getConnectedComponents();
+        return Math.max(...components.map(c => c.length));
     }
 
     calculateHarmonicCentrality(x) {
@@ -740,7 +763,6 @@ class GraphApp extends React.Component {
 
         // H(x) = sum_{y!=x} 1 / d(x, y)
 
-        // creates .distance and .parent attributes on all vertex objects.
         this.bfs(x);
         let sum = 0;
 
@@ -768,6 +790,13 @@ class GraphApp extends React.Component {
         return nodes.length ? sum / nodes.length : NaN;
     }
 
+    /**
+     * Calculate the eccentricity of a vertex.
+     * Eccentricity the the greatest geodesic given a vertex,
+     * i.e. The greatest shortest path.
+     * @param vertex
+     * @returns {*}
+     */
     eccentricity(vertex) {
         if (vertex === null) return NaN;
         this.bfs(vertex);
@@ -778,6 +807,11 @@ class GraphApp extends React.Component {
         }));
     }
 
+    /**
+     * Returns only vertices from {this.state.vertices} that do not
+     * have the {.deleted} property set to a !falsey value.
+     * @returns {Array} vertices that have not yet been deleted.
+     */
     nonDeleted() {
         return this.state.vertices.filter((v) => !v.deleted);
     }
@@ -880,7 +914,8 @@ class GraphApp extends React.Component {
                   radius={this.state.radius}
                   harmonicCentrality={this.state.harmonicCentrality}
                   averageHarmonicCentrality={this.state.averageHarmonicCentrality}
-                  eccentricity={this.state.eccentricity} />
+                  eccentricity={this.state.eccentricity}
+                  maximumClusterSize={this.state.maximumClusterSize} />
               <svg
               style={{border: "0 solid black",
               position: "absolute",
