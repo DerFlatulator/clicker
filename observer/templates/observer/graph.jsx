@@ -577,7 +577,8 @@ class GraphApp extends React.Component {
         } else {
             this.setState({ hasUbiquitousVertex: true });
             let index = this.addVertex(v);
-            this.state.vertices.forEach((vertex) => {
+            console.log(index);
+            this.nonDeleted().forEach((vertex) => {
                if (vertex.label !== v.label) {
                    this.addEdge({ source: index, target: vertex.index },
                                 true);
@@ -712,6 +713,7 @@ class GraphApp extends React.Component {
         var queue = [],
             component = [];
 
+        //console.log('x.distance', x);
         x.distance = 0;
         queue.unshift(x);
         component.push(x);
@@ -736,8 +738,9 @@ class GraphApp extends React.Component {
 
     getConnectedComponents() {
         var components = [];
-        var vertices = this.nonDeleted();
-        var indices = vertices.map(v => v.index);
+        var vertices = this.state.vertices;
+        var indices = this.nonDeleted().map(v => v.index);
+        console.log(indices);
         var iters = 0;
         while (indices.length) {
             console.log(vertices.length, indices.length);
