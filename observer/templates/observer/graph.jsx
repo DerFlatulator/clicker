@@ -152,7 +152,11 @@ class InfoPanel extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            hidden: false,
+            fontSize: 100
         };
+        this.panelWidth = 0;
+        this.panelHeight = 0;
     }
 
     static defaultProps = {
@@ -162,7 +166,32 @@ class InfoPanel extends React.Component {
         diameter: NaN,
         eccentricity: NaN,
         averageHarmonicCentrality: NaN,
-        maximumClusterSize: NaN
+        maximumClusterSize: NaN,
+        fullHeight: 'auto', //250,
+        fullWidth: 'auto'
+    };
+
+    show = () => {
+        this.setState({ hidden: false });
+        // as of React 0.14 refs.panel is a DOM Node. No need for {.getDOMNode()}
+        $(this.refs.panel).fadeIn(1000);
+    };
+
+    hide = () => {
+        this.setState({ hidden: true });
+        $(this.refs.panel).fadeOut(1000);
+    };
+
+    fontPlus = () => {
+        this.setState({
+            fontSize: this.state.fontSize + 10
+        });
+    };
+
+    fontMinus = () => {
+        this.setState({
+            fontSize: this.state.fontSize - 10
+        });
     };
 
     globalContent() {
@@ -178,20 +207,23 @@ class InfoPanel extends React.Component {
 
                 Average Path Length: <strong>{avgPL.toFixed(3)}</strong>
                 <br/>
-                <img width={210} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPEAAAAzCAMAAABxNR6EAAAAOVBMVEX///8JCQkYGBgtLS2KiooMDAxAQEAwMDDMzMx0dHS2trYiIiJiYmLm5uaenp4WFhYEBARQUFAAAAAULKwyAAAAAXRSTlMAQObYZgAABK9JREFUaAXtWelirCoM5p6jCAoqvP/D3gSIrDpOp3ZsT/nhAiEkkOWLMnZV0/wqzjflO/bTTSW7Riw9mOXf0hj2cfjV+BpruhHX3zO+0WFcJMrvGV+0sTdi+3vGNzqMi0R57YyttQu1foU3aONFkn4W22F5hZOyVqbzR9XbIe243bMZrB2M/rhck7Uin92tLXaqoMrn5G8yWIlZbT5wize92r4QZDRJR5C665K+h49D2DPzkv09XOaDBLO1Zb2ZaeekFs9ZOpEv6d59UL4Lphlr5wO2TurhyWg2eI6HjA/WvHposU3PDcs6qZ+1ztnZxGxbEeFqdU7wF5ChdslmDD6ytPtdchpwIUvtsyW6N907a5sONxqlnBtP3rOFQuuWZaRrdS9o1lOTK+MEAOD+ruKeN125gyMSbi8W78aGcTjsylZb3QNm+bu6MRpW33Bl4RK1k9r7+TyyHhUpbLXZbeB4R8rGUikpR4UL7TYP9z79SuvpMiGNdYpiDsw5N2YkunChCEQXmdZbN2M8ZDYFxhDceJzQwvV6lBBIsMvuui89zNTh2uKheAxBMdfrgOecBeHYvfWjxt6N9epdImb0O/gx032VcIVPS25r1gAxXW7uKrzZ6OawXcAANmcKcb5a4LLzPMV4yWCWm6LRjbWXmvZjRTLQRfFMa+pmUpHtDEBpxThC6PsUa34G1nuNCdy39Z/QgMvWg6jGaghMzEVeGEc6KVgnUCEwDLRvaKGbASl5PO6RMjDuI/tsdjKVZ/Dw+gysp580BO5bzDHn1E1wqZhBqTcEIgblt25Fcr2G+EXdms0U0bacrX0M8BGwXuRcD+H0M9TbT5qDSfIhDNCbAn5NGcJQOOMoCCYlbB1ZN0Rv9/jad4vzsD79SRPAvZcovc59FnhhKIpLdDx3xmn2ulbe7xIRTJoSP1ccs3G1OcT6zJ0s5wxt/EnjwX09R/SJdG7YGXJOqHMzUMrpKvJ9gCnBjcemm+Qsn3h7DtZHc6Kgki9V5aVxouybEs6t2FYd8RgOI+belMfxc6cG1knZijcB1h9QpKyjxg7cp0PueeEjtbmTivfwFakigo46C1dUnHFvu7J0k4q00SHZyjEt1C7FAqw/oEj5RY0pxaSjDD6TVa2y1WzG/sukWoawT5+NzEJbtJlWFguw/oAiZRU1pjiajjI63/SeEXzdi09gDs3gogn2J38sKJiILbGqqDFC3Ts3g9HRFyUoZoL9KbAUFGKILbGu76PxglI3v35usH6XAreIWtQYwf2dm/sXAsC1FpNg/T5FqlfU2GHhdKh8fm91EypxoWusEmLuAUWqSvxJQzuVjqa1PSFwKupzusvfPMyAL2v1SgGBHFDEOelPmgIbE9EW5UzAXlsHUbz9XsL6kwIl4L45QzRSf5PwDZ0FrD8pQQru45RY23N/trGoj0Rvfypg/Tl52uDe1faaQ/v7By5QwMei/hzfr6FqwvoHSzfBMsxxtT3cw3hS1D9g+LXDJ2B9IdAeuKfavttyQhOMFty+8yvW9poPw38I2BwMpaL+O2t1JHuo7WWslwi2H836AWPRy6mo/wFKHalgCGBuRf0R9U8Y25DdS0V9vhP/AwS/Ls1k0n5JAAAAAElFTkSuQmCC"/>
+                <img  width={`${2*this.state.fontSize}px`}
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPEAAAAzCAMAAABxNR6EAAAAOVBMVEX///8JCQkYGBgtLS2KiooMDAxAQEAwMDDMzMx0dHS2trYiIiJiYmLm5uaenp4WFhYEBARQUFAAAAAULKwyAAAAAXRSTlMAQObYZgAABK9JREFUaAXtWelirCoM5p6jCAoqvP/D3gSIrDpOp3ZsT/nhAiEkkOWLMnZV0/wqzjflO/bTTSW7Riw9mOXf0hj2cfjV+BpruhHX3zO+0WFcJMrvGV+0sTdi+3vGNzqMi0R57YyttQu1foU3aONFkn4W22F5hZOyVqbzR9XbIe243bMZrB2M/rhck7Uin92tLXaqoMrn5G8yWIlZbT5wize92r4QZDRJR5C665K+h49D2DPzkv09XOaDBLO1Zb2ZaeekFs9ZOpEv6d59UL4Lphlr5wO2TurhyWg2eI6HjA/WvHposU3PDcs6qZ+1ztnZxGxbEeFqdU7wF5ChdslmDD6ytPtdchpwIUvtsyW6N907a5sONxqlnBtP3rOFQuuWZaRrdS9o1lOTK+MEAOD+ruKeN125gyMSbi8W78aGcTjsylZb3QNm+bu6MRpW33Bl4RK1k9r7+TyyHhUpbLXZbeB4R8rGUikpR4UL7TYP9z79SuvpMiGNdYpiDsw5N2YkunChCEQXmdZbN2M8ZDYFxhDceJzQwvV6lBBIsMvuui89zNTh2uKheAxBMdfrgOecBeHYvfWjxt6N9epdImb0O/gx032VcIVPS25r1gAxXW7uKrzZ6OawXcAANmcKcb5a4LLzPMV4yWCWm6LRjbWXmvZjRTLQRfFMa+pmUpHtDEBpxThC6PsUa34G1nuNCdy39Z/QgMvWg6jGaghMzEVeGEc6KVgnUCEwDLRvaKGbASl5PO6RMjDuI/tsdjKVZ/Dw+gysp580BO5bzDHn1E1wqZhBqTcEIgblt25Fcr2G+EXdms0U0bacrX0M8BGwXuRcD+H0M9TbT5qDSfIhDNCbAn5NGcJQOOMoCCYlbB1ZN0Rv9/jad4vzsD79SRPAvZcovc59FnhhKIpLdDx3xmn2ulbe7xIRTJoSP1ccs3G1OcT6zJ0s5wxt/EnjwX09R/SJdG7YGXJOqHMzUMrpKvJ9gCnBjcemm+Qsn3h7DtZHc6Kgki9V5aVxouybEs6t2FYd8RgOI+belMfxc6cG1knZijcB1h9QpKyjxg7cp0PueeEjtbmTivfwFakigo46C1dUnHFvu7J0k4q00SHZyjEt1C7FAqw/oEj5RY0pxaSjDD6TVa2y1WzG/sukWoawT5+NzEJbtJlWFguw/oAiZRU1pjiajjI63/SeEXzdi09gDs3gogn2J38sKJiILbGqqDFC3Ts3g9HRFyUoZoL9KbAUFGKILbGu76PxglI3v35usH6XAreIWtQYwf2dm/sXAsC1FpNg/T5FqlfU2GHhdKh8fm91EypxoWusEmLuAUWqSvxJQzuVjqa1PSFwKupzusvfPMyAL2v1SgGBHFDEOelPmgIbE9EW5UzAXlsHUbz9XsL6kwIl4L45QzRSf5PwDZ0FrD8pQQru45RY23N/trGoj0Rvfypg/Tl52uDe1faaQ/v7By5QwMei/hzfr6FqwvoHSzfBMsxxtT3cw3hS1D9g+LXDJ2B9IdAeuKfavttyQhOMFty+8yvW9poPw38I2BwMpaL+O2t1JHuo7WWslwi2H836AWPRy6mo/wFKHalgCGBuRf0R9U8Y25DdS0V9vhP/AwS/Ls1k0n5JAAAAAElFTkSuQmCC"/>
                 <br/>
 
                 Maximum Cluster Size: <strong>{cluster}</strong>
                 <br/>
 
-                Diameter: {diam.toFixed(3)}
+                Diameter: <strong>{diam.toFixed(3)}</strong>
                 <br/>
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAAAdBAMAAAC9NpSaAAAAMFBMVEX///8iIiJAQEAMDAx0dHTm5uYwMDDMzMyKiopiYmK2traenp4WFhYEBARQUFAAAABMw5L0AAAAAXRSTlMAQObYZgAAAjVJREFUOBG1Uk1oE0EYfdnu7mSzaVJP6kU2qyLecpK2pyVUVFBY8KAXaZCIQYTuqdeEUsFDD6sUT0WWHrXgnoT2YvQg+EMIhWLAgwsVRJC2KGmFovjNZtJN07ruxQffN9987735YQb4/9CccA/ZC4fcp4Q73he6W93xWzIbKwvddHdsJrOpntCpfljsJrNlezK9zCt9qzePH0t7NBkyXx839ua8WGrPPrg2UQVmSz4u/3I2x3h3+TSOAeyRJxeBd8AcagG1pfccL7li1VGreGany/gI3MVz3ls6D7wFcpKhd4AK2A7y3RtyNsQ5aB1MenILN4EbbkBNpU1pDVgZstAANqA28IJa/RiD1uJrZeZf0x2+28SpdDJsUdRsuMBD5F0MPhvZimRTmiiQ8CQF8q9MB3Q6LAAWt9V8hM/WdzdhSxkoMLAFg9T5OqUPFE2kHeAsJh1lV6Z5H4SNpEc05NhPoobrlMYp2tAoVzHk5zorVPVB2IYDVtBwB1doedkgvkJxHBcoj4OdcjcsqiIs/gjWt59OvcmcuJj9sv4bU6vEXZrwwZ97et6jXKRIjKs9ZTroVUlGyReqFB07OZQRoV38h2fzDKTRSLMsynLUOlApJdOmryLbEcOfjNDfikhRzXhA1sKTA8RfG9ptyc0ERKsG/0pJca+qBxIXa42BDxS/whqrp0zTtPXWwAeKtekjMsLd2I4VK9xPpo3r0Ou8t72fiJ8pFRf4zDVH44WHsDrd7ZB2t/UHlXmFbSrrlPgAAAAASUVORK5CYII="/>
+                <img width={`${this.state.fontSize}px`}
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAAAdBAMAAAC9NpSaAAAAMFBMVEX///8iIiJAQEAMDAx0dHTm5uYwMDDMzMyKiopiYmK2traenp4WFhYEBARQUFAAAABMw5L0AAAAAXRSTlMAQObYZgAAAjVJREFUOBG1Uk1oE0EYfdnu7mSzaVJP6kU2qyLecpK2pyVUVFBY8KAXaZCIQYTuqdeEUsFDD6sUT0WWHrXgnoT2YvQg+EMIhWLAgwsVRJC2KGmFovjNZtJN07ruxQffN9987735YQb4/9CccA/ZC4fcp4Q73he6W93xWzIbKwvddHdsJrOpntCpfljsJrNlezK9zCt9qzePH0t7NBkyXx839ua8WGrPPrg2UQVmSz4u/3I2x3h3+TSOAeyRJxeBd8AcagG1pfccL7li1VGreGany/gI3MVz3ls6D7wFcpKhd4AK2A7y3RtyNsQ5aB1MenILN4EbbkBNpU1pDVgZstAANqA28IJa/RiD1uJrZeZf0x2+28SpdDJsUdRsuMBD5F0MPhvZimRTmiiQ8CQF8q9MB3Q6LAAWt9V8hM/WdzdhSxkoMLAFg9T5OqUPFE2kHeAsJh1lV6Z5H4SNpEc05NhPoobrlMYp2tAoVzHk5zorVPVB2IYDVtBwB1doedkgvkJxHBcoj4OdcjcsqiIs/gjWt59OvcmcuJj9sv4bU6vEXZrwwZ97et6jXKRIjKs9ZTroVUlGyReqFB07OZQRoV38h2fzDKTRSLMsynLUOlApJdOmryLbEcOfjNDfikhRzXhA1sKTA8RfG9ptyc0ERKsG/0pJca+qBxIXa42BDxS/whqrp0zTtPXWwAeKtekjMsLd2I4VK9xPpo3r0Ou8t72fiJ8pFRf4zDVH44WHsDrd7ZB2t/UHlXmFbSrrlPgAAAAASUVORK5CYII="/>
+                <br/>
 
+                Radius: <strong>{rad.toFixed(3)}</strong>
                 <br/>
-                Radius: {rad.toFixed(3)}
-                <br/>
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGcAAAAdBAMAAABF1m9tAAAAMFBMVEX///8MDAy2trYWFhYiIiJQUFCenp7m5uYEBARiYmLMzMxAQEAwMDB0dHSKiooAAADOW4UwAAAAAXRSTlMAQObYZgAAAfpJREFUOBG1Us9LG0EU/hLdTXazmwTBg2BxQfRioaVFqIiQqxUkhf4BS09qRdOr0Kb0IlQa1upRYf8AxdgehOZgThUqpqEXsVbYS/GkqAcjVKFvZh3Z0STsxQ9m573vx05edoD7heby9/9qeor6QZaP/dbIybTcRdukXi/7rdglsVFjWNfK90aOOnyL4CZFUW/XJyR2X3QpIPnH3HdFz/fuwtHizEEFK1fRZ8d7W5wb38AooC9ZZhotNrT4Vt4j4etThgxVmHONCh7l8Anxb9hmTPcu8ARQEkW1BqOKibytMz6ATmg15C08QKSMeRJiBXrMAq8iVTyGkgWmA3a/7ID2HimbhRweMtIknNBay8GBVgRe1gulpVBqsOSiRr4FoMpDA34oMBOddCvkkecjrX4kXSQc4MwPBZ53QnGPVHY/CtAAw4PKfqsMEeoQM5k0BXZoDeM3ELFglqmR0HeafXHZ+3Pg4cXnzXal6wuJewc22MddWbYoJLmbN2+E/FcUIfaEfW16HsIsLLGMX0XZgI2h/HOx7t3o435l3BB3i7elDZwDdOkE6BMxBBjeBx5J9qcNIWoFuKal9iPh9DDHNsymxqB4WFGzfNoFummhMat7IyWaaUy1QmfUjAl+0tpq6AySxXeYYvZUOXwotuNAYdO0uuFD3PmaZmqE/5n0dttGfuSvAAAAAElFTkSuQmCC"/>
+                <img width={`${this.state.fontSize}px`}
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGcAAAAdBAMAAABF1m9tAAAAMFBMVEX///8MDAy2trYWFhYiIiJQUFCenp7m5uYEBARiYmLMzMxAQEAwMDB0dHSKiooAAADOW4UwAAAAAXRSTlMAQObYZgAAAfpJREFUOBG1Us9LG0EU/hLdTXazmwTBg2BxQfRioaVFqIiQqxUkhf4BS09qRdOr0Kb0IlQa1upRYf8AxdgehOZgThUqpqEXsVbYS/GkqAcjVKFvZh3Z0STsxQ9m573vx05edoD7heby9/9qeor6QZaP/dbIybTcRdukXi/7rdglsVFjWNfK90aOOnyL4CZFUW/XJyR2X3QpIPnH3HdFz/fuwtHizEEFK1fRZ8d7W5wb38AooC9ZZhotNrT4Vt4j4etThgxVmHONCh7l8Anxb9hmTPcu8ARQEkW1BqOKibytMz6ATmg15C08QKSMeRJiBXrMAq8iVTyGkgWmA3a/7ID2HimbhRweMtIknNBay8GBVgRe1gulpVBqsOSiRr4FoMpDA34oMBOddCvkkecjrX4kXSQc4MwPBZ53QnGPVHY/CtAAw4PKfqsMEeoQM5k0BXZoDeM3ELFglqmR0HeafXHZ+3Pg4cXnzXal6wuJewc22MddWbYoJLmbN2+E/FcUIfaEfW16HsIsLLGMX0XZgI2h/HOx7t3o435l3BB3i7elDZwDdOkE6BMxBBjeBx5J9qcNIWoFuKal9iPh9DDHNsymxqB4WFGzfNoFummhMat7IyWaaUy1QmfUjAl+0tpq6AySxXeYYvZUOXwotuNAYdO0uuFD3PmaZmqE/5n0dttGfuSvAAAAAElFTkSuQmCC"/>
 
             </div>
         );
@@ -200,6 +232,7 @@ class InfoPanel extends React.Component {
     getContent() {
         var hCentrality = this.props.harmonicCentrality.toFixed(3),
             ecc = this.props.eccentricity.toFixed(3);
+
         return (
             <div>
                 Selected: <strong>{this.props.vertex.label}</strong>
@@ -208,11 +241,20 @@ class InfoPanel extends React.Component {
                 Harmonic Centrality: <strong>{hCentrality}</strong>
                 <br />
                 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKMAAAAzCAYAAAD7CrjDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAG30lEQVR42u1dsY/Tvhd//SkDoEwZrFNHT6gSyEOnE0OEmDKgTExMnpiRdX8BQshiZrghMyM6IU83MN1kIWaGGxgsVKGKASEGpPdd6v6SNk7Sq0vdnj9SJI4maWw/v/d5zx+nABG3HsYYzPMcY09E7BVKKUzTFCmlezfG/8XhuL3ekDGG5+fncO/evdghEWGAMRY9Y0RENMaIaIwREdEYI6IxRkREY4yIxhgRsQ2S2AWDsKzBEUJ6T/79+zf8+fMH/v792/q5UgqKohjFbo3YGJxzXBgkCiE2Lg4rpZBzjmmaIgAgYyyodWDGGBJC8OgHUWt9o0YKIVApFUwHLVYoEABu3CYAACklJkmCxpi9t60sSzsxlpOkLMsgnm1pQLbjkyRBxhhWVYUA/1/PTJIEAQAJIU61h5QSpZS47YwNpWOMMct2LzzcjaGUwrIso0pmaGcBgNOYagbZCq21l1Dk6z6+sJiUCABbS662nai3jiO5vJL1mF0ezVeIrXvmELDwaAgAQT3X0YJS6gxFC77USeR9kuGqqoIj/Iv2BcP9jr6U4QpDCyN0knghxC5Uw0ENuJ2QljdHcwmUL1JKOxMXrTUKIZBzvjRazjkKIZwekBASXEhctBEBICYju4L1fIwxzPN87QCATiEmIcTJF40xjfBOKUVKKRpjrAG3hj3G2KD6Xp7nSAgZfGwrKLX9EfnjjtBVALXhaZHggCu5cfGo1esIIQ2v4gr9ZVkG631sITvyxx0gSZJevtiTKTs/axmsQR6lHtJDpTU+yj0t/XjMxzBi7uJ8tbDU2YlDPEStZgeHbIzWc0fPuCO+6OrUIVsakyQZtFxWluXgTDTP805qsC/OaL19mqZBLV0eDV90ZcoLA+01iq6BqRvp6lJiLYlpfa5QVywIIRhXU3bEF13lFZvt9nkAV+Zrw7LWGpVSuJq8dBl5qJ6HUjrIY/9rbCNQ8R1p+8bNRpalzdjwZrPCPM+XodqugFiRQN8AuIreWmvM8xyFECiEQPtKjfrfPRlrUKiVuvbGUds4tw+Biu9o2zW2VoByE2neYA7l635SyuDKOkKIvW96b+PcoQlLgnimPM+9FYEppUGEnDrdSNN068x52wm2SnOsFwqRzuxV7GKM8eI5lFJBlXS01pim6daToyxLH2FpbYBDXSffu9ilqqqtyX1IIcdHCUcptRQub+NZ22q0OxKo+ETvs+10U5CUEh8/fgzT6XTj7xFC4MuXL2E8HgexcYkQgpPJBM7OznrP/f79O/z48QNmsxnM53O4vr4GrTX8+vXLTjL48uXLaBMjPj8/hyzLAABgPp/D1dUVzGazUZ3OvHjxAs7OzkZtHv3du3fw+fNneP36dWMzWJ7nOJ1O4e3bt4OfR2uN79+/X7bt06dPI845ZlkGl5eXrW0jhOCbN2+Acx43onnw0N6OTfiTlLKRqNhVslW+2CVQsec6KgAbZd+7FLtEKx3omXzeb+g2Va01TqdT0FqvRhesqqrhZZIkwW/fvq1Fkqqq8OTkBIqiGKVpis+ePYOqqka2XUVRgDFmcATinKO93k6C09NT+PDhw6j2zCPXhLDnRRygR15NSjrW9LHPsGFFFF3bPrsRd+5LpFxGHF/VfNhYSwI71vQ7kyLO+dp1lNKtDMS32CW+3iRQWA/26NGjxv9fXV3B6enp2vlJkoAxxnm/jx8/rl13fX0NRVHc+BkvLi4GvWHDfhelFKIxHiDPHI/HAADw8OHDRoiczWbw9OnTZcXBfnbnzh2YzWbO+83n84Yx2ud7/vz5jSaJnRiTyaTxfK5k6OfPn3D//v1oGP8avn7KIk3TBh+z22SNMVhVVSN77stWV9VFjLE1vrgmWnCE5WMSuxw9yrL0soRZF5fYgbZbMFYNpq/orZRCxhhyztHyx9XzrWiha9vJMYldbgXX24ew4wYCFaen8q2gCVHscnCwGaD1csaYXnV6XX63GuLs/aSUyDlHxphXEYhLoEIpXQunXe3wLUELTexycJBSon3RlR0cKeVSAGJDVP148OABnpycrG7tbXib+oqK7xdbuQQqhJClMdhfxHJ9r9baq8ImNLHLQaO+0apvL84QYceut922CVSsJ7bf3TUBfHvF0PSVB4uqqhqepisjlFIOkoX9i7djSCmD2XYQd0x67EwbYmrv12mUbxhjyBjDu3fvLv9tD3ut9VZ2U5sdoBD3z+wTcdG6h4MVRQFPnjyBy8tLMMY0ZFt1o51MJk55VFVVeHFxAVmWQZZlMJ/PAQDg1atXwUjkIgJHPSR38cXIiyJ27hVtWLbbDdr4T1mWcWXBV7IYu6Ad4/F4ZN+wIYSAr1+/tobULMviz2h4wn/2uTHgBQDXNgAAAABJRU5ErkJggg=="/>
-
                 <br />
-                Eccentricity: {ecc}
+
+                Eccentricity: <strong>{ecc}</strong>
                 <br/>
-                (&epsilon;(v) = Maximum shortest path from <i>v</i>)
+                &epsilon;(v) = Maximum shortest path from <i>v</i>
+                {/* // Alternate Markup:
+                <dl>
+                    <dt>Selected:</dt> <dd>{this.props.vertex.label}</dd>
+                    <dt>Harmonic Centrality:</dt> <dd>{hCentrality}</dd>
+                    <img src="data:image/png;base64,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"/>
+                    <dt>Eccentricity:</dt> <dd>{ecc}</dd>
+                    &epsilon;(v) = Maximum shortest path from <i>v</i>
+                </dl>
+                */}
             </div>
         );
     }
@@ -223,18 +265,38 @@ class InfoPanel extends React.Component {
 
     render() {
         return (
-            <div className="card-panel"
-                 style={{position: 'absolute',
-            bottom: 50, right: 30,
-            width: 250, height: 'auto',
-            border: '1px solid black',
-            padding: 5,
-            zIndex: 10001,
-            background: 'rgba(255,255,255,0.5)'}}>
-                {this.globalContent()}
-                <hr/>
-                {this.props.vertex && !this.props.vertex.deleted
-                    ? this.getContent() : this.empty()}
+            <div>
+                <div className="card-panel"
+                     ref="panel"
+                     style={{position: 'absolute',
+                             bottom: 50, right: 30,
+                             width: this.props.fullWidth, height: this.props.fullHeight,
+                             border: '1px solid black',
+                             padding: 5,
+                             zIndex: 10001,
+                             fontSize: `${this.state.fontSize}%`,
+                             background: 'rgba(255,255,255,0.5)'}}>
+                    {this.globalContent()}
+                    <hr/>
+                    {this.props.vertex && !this.props.vertex.deleted
+                        ? this.getContent() : this.empty()}
+                </div>
+                <div style={{position: 'absolute',
+                             bottom: 40, right: 40,
+
+                             zIndex: 10001}}>
+                    {this.state.hidden
+                        ? ''
+                        : <span>
+                            <a href="#" onClick={this.fontPlus}>[font +]</a>
+                            &nbsp;
+                            <a href="#" onClick={this.fontMinus}>[font -]</a>
+                          </span>}
+                    &nbsp;
+                    {this.state.hidden
+                        ? <a href="#" onClick={this.show}>[show]</a>
+                        : <a href="#" onClick={this.hide}>[hide]</a>}
+                </div>
             </div>
         );
     }
