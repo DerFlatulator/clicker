@@ -54,6 +54,7 @@
   "browserify-shim": {
     "jquery": "global:$",
     "materialize": "global:Materialize",
-    "react": "global:React"
+    "react": "global:React",
+    "react-dom": "global:ReactDOM"
   }
 }

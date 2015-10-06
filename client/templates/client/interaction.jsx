@@ -3,6 +3,7 @@
 import $ from 'jquery';
 import classNames from 'classnames';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import 'jquery.cookie'; // $.cookie
 import querystring from 'querystring';
 
@@ -341,7 +342,7 @@ let run = function () {
 
     $.getScript(socketURL, function () {
         $(() => {
-            React.render(
+            ReactDOM.render(
                 <Interaction channel={channel}
                              params={qs}
                              clickerClass={$context.class_name}

@@ -15,7 +15,7 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "jquery-legacy": "jquery#1.10",
-    "react": "~0.13.3",
+    "react": "~0.14.0-rc1",
     "materialize": "~0.97.0"
   }
 }

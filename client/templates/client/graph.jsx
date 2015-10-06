@@ -6,6 +6,7 @@
 
 import classNames from 'classnames';
 import Materialize from 'materialize';
+import React from 'react';
 
 class Graph extends React.Component {
     constructor(props) {

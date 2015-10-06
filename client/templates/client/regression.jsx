@@ -5,6 +5,7 @@
  */
 
 import classNames from 'classnames';
+import React from 'react';
 
 class Regression extends React.Component {
     constructor(props) {

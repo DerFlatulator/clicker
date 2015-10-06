@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import classNames from 'classnames';
 
@@ -594,7 +595,7 @@ let run = function () {
         beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
     });
 
-    React.render(
+    ReactDOM.render(
         <CreateGraphRulesApp />,
         document.getElementById('react-main')
     );

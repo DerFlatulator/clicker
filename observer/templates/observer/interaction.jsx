@@ -1,6 +1,7 @@
 "use strict";
 
 import React from "react";
+import ReactDOM from "react-dom";
 import $ from "jquery";
 import 'jquery.cookie'; // $.cookie
 import querystring from 'querystring';
@@ -127,7 +128,7 @@ let run = function () {
     $.getScript(socketURL, () => {
         // Wait for DOM ready before activating React
         $(() => {
-            React.render(
+            ReactDOM.render(
                 <Interaction params={qs}
                              clickerClass={$context.class_name}
                              channel={channel}

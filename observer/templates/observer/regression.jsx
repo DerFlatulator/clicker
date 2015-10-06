@@ -4,6 +4,8 @@
  * :file: /observer/templates/observer/regression
  */
 
+import React from "react";
+
 class Regression extends React.Component {
     constructor(props) {
         super(props);
@@ -12,7 +14,6 @@ class Regression extends React.Component {
             numResponses: 0
         };
     }
-
 
     render() {
         var stage = '';

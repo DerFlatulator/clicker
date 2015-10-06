@@ -7,6 +7,7 @@
 import 'd3';
 import cola from 'webcola';
 import $ from 'jquery';
+import React from 'react';
 
 var color = d3.scale.category20();
 
@@ -45,7 +46,7 @@ class Vertex extends React.Component {
     }
 
     static defaultProps = {
-        r: 45,
+        radius: 45,
         clickCallback: Vertex.handleClick
     };
 
@@ -56,9 +57,6 @@ class Vertex extends React.Component {
     }
 
     componentWillReceiveProps(newProps) {
-        // force vertex to render on screen.
-        newProps.x = Math.max(this.props.r, Math.min(getWidth() - this.props.r, newProps.x));
-        newProps.y = Math.max(this.props.r, Math.min(getHeight() - this.props.r, newProps.y));
     }
 
     textRows(txt, x) {
@@ -92,14 +90,14 @@ class Vertex extends React.Component {
                     cursor: "pointer"
                 }}>
                 <circle
-                  r={this.props.r}
+                  r={this.props.radius}
                   style={{
                     fill: d3.rgb(color(this.props.index)).darker(),
                     stroke: this.props.selected
                     ? "#e00"
                     : this.props.fixed ? "#000" : "#fff",
                     strokeWidth: "1.5px",
-                    opacity: 0.9,
+                    opacity: 0.9
                     //style: 'filter:url(#dropshadow)',
                 }}>
                 </circle>
@@ -388,6 +386,7 @@ class GraphApp extends React.Component {
 
             var q = d3.geom.quadtree(this.state.vertices);
             this.state.vertices.forEach((vertex) => q.visit(this.collide(vertex)));
+            this.state.vertices.forEach((vertex) => this.forceOntoScreen(vertex));
             // call forceUpdate since we are mutating a property of this.state.
             this.forceUpdate();
         });
@@ -424,6 +423,12 @@ class GraphApp extends React.Component {
 
     componentWillUnmount() {
         $(window).off("resize");
+    }
+
+    forceOntoScreen(vertex) {
+        // force vertex to render on screen.
+        vertex.x = Math.max(vertex.radius, Math.min(getWidth() - vertex.radius, vertex.x));
+        vertex.y = Math.max(vertex.radius, Math.min(getHeight() - vertex.radius, vertex.y));
     }
 
     collide(node) {
@@ -550,7 +555,12 @@ class GraphApp extends React.Component {
     }
 
     update() {
-        this.state.vertices.forEach(function (v) { v.width = 200; v.height = 200 });
+        this.state.vertices.forEach(function (v) {
+            v.width = 200;  // width (including margin for collisions)
+            v.height = 200; // height (including margin for collisions)
+            v.radius = 45; // radius to draw
+        });
+
         this.state.force
             .nodes(this.state.vertices)
             .links(this.state.edges)
@@ -603,6 +613,9 @@ class GraphApp extends React.Component {
             svgHeight: getHeight(),
             svgWidth: getWidth()
         });
+        this.state.force
+            .size([this.state.svgWidth, this.state.svgHeight])
+            .resume();
     };
 
     addEdge(edge, quiet) {
@@ -619,7 +632,6 @@ class GraphApp extends React.Component {
                 Materialize.toast(`New edge from "${source.label}" to "${target.label}"`,
                     1000, 'green');
             this.update();
-
         }
 
     }

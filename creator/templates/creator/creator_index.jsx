@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import 'jquery.cookie';
 import classNames from 'classnames';
@@ -86,7 +87,7 @@ let run = function () {
         beforeSend: req => req.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
     });
 
-    React.render(
+    ReactDOM.render(
         <CreatorIndex user={$context.user}
                       classes={$context.classes}
                       date={new Date()}/>,
