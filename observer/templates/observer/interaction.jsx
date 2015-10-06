@@ -54,11 +54,15 @@ class Interaction extends React.Component {
         });
 
         $.ajax({
-            dataType: "script",
-            cache: false, // TODO change this to true
             url: this.state.instance_script_path,
-            error: console.error.bind(console)
-        }).done(this.onGotInstance.bind(this, this.state.instance_component_name));
+            dataType: "script",
+            method: 'GET',
+            cache: false, // TODO change this to true
+            success: this.onGotInstance.bind(this, this.state.instance_component_name),
+            error: (xhr, status, err) => {
+                console.error(xhr, status, err.toString());
+            }
+        });
     }
 
     onGotInstance(component_name) {
@@ -80,7 +84,7 @@ class Interaction extends React.Component {
             instance_component_name: data.instance_component_name,
             instance_loaded: false
         });
-        console.log(interaction);
+        //console.log(interaction);
 
         this.getInstance();
     }

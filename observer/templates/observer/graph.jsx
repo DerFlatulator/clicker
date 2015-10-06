@@ -400,7 +400,7 @@ class GraphApp extends React.Component {
         this.props.socket.on(m_type, message => {
             let data = JSON.parse(message);
             let url = this.props.urls.source;
-            console.log(data.graph, url, data);
+            //console.log(data.graph, url, data);
             if (url === `/api/graph/${data.graph}/`) {
                 switch (data.event_type) {
                 case 'add_vertex':
@@ -577,7 +577,7 @@ class GraphApp extends React.Component {
         } else {
             this.setState({ hasUbiquitousVertex: true });
             let index = this.addVertex(v);
-            console.log(index);
+            //console.log(index);
             this.nonDeleted().forEach((vertex) => {
                if (vertex.label !== v.label) {
                    this.addEdge({ source: index, target: vertex.index },
@@ -598,7 +598,7 @@ class GraphApp extends React.Component {
     };
 
     resize = () => {
-        console.log('size');
+        //console.log('size');
         this.setState({
             svgHeight: getHeight(),
             svgWidth: getWidth()
@@ -743,7 +743,7 @@ class GraphApp extends React.Component {
         console.log(indices);
         var iters = 0;
         while (indices.length) {
-            console.log(vertices.length, indices.length);
+            //console.log(vertices.length, indices.length);
             iters++; if (iters > 500) break; // avoid infinite recursion...
 
             var component = this.bfs(vertices[indices[0]]);
