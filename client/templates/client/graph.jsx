@@ -17,6 +17,7 @@ class Graph extends React.Component {
             loadedAllVertices: false,
             loaded: false,
             vertices: [],
+            edges: [],
             vertex: null,
             vertex_url: props.assignments[props.deviceId].vertices[0]
         };
@@ -165,7 +166,6 @@ class Graph extends React.Component {
             });
             if (!this.state.loaded && this.state.loadedVertex)
                 this.setState({ loaded: true });
-
         });
     };
 
@@ -173,12 +173,14 @@ class Graph extends React.Component {
         this.setState({ buttonEnabled: true });
         this.forceUpdate();
         Materialize.toast("Successfully Updated Label", 3000, "green");
+        this.syncEdges();
     };
 
     submitEdgeDone = () => {
         this.setState({ buttonEnabled: true });
         this.forceUpdate();
         Materialize.toast("Successfully Added an Edge", 3000, "green");
+        this.syncEdges();
     };
 
     render() {
@@ -199,12 +201,29 @@ class Graph extends React.Component {
         $('.select-wrapper').siblings('.caret').remove();
     }
 
+    vertexByURL(url) {
+        var r = this.state.vertices.filter((vertex) => {
+            return vertex.url === url || url.endsWith(vertex.url);
+        });
+        if (!r.length)
+            return {}; // soft error so React doesn't throw an error
+        return r[0];
+    }
+
     renderForm() {
         var btnClasses = classNames({
             'disabled': !this.state.buttonEnabled
         }, 'swapButton', 'waves-effect', 'waves-light', 'btn');
         var vertexLabel = this.state.vertex ? this.state.vertex.label : "?";
         var vertexIndex = this.state.vertex ? this.state.vertex.index : -1;
+        var edges = this.state.edges
+            .map(e => {
+                if (e.source.endsWith(this.state.vertex_url))
+                    return this.vertexByURL(e.target).label;
+                else if (e.target.endsWith(this.state.vertex_url))
+                    return this.vertexByURL(e.source).label;
+            }).filter(e => !!e);
+
         return <form ref='form'>
             <div>
                 <p className='flow-text'>Modify your vertex:</p>
@@ -245,7 +264,10 @@ class Graph extends React.Component {
                     Create Edge
                 </button>
             </div>
-            <div>
+            <div className='col s12 m6'>
+                <p className="flow-text">You are connected to:</p>
+                {edges.length === 0 && <p>No-one. Add some edges!</p>}
+                {edges.map((edge, i) => <p key={i}>&#8226; {edge}</p>)}
             </div>
         </form>;
     }
