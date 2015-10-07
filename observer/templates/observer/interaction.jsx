@@ -104,7 +104,8 @@ class Interaction extends React.Component {
             return (
                 <div className="card-panel">
                     <h4>Observer</h4>
-                    <p className={'flow-text'}>Waiting for interactions to open</p>
+                    <p className={'flow-text'}>Waiting for interactions to open.
+                    Participate at: <code>tinyurl.com/CLKstudent</code></p>
                     <div className="progress">
                         <div className="indeterminate"></div>
                     </div>
