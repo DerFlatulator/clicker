@@ -6,8 +6,9 @@
 
 import 'd3';
 import cola from 'webcola';
-import $ from 'jquery';
 import React from 'react';
+import 'jquery.cookie'; // $.cookie
+import querystring from 'querystring';
 
 var color = d3.scale.category20();
 
@@ -62,12 +63,13 @@ class Vertex extends React.Component {
     textRows(txt, x) {
 
         var lines = txt.split(" ");
-        var offset = -20 * (lines.length-1)/2 + 5;
+        var dy = this.props.radius / 2.25;
+        var offset = -dy * (lines.length-1)/2 + 5;
         return lines.map((word, i) => {
             if (i === 0)
                 return <tspan key={i} x={0} dy={offset}>{word}</tspan>;
 
-            return <tspan key={i} x={0} dy={20}>{word}</tspan>;
+            return <tspan key={i} x={0} dy={dy}>{word}</tspan>;
         });
     }
 
@@ -81,6 +83,7 @@ class Vertex extends React.Component {
 
         var x = this.props.x || 0;
         var y = this.props.y || 0;
+        var fsz = this.props.radius / 3;
 
         return (
             <g transform={`translate(${x},${y})`}
@@ -101,7 +104,7 @@ class Vertex extends React.Component {
                     //style: 'filter:url(#dropshadow)',
                 }}>
                 </circle>
-                <text dy={5} textAnchor="middle" fill= "white">
+                <text dy={5} textAnchor="middle" fill= "white" fontSize={fsz}>
                     {this.textRows(this.props.label, x)}
                 </text>
             </g>
@@ -359,6 +362,9 @@ class Graph extends React.Component {
     }
 
     render() {
+
+        var qs = querystring.parse(window.location.search.substring(1));
+
         if (this.state.loaded) {
             return <div>
                 <GraphApp
@@ -366,6 +372,7 @@ class Graph extends React.Component {
                 height={getHeight()}
                 layout={this.state.layout}
                 data={this.state.graph}
+                radius={qs.radius || 45}
                 //data={graph}
                 //data={empty}
                 {...this.props} />
@@ -403,7 +410,8 @@ class GraphApp extends React.Component {
     }
 
     static defaultProps = {
-        directed: false //  no support for directed graphs just yet
+        directed: false, //  no support for directed graphs just yet
+        radius: 45
     };
 
     componentWillReceiveProps(newProps) {
@@ -617,10 +625,11 @@ class GraphApp extends React.Component {
     }
 
     update() {
-        this.state.vertices.forEach(function (v) {
-            v.width = 200;  // width (including margin for collisions)
-            v.height = 200; // height (including margin for collisions)
-            v.radius = 45; // radius to draw
+        this.state.vertices.forEach((v) => {
+            var padding = Math.pow(this.props.radius, 2)/10;
+            v.width = padding;  // width (including margin for collisions)
+            v.height = padding; // height (including margin for collisions)
+            v.radius = this.props.radius; // radius to draw
         });
 
         this.state.force
